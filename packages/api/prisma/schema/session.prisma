@@ -1,0 +1,21 @@
+model Session {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  ip               String?
+  userAgent        String?  @map("user_agent")
+  jti              String
+  refreshTokenHash String   @map("refresh_token_hash")
+  revoked          Boolean  @default(false)
+  expiresAt        DateTime @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([jti])
+  @@index([userId], map: "sessions_user_idx")
+  @@index([jti], map: "sessions_jti_idx")
+  @@index([revoked], map: "sessions_revoked_idx")
+  @@index([expiresAt], map: "sessions_expires_at_idx")
+  @@map("sessions")
+}

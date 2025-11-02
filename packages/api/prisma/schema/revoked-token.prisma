@@ -1,0 +1,19 @@
+model RevokedToken {
+  id             String   @id @default(uuid()) @db.Uuid
+  jti            String
+  revokedById    String   @map("revoked_by_id") @db.Uuid
+  tokenUserId    String   @map("token_user_id") @db.Uuid
+  tokenExpiresAt DateTime @map("token_expires_at")
+  revokedAt      DateTime @default(now()) @map("revoked_at")
+
+  revoked_by_user User @relation("revoked_by_user", fields: [revokedById], references: [id])
+  token_user      User @relation("token_user", fields: [tokenUserId], references: [id])
+
+  @@unique([jti], map: "revoked_tokens_jti_unique")
+  @@index([revokedById], map: "revoked_tokens_revoked_by_idx")
+  @@index([tokenUserId], map: "revoked_tokens_token_user_idx")
+  @@index([tokenExpiresAt], map: "revoked_tokens_token_expires_at_idx")
+  @@index([revokedAt], map: "revoked_tokens_revoked_at_idx")
+  @@index([tokenUserId, revokedAt(sort: Desc)], map: "revoked_tokens_user_revoked_idx")
+  @@map("revoked_tokens")
+}

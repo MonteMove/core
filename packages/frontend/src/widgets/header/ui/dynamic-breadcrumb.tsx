@@ -1,0 +1,68 @@
+"use client";
+
+import { Fragment } from "react";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/shared/ui/shadcn/breadcrumb";
+import { ROUTER_MAP, ROUTER_TITLES } from "@/shared/utils/constants/router-map";
+
+export function DynamicBreadcrumb() {
+  const pathname = usePathname();
+
+  const segments = pathname.split("/").filter(Boolean);
+  const isDashboard = segments[0] === "dashboard";
+  const subSegments = isDashboard ? segments.slice(1) : segments;
+  const dashboardHref = ROUTER_MAP.DASHBOARD;
+  const dashboardTitle = ROUTER_TITLES[dashboardHref] ?? "Панель управления";
+
+  const items = subSegments.map((segment, index) => {
+    const href = [ROUTER_MAP.DASHBOARD, ...subSegments.slice(0, index + 1)].join("/");
+    const title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
+    const isLast = index === subSegments.length - 1;
+    return { href, title, isLast };
+  });
+
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        {items.length === 0 ? (
+          <BreadcrumbItem>
+            <BreadcrumbPage>{dashboardTitle}</BreadcrumbPage>
+          </BreadcrumbItem>
+        ) : (
+          <Fragment>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={dashboardHref}>{dashboardTitle}</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            {items.map((item, idx) => (
+              <Fragment key={item.href}>
+                <BreadcrumbItem key={item.href}>
+                  {item.isLast ? (
+                    <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link href={item.href}>{item.title}</Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {idx < items.length - 1 && <BreadcrumbSeparator key={`${item.href}-sep`} />}
+              </Fragment>
+            ))}
+          </Fragment>
+        )}
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+}

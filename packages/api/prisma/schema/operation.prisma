@@ -1,0 +1,27 @@
+model Operation {
+  id                String       @id @default(uuid()) @db.Uuid
+  userId            String       @map("user_id") @db.Uuid
+  updatedById       String       @map("updated_by_id") @db.Uuid
+  typeId            String       @map("type_id") @db.Uuid
+  description       String?
+  conversionGroupId Int?         @map("conversion_group_id")
+  applicationId     Int?         @unique
+  application       Application? @relation(fields: [applicationId], references: [id])
+  deleted           Boolean      @default(false)
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
+
+  created_by User             @relation("operations_created_by", fields: [userId], references: [id])
+  updated_by User             @relation("operations_updated_by", fields: [updatedById], references: [id])
+  type       OperationType    @relation(fields: [typeId], references: [id])
+  entries    OperationEntry[]
+  wallet     Wallet[]
+
+  @@index([userId], map: "operations_user_idx")
+  @@index([updatedById], map: "operations_updated_by_idx")
+  @@index([typeId], map: "operations_type_idx")
+  @@index([conversionGroupId], map: "operations_conversion_group_idx")
+  @@index([deleted], map: "operations_deleted_idx")
+  @@index([createdAt], map: "operations_created_at_idx")
+  @@map("operations")
+}

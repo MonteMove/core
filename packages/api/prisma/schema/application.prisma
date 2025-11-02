@@ -1,0 +1,52 @@
+enum ApplicationStatus {
+  open
+  done
+
+  @@map("application_status")
+}
+
+model Application {
+  id               Int               @id @default(autoincrement())
+  userId           String            @map("user_id") @db.Uuid
+  updatedById      String            @map("updated_by_id") @db.Uuid
+  currencyId       String            @map("currency_id") @db.Uuid
+  operationTypeId  String            @map("operation_type_id") @db.Uuid
+  assigneeUserId   String            @map("assignee_user_id") @db.Uuid
+  operationId      String?           @map("operation_id") @db.Uuid
+  status           ApplicationStatus
+  description      String?
+  amount           Int
+  telegramUsername String?           @map("telegram_username")
+  phone            String?
+  deleted          Boolean           @default(false)
+  meetingDate      DateTime          @map("meeting_date")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  created_by     User          @relation("applications_created_by", fields: [userId], references: [id])
+  updated_by     User          @relation("applications_updated_by", fields: [updatedById], references: [id])
+  assignee_user  User          @relation("applications_assignee", fields: [assigneeUserId], references: [id])
+  currency       Currency      @relation(fields: [currencyId], references: [id])
+  operation_type OperationType @relation(fields: [operationTypeId], references: [id])
+
+  operation Operation?
+
+  @@index([userId], map: "applications_user_id_idx")
+  @@index([updatedById], map: "applications_updated_by_id_idx")
+  @@index([assigneeUserId], map: "applications_assignee_user_id_idx")
+  @@index([currencyId], map: "applications_currency_id_idx")
+  @@index([operationTypeId], map: "applications_operation_type_id_idx")
+  @@index([operationId], map: "applications_operation_id_idx")
+  @@index([status], map: "applications_status_idx")
+  @@index([deleted], map: "applications_deleted_idx")
+  @@index([meetingDate], map: "applications_meeting_date_idx")
+  @@index([createdAt], map: "applications_created_at_idx")
+  @@index([updatedAt], map: "applications_updated_at_idx")
+  @@index([amount], map: "applications_amount_idx")
+  @@index([telegramUsername], map: "applications_telegram_username_idx")
+  @@index([phone], map: "applications_phone_idx")
+  @@index([deleted, createdAt(sort: Desc)], map: "applications_deleted_created_idx")
+  @@index([assigneeUserId, status, deleted], map: "applications_assignee_status_deleted_idx")
+  @@index([status, deleted], map: "applications_status_deleted_idx")
+  @@map("applications")
+}

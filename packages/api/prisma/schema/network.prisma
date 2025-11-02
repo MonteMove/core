@@ -1,0 +1,22 @@
+model Network {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  updatedById String   @map("updated_by_id") @db.Uuid
+  code        String
+  name        String
+  deleted     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  created_by     User           @relation("networks_created_by", fields: [userId], references: [id])
+  updated_by     User           @relation("networks_updated_by", fields: [updatedById], references: [id])
+  network_types  NetworkType[]
+  wallet_details WalletDetail[]
+
+  @@unique([code], map: "networks_code_unique")
+  @@index([userId], map: "networks_user_idx")
+  @@index([updatedById], map: "networks_updated_by_idx")
+  @@index([code], map: "networks_code_idx")
+  @@index([deleted], map: "networks_deleted_idx")
+  @@map("networks")
+}

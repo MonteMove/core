@@ -1,0 +1,34 @@
+model WalletDetail {
+  id            String   @id @default(uuid()) @db.Uuid
+  walletId      String   @map("wallet_id") @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  updatedById   String   @map("updated_by_id") @db.Uuid
+  phone         String?
+  card          String?
+  ownerFullName String?  @map("owner_full_name")
+  networkId     String?  @map("network_id") @db.Uuid
+  networkTypeId String?  @map("network_type_id") @db.Uuid
+  address       String?
+  accountId     String?  @map("account_id")
+  username      String?
+  exchangeUid   String?  @map("exchange_uid")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  wallet       Wallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  user         User            @relation("wallet_details_created_by", fields: [userId], references: [id])
+  updated_by   User            @relation("wallet_details_updated_by", fields: [updatedById], references: [id])
+  network      Network?        @relation(fields: [networkId], references: [id])
+  networkType  NetworkType?    @relation(fields: [networkTypeId], references: [id])
+
+  @@unique([walletId], map: "wallet_details_wallet_unique")
+  @@index([userId], map: "wallet_details_user_idx")
+  @@index([updatedById], map: "wallet_details_updated_by_idx")
+  @@index([walletId], map: "wallet_details_wallet_idx")
+  @@index([networkId], map: "wallet_details_network_idx")
+  @@index([networkTypeId], map: "wallet_details_network_type_idx")
+  @@index([phone], map: "wallet_details_phone_idx")
+  @@index([address], map: "wallet_details_address_idx")
+  @@index([accountId], map: "wallet_details_account_id_idx")
+  @@map("wallet_details")
+}

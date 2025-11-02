@@ -1,0 +1,308 @@
+import { z } from "zod";
+
+import { PaginationSchema } from "@/shared/utils/schemas/common-schemas";
+
+const WalletUserSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string(),
+});
+
+const WalletDetailsCategorySchema = z.object({
+  id: z.string().uuid(),
+  code: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+});
+
+const WalletDetailsSimpleEntitySchema = z.object({
+  id: z.string().uuid(),
+  code: z.string(),
+  name: z.string(),
+});
+
+export const WalletDetailsSchema = z
+  .object({
+    id: z.string().uuid(),
+    phone: z.string().nullable().optional(),
+    card: z.string().nullable().optional(),
+    ownerFullName: z.string().nullable().optional(),
+    address: z.string().nullable().optional(),
+    accountId: z.string().nullable().optional(),
+    username: z.string().nullable().optional(),
+    exchangeUid: z.string().nullable().optional(),
+    category: WalletDetailsCategorySchema.nullable().optional(),
+    network: WalletDetailsSimpleEntitySchema.nullable().optional(),
+    networkType: WalletDetailsSimpleEntitySchema.nullable().optional(),
+  })
+  .partial({
+    phone: true,
+    card: true,
+    ownerFullName: true,
+    address: true,
+    accountId: true,
+    username: true,
+    exchangeUid: true,
+    category: true,
+    network: true,
+    networkType: true,
+  });
+
+export const WalletCurrencySchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  code: z.string(),
+});
+
+export const PinnedWalletSchema = z.object({
+  id: z.string().uuid(),
+  user: WalletUserSchema,
+  updatedById: z.string().uuid(),
+  currencyId: z.string().uuid(),
+  name: z.string(),
+  description: z.string().nullable(),
+  amount: z.number(),
+  balanceStatus: z.string(),
+  walletKind: z.string(),
+  walletType: z.string(),
+  active: z.boolean(),
+  pinOnMain: z.boolean(),
+  pinned: z.boolean(),
+  visible: z.boolean(),
+  deleted: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  created_by: WalletUserSchema,
+  updated_by: WalletUserSchema,
+  currency: WalletCurrencySchema,
+  details: WalletDetailsSchema.nullable().optional(),
+});
+
+export const WalletCurrencyGroupSchema = z.object({
+  currency: z.string(),
+  wallets: z.array(PinnedWalletSchema),
+});
+
+export const GetPinnedWalletsResponseSchema = z.object({
+  currencyGroups: z.array(WalletCurrencyGroupSchema),
+  totalWallets: z.number(),
+  totalCurrencies: z.number(),
+});
+
+export const WalletPaginationSchema = PaginationSchema;
+
+export const GetWalletsResponseSchema = z.object({
+  wallets: z.array(PinnedWalletSchema),
+  pagination: WalletPaginationSchema,
+});
+
+export const GetWalletsResponseDtoSchema = GetWalletsResponseSchema;
+
+export enum BalanceStatus {
+  unknown = "unknown",
+  positive = "positive",
+  negative = "negative",
+  neutral = "neutral",
+}
+
+export enum WalletKind {
+  crypto = "crypto",
+  bank = "bank",
+  simple = "simple",
+}
+
+export enum WalletType {
+  inskech = "inskech",
+  bet11 = "bet11",
+  vnj = "vnj",
+}
+
+export enum SortOrder {
+  ASC = "asc",
+  DESC = "desc",
+}
+
+export enum WalletSortField {
+  NAME = "name",
+  AMOUNT = "amount",
+  BALANCE_STATUS = "balanceStatus",
+  WALLET_KIND = "walletKind",
+  WALLET_TYPE = "walletType",
+  ACTIVE = "active",
+  PINNED = "pinned",
+  VISIBLE = "visible",
+  CREATED_AT = "createdAt",
+  UPDATED_AT = "updatedAt",
+}
+
+const optionalTrimmedString = (limit: number, message: string) =>
+  z
+    .string()
+    .max(limit, message)
+    .optional()
+    .transform((value) => {
+      if (typeof value !== "string") {
+        return undefined;
+      }
+
+      const trimmed = value.trim();
+      return trimmed.length ? trimmed : undefined;
+    });
+
+const optionalUuid = (message: string) =>
+  z
+    .union([z.string().uuid(message), z.literal("")])
+    .optional()
+    .transform((value) => {
+      if (typeof value !== "string") {
+        return undefined;
+      }
+
+      const trimmed = value.trim();
+      return trimmed.length ? trimmed : undefined;
+    });
+
+const WalletDetailsCreateSchema = z
+  .object({
+    ownerFullName: optionalTrimmedString(255, "ФИО не должно превышать 255 символов"),
+    card: optionalTrimmedString(64, "Номер карты не должен превышать 64 символов"),
+    phone: optionalTrimmedString(64, "Телефон не должен превышать 64 символов"),
+    address: optionalTrimmedString(512, "Адрес не должен превышать 512 символов"),
+    exchangeUid: optionalTrimmedString(255, "UID биржи не должен превышать 255 символов"),
+    networkId: optionalUuid("Укажите корректный UUID сети"),
+    networkTypeId: optionalUuid("Укажите корректный UUID типа сети"),
+  })
+  .transform((details) => {
+    const entries = Object.entries(details).filter(
+      ([, value]) => value !== undefined && value !== null
+    );
+
+    if (!entries.length) {
+      return undefined;
+    }
+
+    return Object.fromEntries(entries) as Partial<typeof details>;
+  });
+
+export const CreateWalletSchema = z
+  .object({
+    name: z
+      .string({ message: "Название обязательно" })
+      .min(2, "Название должно содержать минимум 2 символа")
+      .max(255, "Название не должно превышать 255 символов"),
+    description: z
+      .string()
+      .max(2000, "Описание не должно превышать 2000 символов")
+      .optional()
+      .transform((value) => {
+        if (!value) {
+          return undefined;
+        }
+        const trimmed = value.trim();
+        return trimmed.length ? trimmed : undefined;
+      }),
+    amount: z.coerce
+      .number({ message: "Сумма должна быть числом" })
+      .int("Сумма должна быть целым числом")
+      .min(0, "Сумма не может быть отрицательной"),
+    balanceStatus: z
+      .enum(BalanceStatus, { message: "Выберите статус баланса" })
+      .default(BalanceStatus.unknown),
+    walletKind: z.enum(WalletKind, { message: "Выберите вид кошелька" }).default(WalletKind.simple),
+    walletType: z.enum(WalletType, { message: "Выберите тип кошелька" }),
+    currencyId: z.string({ message: "Выберите валюту" }).uuid("Укажите корректный UUID"),
+    active: z.boolean().default(true),
+    pinOnMain: z.boolean().default(false),
+    pinned: z.boolean().default(false),
+    visible: z.boolean().default(true),
+    details: WalletDetailsCreateSchema.optional(),
+  })
+  .superRefine((data, ctx) => {
+    const details = data.details ?? {};
+
+    if (data.walletKind === WalletKind.bank) {
+      if (!details.ownerFullName) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["details", "ownerFullName"],
+          message: "Укажите владельца карты",
+        });
+      }
+
+      if (!details.card) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["details", "card"],
+          message: "Укажите номер карты",
+        });
+      }
+    }
+
+    if (data.walletKind === WalletKind.crypto) {
+      if (!details.address) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["details", "address"],
+          message: "Укажите адрес кошелька",
+        });
+      }
+
+      if (!details.networkId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["details", "networkId"],
+          message: "Выберите сеть",
+        });
+      }
+
+      if (!details.networkTypeId) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["details", "networkTypeId"],
+          message: "Выберите тип сети",
+        });
+      }
+    }
+  });
+
+export const GetWalletsFilterSchema = z.object({
+  search: z.string().optional(),
+
+  balanceStatus: z.enum(BalanceStatus).optional(),
+  walletKind: z.enum(WalletKind).optional(),
+  walletType: z.enum(WalletType).optional(),
+
+  minAmount: z.number().int().min(0).optional().nullable(),
+  maxAmount: z.number().int().min(0).optional().nullable(),
+
+  currencyId: z.string().uuid().optional(),
+  userId: z.string().uuid().optional(),
+
+  active: z.boolean().optional(),
+
+  pinned: z.boolean().optional(),
+
+  visible: z.boolean().optional(),
+
+  pinOnMain: z.boolean().optional(),
+
+  deleted: z.boolean().optional(),
+
+  sortField: z.enum(WalletSortField).default(WalletSortField.CREATED_AT).optional(),
+  sortOrder: z.enum(SortOrder).default(SortOrder.DESC).optional(),
+
+  page: z.number().int().min(1).default(1).optional(),
+  limit: z.number().int().min(1).max(100).default(10).optional(),
+});
+
+export type GetWalletsFilter = z.infer<typeof GetWalletsFilterSchema>;
+export type WalletPagination = z.infer<typeof WalletPaginationSchema>;
+export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>;
+export type WalletDetails = z.infer<typeof WalletDetailsSchema>;
+export type WalletCurrency = z.infer<typeof WalletCurrencySchema>;
+export type PinnedWallet = z.infer<typeof PinnedWalletSchema>;
+export type WalletCurrencyGroup = z.infer<typeof WalletCurrencyGroupSchema>;
+export type GetPinnedWalletsResponse = z.infer<typeof GetPinnedWalletsResponseSchema>;
+export type GetWalletsResponseDto = z.infer<typeof GetWalletsResponseDtoSchema>;
+export type WalletDetailsCreate = NonNullable<z.infer<typeof WalletDetailsCreateSchema>>;
+export type CreateWalletRequest = z.infer<typeof CreateWalletSchema>;
+export type CreateWalletFormValues = z.input<typeof CreateWalletSchema>;

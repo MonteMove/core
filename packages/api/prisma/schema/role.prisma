@@ -1,0 +1,24 @@
+enum RoleCode {
+  admin
+  moderator
+  holder
+  courier
+  user
+
+  @@map("role_code")
+}
+
+model Role {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      RoleCode
+  name      String
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@unique([code], map: "roles_code_unique")
+  @@index([createdAt], map: "roles_created_at_idx")
+  @@map("roles")
+}

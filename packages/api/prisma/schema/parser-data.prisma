@@ -1,0 +1,23 @@
+model ParserData {
+  id                          String   @id @default(uuid()) @db.Uuid
+  usdEur                      Decimal? @map("usd_eur") @db.Decimal(18, 6)
+  usdtRub                     Decimal? @map("usdt_rub") @db.Decimal(18, 6)
+  serbiaMultsRsdCoef          Decimal? @map("serbia_mults_rsd_coef") @db.Decimal(18, 6)
+  serbiaMultsEurUsdtCoef      Decimal? @map("serbia_mults_eur_usdt_coef") @db.Decimal(18, 6)
+  additionalSerbiaEurUsdt     Decimal? @map("additional_serbia_eur_usdt") @db.Decimal(18, 6)
+  additionalSerbiaEurRub      Decimal? @map("additional_serbia_eur_rub") @db.Decimal(18, 6)
+  additionalSerbiaRsdUsdt     Decimal? @map("additional_serbia_rsd_usdt") @db.Decimal(18, 6)
+  additionalSerbiaRsdRub      Decimal? @map("additional_serbia_rsd_rub") @db.Decimal(18, 6)
+  montenegroEurUsdt           Decimal? @map("montenegro_eur_usdt") @db.Decimal(18, 6)
+  montenegroMultsEurUsdtCoef  Decimal? @map("montenegro_mults_eur_usdt_coef") @db.Decimal(18, 6)
+  additionalMontenegroRsdUsdt Decimal? @map("additional_montenegro_rsd_usdt") @db.Decimal(18, 6)
+  additionalMontenegroRsdRub  Decimal? @map("additional_montenegro_rsd_rub") @db.Decimal(18, 6)
+  tinkoffCourse               Decimal? @map("tinkoff_course") @db.Decimal(18, 6)
+  usdtTjs                     Decimal? @map("usdt_tjs") @db.Decimal(18, 6)
+  createdAt                   DateTime @default(now()) @map("created_at")
+  updatedAt                   DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt], map: "parser_data_created_at_idx")
+  @@index([updatedAt], map: "parser_data_updated_at_idx")
+  @@map("parser_data")
+}

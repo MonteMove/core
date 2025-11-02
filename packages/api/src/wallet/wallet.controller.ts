@@ -1,0 +1,182 @@
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    HttpStatus,
+    Param,
+    Post,
+    Put,
+    Query,
+    UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+
+import { RoleCode } from '../../prisma/generated/prisma';
+import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { ApiCrudResponses, ApiIdParam, ApiListParams, ApiReadResponses, ApiTag } from '../common';
+import {
+    CreateWalletDto,
+    CreateWalletResponseDto,
+    DeleteWalletResponseDto,
+    GetPinnedWalletsResponseDto,
+    GetWalletsDto,
+    GetWalletsResponseDto,
+    UpdateWalletDto,
+    UpdateWalletResponseDto,
+    WalletResponseDto,
+} from './dto';
+import {
+    CreateWalletUseCase,
+    DeleteWalletUseCase,
+    GetPinnedWalletsUseCase,
+    GetWalletByIdUseCase,
+    GetWalletsUseCase,
+    UpdateWalletUseCase,
+} from './use-cases';
+
+@ApiTag('Wallets', 'Управление кошельками')
+@ApiBearerAuth('access-token')
+@Controller('wallets')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class WalletController {
+    constructor(
+        private readonly createWalletUseCase: CreateWalletUseCase,
+        private readonly getWalletsUseCase: GetWalletsUseCase,
+        private readonly getPinnedWalletsUseCase: GetPinnedWalletsUseCase,
+        private readonly getWalletByIdUseCase: GetWalletByIdUseCase,
+        private readonly updateWalletUseCase: UpdateWalletUseCase,
+        private readonly deleteWalletUseCase: DeleteWalletUseCase,
+    ) {}
+
+    @Get()
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Получить список кошельков',
+        description:
+            'Возвращает список кошельков с поддержкой точного поиска по полям и пагинации. Доступно только администраторам.',
+    })
+    @ApiListParams('Точный поиск по полям кошелька')
+    @ApiResponse({ status: 200, description: 'Список кошельков успешно получен', type: GetWalletsResponseDto })
+    @ApiReadResponses()
+    public async getWallets(@Query() getWalletsDto: GetWalletsDto): Promise<GetWalletsResponseDto> {
+        const result = await this.getWalletsUseCase.execute(getWalletsDto);
+
+        return {
+            wallets: result.wallets,
+            pagination: result.pagination,
+        };
+    }
+
+    @Get('pinned')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Получить закрепленные кошельки',
+        description:
+            'Возвращает кошельки, закрепленные на главной странице, сгруппированные по валютам. Доступно только администраторам.',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Закрепленные кошельки успешно получены',
+        type: GetPinnedWalletsResponseDto,
+    })
+    @ApiReadResponses()
+    public async getPinnedWallets(): Promise<GetPinnedWalletsResponseDto> {
+        const result = await this.getPinnedWalletsUseCase.execute();
+
+        return {
+            currencyGroups: result.currencyGroups,
+            totalWallets: result.totalWallets,
+            totalCurrencies: result.totalCurrencies,
+        };
+    }
+
+    @Get(':id')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Получить кошелек по ID',
+        description: 'Возвращает информацию о конкретном кошельке. Доступно только администраторам.',
+    })
+    @ApiIdParam('Уникальный идентификатор кошелька')
+    @ApiResponse({ status: 200, description: 'Кошелек найден', type: WalletResponseDto })
+    @ApiReadResponses()
+    public async getWalletById(@Param('id') walletId: string): Promise<WalletResponseDto> {
+        const result = await this.getWalletByIdUseCase.execute(walletId);
+
+        return result.wallet;
+    }
+
+    @Post()
+    @HttpCode(HttpStatus.CREATED)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Создать новый кошелек',
+        description: 'Создаёт новый кошелек в системе. Доступно только администраторам.',
+    })
+    @ApiBody({ type: CreateWalletDto })
+    @ApiResponse({ status: 201, description: 'Кошелек успешно создан', type: CreateWalletResponseDto })
+    @ApiCrudResponses()
+    public async createWallet(
+        @Body() createWalletDto: CreateWalletDto,
+        @CurrentUserId() userId: string,
+    ): Promise<CreateWalletResponseDto> {
+        const result = await this.createWalletUseCase.execute(createWalletDto, userId);
+
+        return {
+            message: result.message,
+            wallet: result.wallet,
+        };
+    }
+
+    @Put(':id')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Обновить кошелек',
+        description: 'Обновляет данные существующего кошелька. Доступно только администраторам.',
+    })
+    @ApiIdParam('Уникальный идентификатор кошелька')
+    @ApiBody({ type: UpdateWalletDto })
+    @ApiResponse({ status: 200, description: 'Кошелек успешно обновлен', type: UpdateWalletResponseDto })
+    @ApiCrudResponses()
+    public async updateWallet(
+        @Param('id') walletId: string,
+        @Body() updateWalletDto: UpdateWalletDto,
+        @CurrentUserId() userId: string,
+    ): Promise<UpdateWalletResponseDto> {
+        const result = await this.updateWalletUseCase.execute(walletId, updateWalletDto, userId);
+
+        return {
+            message: result.message,
+            wallet: result.wallet,
+        };
+    }
+
+    @Delete(':id')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Удалить кошелек',
+        description: 'Выполняет мягкое удаление кошелька из системы. Доступно только администраторам.',
+    })
+    @ApiIdParam('Уникальный идентификатор кошелька')
+    @ApiResponse({ status: 200, description: 'Кошелек успешно удален', type: DeleteWalletResponseDto })
+    @ApiReadResponses()
+    public async deleteWallet(
+        @Param('id') walletId: string,
+        @CurrentUserId() userId: string,
+    ): Promise<DeleteWalletResponseDto> {
+        const result = await this.deleteWalletUseCase.execute(walletId, userId);
+
+        return {
+            message: result.message,
+        };
+    }
+}

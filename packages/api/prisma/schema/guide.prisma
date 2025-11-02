@@ -1,0 +1,24 @@
+model Guide {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  updatedById String   @map("updated_by_id") @db.Uuid
+  description String?
+  fullName    String  @map("full_name")
+  phone       String?
+  cardNumber  String?  @map("card_number")
+  birthDate   String?  @map("birth_date")
+  address     String?
+  deleted     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  created_by User @relation("guides_created_by", fields: [userId], references: [id])
+  updated_by User @relation("guides_updated_by", fields: [updatedById], references: [id])
+
+  @@index([userId], map: "guides_user_idx")
+  @@index([updatedById], map: "guides_updated_by_idx")
+  @@index([phone], map: "guides_phone_idx")
+  @@index([address], map: "guides_address_idx")
+  @@index([deleted, createdAt(sort: Desc)], map: "guides_deleted_created_idx")
+  @@map("guides")
+}
