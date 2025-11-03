@@ -8,11 +8,7 @@ export enum UserRole {
 
 export const UserRoleSchema = z.object({
   id: z.string(),
-  code: z.enum([
-    UserRole.ADMIN,
-    UserRole.MODERATOR,
-    UserRole.USER,
-  ]),
+  code: z.enum([UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]),
   name: z.string(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),

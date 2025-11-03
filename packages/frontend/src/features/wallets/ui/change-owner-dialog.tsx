@@ -121,13 +121,14 @@ export const ChangeOwnerDialog = ({
           )}
           {currentOwner && (
             <p className="text-sm text-muted-foreground mt-4">
-              Текущий держатель: <span className="font-medium">{currentOwner.username}</span>
+              Текущий держатель:{' '}
+              <span className="font-medium">{currentOwner.username}</span>
             </p>
           )}
         </div>
         <DialogFooter>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={changeOwnerMutation.isPending}
           >
@@ -136,8 +137,8 @@ export const ChangeOwnerDialog = ({
           <Button
             onClick={handleConfirm}
             disabled={
-              !selectedOwnerId || 
-              selectedOwnerId === currentOwner?.id || 
+              !selectedOwnerId ||
+              selectedOwnerId === currentOwner?.id ||
               changeOwnerMutation.isPending
             }
           >

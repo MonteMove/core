@@ -209,7 +209,11 @@ export default function WalletsPage() {
         }
         onValueChange={(val) => {
           if (val === 'all') {
-            form.reset({ ...baseFilters, walletTypeIdIsNull: true, pinned: false });
+            form.reset({
+              ...baseFilters,
+              walletTypeIdIsNull: true,
+              pinned: false,
+            });
           } else if (val === 'deleted') {
             form.reset({ ...baseFilters, deleted: true });
           } else if (val === 'hidden') {

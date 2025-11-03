@@ -7,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function HelpPage() {
-  return <HelpForm />;
+  return (
+    <div className="max-w-3xl mx-auto">
+      <HelpForm />
+    </div>
+  );
 }

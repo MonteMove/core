@@ -22,39 +22,29 @@ export default function EditCurrencyPage({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-start">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
-          </CardContent>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
       </div>
     );
   }
 
   if (!currency) {
     return (
-      <div className="flex justify-center items-start">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 text-muted-foreground">
-              Валюта не найдена
-            </div>
-          </CardContent>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Валюта не найдена</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center items-start">
-      <Card className="w-full max-w-2xl">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Редактировать валюту
-          </CardTitle>
+          <CardTitle className="text-2xl">Редактировать валюту</CardTitle>
           <CardDescription>Измените данные валюты.</CardDescription>
         </CardHeader>
         <CardContent>

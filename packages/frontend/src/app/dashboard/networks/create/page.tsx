@@ -15,10 +15,10 @@ export const metadata: Metadata = {
 
 export default function CreateNetworkPage() {
   return (
-    <div className="flex justify-center items-start">
-      <Card className="w-full max-w-2xl">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Создать сеть</CardTitle>
+          <CardTitle className="text-2xl">Создать сеть</CardTitle>
           <CardDescription>
             Заполните форму, чтобы добавить новую сеть.
           </CardDescription>

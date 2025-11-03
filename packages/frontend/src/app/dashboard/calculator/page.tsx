@@ -14,7 +14,7 @@ const CalculatorPage = dynamic(
 
 export default function Calculator() {
   return (
-    <div>
+    <div className="max-w-5xl mx-auto space-y-6">
       <CalculatorPage />
     </div>
   );

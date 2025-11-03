@@ -19,20 +19,18 @@ export default function EditApplicationPage() {
 
   if (isLoading)
     return (
-      <div className="items-center justify-center min-h-screen">
-        <Card className="w-full max-w-5xl mx-auto">
-          <CardHeader className="justify-items-center">
-            <CardTitle>Загрузка...</CardTitle>
-          </CardHeader>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
       </div>
     );
   if (error)
     return (
-      <div className="items-center justify-center min-h-screen">
-        <Card className="w-full max-w-5xl mx-auto">
-          <CardHeader className="justify-items-center">
-            <CardTitle>Ошибка загрузки заявки</CardTitle>
+      <div className="max-w-3xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Ошибка загрузки заявки</CardTitle>
             <CardDescription>Ошибка: {error.message}</CardDescription>
           </CardHeader>
         </Card>
@@ -41,20 +39,18 @@ export default function EditApplicationPage() {
 
   if (!application)
     return (
-      <div className="items-center justify-center min-h-screen">
-        <Card className="w-full max-w-5xl mx-auto">
-          <CardHeader className="justify-items-center">
-            <CardTitle>Заявка не найдена</CardTitle>
-          </CardHeader>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Заявка не найдена</p>
+        </div>
       </div>
     );
 
   return (
-    <div className="items-center justify-center min-h-screen">
-      <Card className="w-full max-w-5xl mx-auto">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle>Редактировать заявку</CardTitle>
+          <CardTitle className="text-2xl">Редактировать заявку</CardTitle>
           <CardDescription>Измените все необходимые поля ниже.</CardDescription>
         </CardHeader>
         <CardContent>

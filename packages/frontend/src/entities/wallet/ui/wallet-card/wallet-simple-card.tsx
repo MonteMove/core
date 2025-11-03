@@ -36,8 +36,13 @@ export const SimpleWalletCard = ({ wallet }: SimpleWalletCardProps) => {
   const queryClient = useQueryClient();
 
   const togglePinMutation = useMutation({
-    mutationFn: ({ pinned, pinOnMain }: { pinned: boolean; pinOnMain: boolean }) =>
-      WalletService.toggleWalletPin(wallet.id, pinned, pinOnMain),
+    mutationFn: ({
+      pinned,
+      pinOnMain,
+    }: {
+      pinned: boolean;
+      pinOnMain: boolean;
+    }) => WalletService.toggleWalletPin(wallet.id, pinned, pinOnMain),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
@@ -117,17 +122,24 @@ export const SimpleWalletCard = ({ wallet }: SimpleWalletCardProps) => {
   };
 
   const handleTogglePinned = () => {
-    togglePinMutation.mutate({ pinned: !wallet.pinned, pinOnMain: wallet.pinOnMain });
+    togglePinMutation.mutate({
+      pinned: !wallet.pinned,
+      pinOnMain: wallet.pinOnMain,
+    });
     setMenuOpen(false);
   };
 
   const handleTogglePinOnMain = () => {
-    togglePinMutation.mutate({ pinned: wallet.pinned, pinOnMain: !wallet.pinOnMain });
+    togglePinMutation.mutate({
+      pinned: wallet.pinned,
+      pinOnMain: !wallet.pinOnMain,
+    });
     setMenuOpen(false);
   };
 
   const balanceStatusMutation = useMutation({
-    mutationFn: (status: string) => WalletService.updateBalanceStatus(wallet.id, status),
+    mutationFn: (status: string) =>
+      WalletService.updateBalanceStatus(wallet.id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
@@ -144,12 +156,15 @@ export const SimpleWalletCard = ({ wallet }: SimpleWalletCardProps) => {
   };
 
   const toggleActiveMutation = useMutation({
-    mutationFn: (active: boolean) => WalletService.toggleActive(wallet.id, active),
+    mutationFn: (active: boolean) =>
+      WalletService.toggleActive(wallet.id, active),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success(wallet.active ? 'Кошелек деактивирован' : 'Кошелек активирован');
+      toast.success(
+        wallet.active ? 'Кошелек деактивирован' : 'Кошелек активирован',
+      );
     },
     onError: () => {
       toast.error('Ошибка при изменении статуса');
@@ -163,114 +178,129 @@ export const SimpleWalletCard = ({ wallet }: SimpleWalletCardProps) => {
 
   return (
     <>
-    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-      <DropdownMenuTrigger asChild>
-        <Card
-          role="button"
-          tabIndex={0}
-          onClick={() => setMenuOpen(true)}
-          onKeyDown={handleKeyDown}
-          className={cn(
-            'w-full cursor-pointer',
-            getBorderClass(wallet.balanceStatus),
-            !wallet.active && 'opacity-40',
-          )}
-        >
-          <CardContent className="py-0">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-2 sm:max-w-[70%]">
-                <div className="flex flex-wrap items-center gap-2">
-                  <CardTitle className="text-sm font-semibold sm:text-base">
-                    {wallet.walletType
-                      ? `Касса ${wallet.name}`
-                      : `${getWalletTypeLabel(wallet.walletType)} ${wallet.name}`}
-                  </CardTitle>
-                  <WalletOwner user={wallet.user} />
+      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <Card
+            role="button"
+            tabIndex={0}
+            onClick={() => setMenuOpen(true)}
+            onKeyDown={handleKeyDown}
+            className={cn(
+              'w-full cursor-pointer',
+              getBorderClass(wallet.balanceStatus),
+              !wallet.active && 'opacity-40',
+            )}
+          >
+            <CardContent className="py-0">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-2 sm:max-w-[70%]">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle className="text-sm font-semibold sm:text-base">
+                      {wallet.walletType
+                        ? `Касса ${wallet.name}`
+                        : `${getWalletTypeLabel(wallet.walletType)} ${wallet.name}`}
+                    </CardTitle>
+                    <WalletOwner user={wallet.user} />
+                  </div>
+                  {wallet.description && (
+                    <CardDescription>{wallet.description}</CardDescription>
+                  )}
                 </div>
-                {wallet.description && (
-                  <CardDescription>{wallet.description}</CardDescription>
-                )}
-              </div>
-              <div className="text-left sm:text-right">
-                <p className="text-xl font-bold leading-tight sm:text-2xl">
-                  {wallet.amount.toLocaleString()} {wallet.currency.code}
-                </p>
-                <div className="mt-2 space-y-1">
-                  <p className="text-xs text-muted-foreground">
-                    Создан: {formatDate(new Date(wallet.createdAt))}
+                <div className="text-left sm:text-right">
+                  <p className="text-xl font-bold leading-tight sm:text-2xl">
+                    {wallet.amount.toLocaleString()} {wallet.currency.code}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    Обновлен: {formatDate(new Date(wallet.updatedAt))}
-                  </p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      Создан: {formatDate(new Date(wallet.createdAt))}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Обновлен: {formatDate(new Date(wallet.updatedAt))}
+                    </p>
+                  </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="center" className="z-50 w-56">
+          <div className="px-2 py-1.5">
+            <div className="text-xs text-muted-foreground mb-2">
+              Статус баланса:
             </div>
-          </CardContent>
-        </Card>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" className="z-50 w-56">
-        <div className="px-2 py-1.5">
-          <div className="text-xs text-muted-foreground mb-2">Статус баланса:</div>
-          <div className="flex gap-2 justify-center">
-            <button
-              onClick={() => handleBalanceStatusChange('unknown')}
-              className={cn(
-                'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
-                wallet.balanceStatus === 'unknown' ? 'border-slate-800 bg-white' : 'border-slate-300 bg-white'
-              )}
-              title="Без цвета"
-            />
-            <button
-              onClick={() => handleBalanceStatusChange('negative')}
-              className={cn(
-                'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
-                wallet.balanceStatus === 'negative' ? 'border-red-800 bg-red-500' : 'border-red-300 bg-red-500'
-              )}
-              title="Красный"
-            />
-            <button
-              onClick={() => handleBalanceStatusChange('positive')}
-              className={cn(
-                'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
-                wallet.balanceStatus === 'positive' ? 'border-emerald-800 bg-emerald-500' : 'border-emerald-300 bg-emerald-500'
-              )}
-              title="Зеленый"
-            />
-            <button
-              onClick={() => handleBalanceStatusChange('neutral')}
-              className={cn(
-                'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
-                wallet.balanceStatus === 'neutral' ? 'border-slate-800 bg-slate-500' : 'border-slate-300 bg-slate-500'
-              )}
-              title="Серый"
-            />
+            <div className="flex gap-2 justify-center">
+              <button
+                onClick={() => handleBalanceStatusChange('unknown')}
+                className={cn(
+                  'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
+                  wallet.balanceStatus === 'unknown'
+                    ? 'border-slate-800 bg-white'
+                    : 'border-slate-300 bg-white',
+                )}
+                title="Без цвета"
+              />
+              <button
+                onClick={() => handleBalanceStatusChange('negative')}
+                className={cn(
+                  'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
+                  wallet.balanceStatus === 'negative'
+                    ? 'border-red-800 bg-red-500'
+                    : 'border-red-300 bg-red-500',
+                )}
+                title="Красный"
+              />
+              <button
+                onClick={() => handleBalanceStatusChange('positive')}
+                className={cn(
+                  'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
+                  wallet.balanceStatus === 'positive'
+                    ? 'border-emerald-800 bg-emerald-500'
+                    : 'border-emerald-300 bg-emerald-500',
+                )}
+                title="Зеленый"
+              />
+              <button
+                onClick={() => handleBalanceStatusChange('neutral')}
+                className={cn(
+                  'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
+                  wallet.balanceStatus === 'neutral'
+                    ? 'border-slate-800 bg-slate-500'
+                    : 'border-slate-300 bg-slate-500',
+                )}
+                title="Серый"
+              />
+            </div>
           </div>
-        </div>
-        <DropdownMenuItem onSelect={handleEdit}>Редактировать</DropdownMenuItem>
-        <DropdownMenuItem onSelect={handleChangeOwner}>
-          Держатель
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={handleToggleActive}>
-          {wallet.active ? 'Деактивировать' : 'Активировать'}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={handleTogglePinned}>
-          {wallet.pinned ? 'Открепить' : 'Закрепить'}
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={handleTogglePinOnMain}>
-          {wallet.pinOnMain ? 'Открепить с главной' : 'Закрепить на главной'}
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive" onSelect={handleDelete}>
-          Удалить
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-    <ChangeOwnerDialog
-      open={changeOwnerDialogOpen}
-      onOpenChange={setChangeOwnerDialogOpen}
-      walletId={wallet.id}
-      walletName={wallet.name}
-      currentOwner={wallet.user}
-    />
+          <DropdownMenuItem onSelect={handleEdit}>
+            Редактировать
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleChangeOwner}>
+            Держатель
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleToggleActive}>
+            {wallet.active ? 'Деактивировать' : 'Активировать'}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleTogglePinned}>
+            {wallet.pinned ? 'Открепить' : 'Закрепить'}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleTogglePinOnMain}>
+            {wallet.pinOnMain ? 'Открепить с главной' : 'Закрепить на главной'}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-destructive"
+            onSelect={handleDelete}
+          >
+            Удалить
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <ChangeOwnerDialog
+        open={changeOwnerDialogOpen}
+        onOpenChange={setChangeOwnerDialogOpen}
+        walletId={wallet.id}
+        walletName={wallet.name}
+        currentOwner={wallet.user}
+      />
     </>
   );
 };

@@ -9,10 +9,10 @@ import {
 
 export default function CreateGuidePage() {
   return (
-    <div className="items-center justify-center min-h-screen ">
-      <Card className="w-full max-w-5xl mx-auto">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle>Создать справочник</CardTitle>
+          <CardTitle className="text-2xl">Создать справочник</CardTitle>
           <CardDescription>
             Заполните все необходимые поля ниже.
           </CardDescription>

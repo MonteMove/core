@@ -25,7 +25,7 @@ export default function UsersPage() {
   if (isError) return router.push(ROUTER_MAP.ERROR);
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-5xl mx-auto space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Пользователи</CardTitle>
@@ -34,7 +34,7 @@ export default function UsersPage() {
           <UsersFilters />
         </CardContent>
       </Card>
-      
+
       <UsersTable />
     </div>
   );

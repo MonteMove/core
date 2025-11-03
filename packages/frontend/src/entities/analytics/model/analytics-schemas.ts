@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-// TODO:Поменять схему на актуальную
 export const AnalyticsItemResponseSchema = z.object({
   month: z.string(),
-  desktop: z.number(),
-  mobile: z.number(),
+  incoming: z.number(),
+  outgoing: z.number(),
+  transactions: z.number(),
 });
 
 export type AnalyticsItemResponse = z.infer<typeof AnalyticsItemResponseSchema>;

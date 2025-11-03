@@ -9,12 +9,10 @@ import {
 
 export default function CreateUserPage() {
   return (
-    <div className="flex justify-center items-center">
-      <Card className="w-full max-w-3xl">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Создать пользователя
-          </CardTitle>
+          <CardTitle className="text-2xl">Создать пользователя</CardTitle>
           <CardDescription>
             Введите данные, чтобы добавить нового пользователя
           </CardDescription>

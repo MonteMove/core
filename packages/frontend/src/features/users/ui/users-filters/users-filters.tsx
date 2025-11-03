@@ -54,7 +54,6 @@ export const UsersFilters = () => {
     [],
   );
   const [filters, setFilters] = useState<UsersFiltersState>(defaults);
-  const [showFilters, setShowFilters] = useState<boolean>(true);
 
   useEffect(() => {
     setAllQueryParams(filters);
@@ -71,189 +70,175 @@ export const UsersFilters = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 justify-end">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label>Поиск</Label>
+          <Input
+            value={filters.search ?? ''}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                search: e.target.value || undefined,
+              }))
+            }
+            placeholder="Введите имя"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>Telegram ID</Label>
+          <Input
+            value={filters.telegramId ?? ''}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                telegramId: e.target.value || undefined,
+              }))
+            }
+            placeholder="Введите Telegram ID"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>Роли</Label>
+          <Select
+            value={filters.roleCode ?? ''}
+            onValueChange={(val) =>
+              setFilters((prev) => ({
+                ...prev,
+                roleCode: val
+                  ? (val as UsersFiltersState['roleCode'])
+                  : undefined,
+              }))
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Все" />
+            </SelectTrigger>
+            <SelectContent>
+              {USER_ROLES.map((r) => (
+                <SelectItem key={r.value} value={r.value}>
+                  {r.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="flex flex-col gap-2">
+          <Label>Сортировать по</Label>
+          <Select
+            value={filters.sortField ?? ''}
+            onValueChange={(val) =>
+              setFilters((prev) => ({
+                ...prev,
+                sortField: val
+                  ? (val as UsersFiltersState['sortField'])
+                  : undefined,
+              }))
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Все" />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_FIELDS.map((f) => (
+                <SelectItem key={f.value} value={String(f.value)}>
+                  {f.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label>Порядок сортировки</Label>
+          <Select
+            value={filters.sortOrder ?? ''}
+            onValueChange={(val) =>
+              setFilters((prev) => ({
+                ...prev,
+                sortOrder: val
+                  ? (val as UsersFiltersState['sortOrder'])
+                  : undefined,
+              }))
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Все" />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_ORDERS.map((o) => (
+                <SelectItem key={o.value} value={String(o.value)}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center gap-2 border rounded-md p-3">
+            <Switch
+              checked={!!filters.isHolder}
+              onCheckedChange={(checked: boolean) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  isHolder: checked ? true : undefined,
+                }))
+              }
+            />
+            <Label className="text-sm font-medium">Держатели</Label>
+          </div>
+
+          <div className="flex items-center gap-2 border rounded-md p-3">
+            <Switch
+              checked={!!filters.isCourier}
+              onCheckedChange={(checked: boolean) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  isCourier: checked ? true : undefined,
+                }))
+              }
+            />
+            <Label className="text-sm font-medium">Курьеры</Label>
+          </div>
+
+          <div className="flex items-center gap-2 border rounded-md p-3">
+            <Switch
+              checked={!!filters.blocked}
+              onCheckedChange={(checked: boolean) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  blocked: checked ? true : undefined,
+                }))
+              }
+            />
+            <Label className="text-sm font-medium">Заблокированные</Label>
+          </div>
+
+          <div className="flex items-center gap-2 border rounded-md p-3">
+            <Switch
+              checked={!!filters.telegramNotifications}
+              onCheckedChange={(checked: boolean) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  telegramNotifications: checked ? true : undefined,
+                }))
+              }
+            />
+            <Label className="text-sm font-medium">Telegram уведомления</Label>
+          </div>
+        </div>
+
         <Button variant="outline" onClick={resetFilters}>
           Сбросить
         </Button>
-        <Button
-          variant="outline"
-          onClick={() => setShowFilters((prev) => !prev)}
-        >
-          {showFilters ? 'Скрыть фильтры' : 'Показать фильтры'}
-        </Button>
       </div>
-
-      {showFilters && (
-        <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col gap-2">
-              <Label>Поиск:</Label>
-              <Input
-                value={filters.search ?? ''}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    search: e.target.value || undefined,
-                  }))
-                }
-                placeholder="Введите имя"
-                className="w-full"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label>Telegram ID:</Label>
-                <Input
-                  value={filters.telegramId ?? ''}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      telegramId: e.target.value || undefined,
-                    }))
-                  }
-                  placeholder="Введите Telegram ID"
-                  className="w-full"
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Сортировать по:</Label>
-                <Select
-                  value={filters.sortField ?? ''}
-                  onValueChange={(val) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      sortField: val
-                        ? (val as UsersFiltersState['sortField'])
-                        : undefined,
-                    }))
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Все" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SORT_FIELDS.map((f) => (
-                      <SelectItem key={f.value} value={String(f.value)}>
-                        {f.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
-            <div className="flex flex-col gap-2">
-              <Label>Порядок по:</Label>
-              <Select
-                value={filters.sortOrder ?? ''}
-                onValueChange={(val) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    sortOrder: val
-                      ? (val as UsersFiltersState['sortOrder'])
-                      : undefined,
-                  }))
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Все" />
-                </SelectTrigger>
-                <SelectContent>
-                  {SORT_ORDERS.map((o) => (
-                    <SelectItem key={o.value} value={String(o.value)}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label>Роли:</Label>
-              <Select
-                value={filters.roleCode ?? ''}
-                onValueChange={(val) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    roleCode: val
-                      ? (val as UsersFiltersState['roleCode'])
-                      : undefined,
-                  }))
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Все" />
-                </SelectTrigger>
-                <SelectContent>
-                  {USER_ROLES.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex flex-wrap gap-4 mt-5">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={!!filters.isHolder}
-                  onCheckedChange={(checked: boolean) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      isHolder: checked ? true : undefined,
-                    }))
-                  }
-                />
-                <Label className="font-medium">Держатели</Label>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={!!filters.isCourier}
-                  onCheckedChange={(checked: boolean) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      isCourier: checked ? true : undefined,
-                    }))
-                  }
-                />
-                <Label className="font-medium">Курьеры</Label>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={!!filters.blocked}
-                  onCheckedChange={(checked: boolean) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      blocked: checked ? true : undefined,
-                    }))
-                  }
-                />
-                <Label className="font-medium">Заблокированные</Label>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={!!filters.telegramNotifications}
-                  onCheckedChange={(checked: boolean) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      telegramNotifications: checked ? true : undefined,
-                    }))
-                  }
-                />
-                <Label className="font-medium">Telegram уведомления</Label>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };

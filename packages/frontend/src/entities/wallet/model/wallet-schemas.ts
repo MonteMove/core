@@ -310,7 +310,7 @@ export const GetWalletsFilterSchema = z.object({
   balanceStatus: z.enum(BalanceStatus).optional(),
   walletKind: z.enum(WalletKind).optional(),
   walletTypeId: z.string().uuid().optional(),
-  
+
   walletTypeIdIsNull: z.boolean().optional(),
 
   minAmount: z.number().int().min(0).optional().nullable(),

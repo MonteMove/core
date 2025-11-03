@@ -26,7 +26,7 @@ export const GuidesPageContent = () => {
   };
   return (
     <Fragment>
-      <Card className="text-foreground">
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Список справочников</CardTitle>
         </CardHeader>

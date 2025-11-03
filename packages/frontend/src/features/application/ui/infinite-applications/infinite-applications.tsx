@@ -62,19 +62,14 @@ export const InfiniteApplicationsList = () => {
     <Fragment>
       {isLoading ? (
         [...Array(10)].map((_, i) => (
-          <Card
-            key={i}
-            className="w-full h-full p-0 min-h-32 max-w-5xl mx-auto my-4"
-          >
+          <Card key={i} className="w-full h-full p-0 min-h-32">
             <Skeleton className="w-full h-full min-h-32 rounded-xl min-w-full" />
           </Card>
         ))
       ) : applications.length === 0 ? (
-        <Card className="w-full max-w-5xl mx-auto px-2 my-4  min-[500px]:px-5">
-          <CardContent className="text-center py-8 ">
-            Заявки не найдены
-          </CardContent>
-        </Card>
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Заявки не найдены</p>
+        </div>
       ) : (
         applications.map((app, index) => {
           const isLast = index === applications.length - 1;

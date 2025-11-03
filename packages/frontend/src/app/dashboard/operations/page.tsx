@@ -111,18 +111,17 @@ export default function OperationsPage() {
 
   return (
     <Form {...form}>
-      <form className="space-y-4">
+      <form className="max-w-5xl mx-auto space-y-6">
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl">Операции</CardTitle>
-              <Button
-                type="button"
-                onClick={() => router.push(ROUTER_MAP.OPERATIONS_CREATE)}
-              >
-                Создать операцию
-              </Button>
-            </div>
+          <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <CardTitle className="text-2xl">Операции</CardTitle>
+            <Button
+              type="button"
+              onClick={() => router.push(ROUTER_MAP.OPERATIONS_CREATE)}
+              className="md:w-auto"
+            >
+              Создать операцию
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
@@ -372,205 +371,206 @@ export default function OperationsPage() {
         </Tabs>
 
         <div className="space-y-2">
-            <div className="">
-              {isLoading ? (
-                <div className="flex flex-col gap-2">
-                  {new Array(5).fill(null).map((_, i) => (
-                    <Card key={i} className="h-[176] w-full p-0">
-                      <Skeleton className="h-[176] w-full"></Skeleton>
-                    </Card>
-                  ))}
-                </div>
-              ) : error ? (
-                <div className="justify-items-center">
-                  <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
-                    {/* <p className="text-destructive">Ошибка при загрузке: {error.message}</p> */}
+          <div className="">
+            {isLoading ? (
+              <div className="flex flex-col gap-2">
+                {new Array(5).fill(null).map((_, i) => (
+                  <Card key={i} className="h-[176] w-full p-0">
+                    <Skeleton className="h-[176] w-full"></Skeleton>
                   </Card>
-                </div>
-              ) : !data?.pages[0]?.operations.length ? (
-                <div className="justify-items-center">
-                  <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
-                    <strong>Операции не найдены.</strong>
-                  </Card>
-                </div>
-              ) : (
-                <div>
-                  {data?.pages.map((page, pageIndex) => (
-                    <Fragment key={pageIndex}>
-                      {page.operations
-                        .filter((operation) =>
-                          activeTab === 'deposit'
-                            ? operation.type.name
-                                .toLowerCase()
-                                .includes('попол')
-                            : true,
-                        )
-                        .map((operation, operationIndex) => {
-                          const isLast =
-                            pageIndex === data.pages.length - 1 &&
-                            operationIndex === page.operations.length - 1;
+                ))}
+              </div>
+            ) : error ? (
+              <div className="justify-items-center">
+                <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
+                  {/* <p className="text-destructive">Ошибка при загрузке: {error.message}</p> */}
+                </Card>
+              </div>
+            ) : !data?.pages[0]?.operations.length ? (
+              <div className="justify-items-center">
+                <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
+                  <strong>Операции не найдены.</strong>
+                </Card>
+              </div>
+            ) : (
+              <div>
+                {data?.pages.map((page, pageIndex) => (
+                  <Fragment key={pageIndex}>
+                    {page.operations
+                      .filter((operation) =>
+                        activeTab === 'deposit'
+                          ? operation.type.name.toLowerCase().includes('попол')
+                          : true,
+                      )
+                      .map((operation, operationIndex) => {
+                        const isLast =
+                          pageIndex === data.pages.length - 1 &&
+                          operationIndex === page.operations.length - 1;
 
-                          const showDetails = expandedIds.includes(operation.id);
+                        const showDetails = expandedIds.includes(operation.id);
 
-                          return (
-                            <DropdownMenu key={operation.id}>
-                              <DropdownMenuTrigger asChild>
-                                <Card
-                                  ref={isLast ? lastOperationRef : null}
-                                  className="relative cursor-pointer hover:bg-accent/50 transition-colors mb-2"
-                                  onTouchStart={(e) => {
-                                    const timer = setTimeout(() => {
-                                      e.currentTarget.click();
-                                    }, 600);
-                                    const cancel = () => clearTimeout(timer);
-                                    e.currentTarget.addEventListener(
-                                      'touchend',
-                                      cancel,
-                                      {
-                                        once: true,
-                                      },
-                                    );
-                                    e.currentTarget.addEventListener(
-                                      'touchmove',
-                                      cancel,
-                                      {
-                                        once: true,
-                                      },
-                                    );
-                                  }}
-                                >
-                                  <CardContent className="py-0">
-                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                      <div className="space-y-2 flex-1">
-                                        <div className="flex items-center gap-2">
-                                          <p className="font-semibold">
-                                            {operation.type.name}
-                                          </p>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">
-                                          {operation.created_by?.username}
-                                        </p>
-
-                                        <div className="space-y-1.5">
-                                          {operation.entries.map((entry) => (
-                                            <div
-                                              key={entry.id}
-                                              className="p-2 rounded-md bg-muted/50"
-                                            >
-                                              {showDetails ? (
-                                                <p className="text-sm">
-                                                  <span className="font-medium">
-                                                    {entry.wallet.name}:{' '}
-                                                  </span>
-                                                  {entry.direction === 'credit' ? (
-                                                    <>
-                                                      <span className="text-muted-foreground">
-                                                        {entry.before} +{' '}
-                                                      </span>
-                                                      <span className="text-emerald-600 font-semibold">
-                                                        {entry.amount}
-                                                      </span>
-                                                      <span className="text-muted-foreground">
-                                                        {' '}= {entry.after}
-                                                      </span>
-                                                    </>
-                                                  ) : (
-                                                    <>
-                                                      <span className="text-muted-foreground">
-                                                        {entry.before} -{' '}
-                                                      </span>
-                                                      <span className="text-red-600 font-semibold">
-                                                        {entry.amount}
-                                                      </span>
-                                                      <span className="text-muted-foreground">
-                                                        {' '}= {entry.after}
-                                                      </span>
-                                                    </>
-                                                  )}
-                                                </p>
-                                              ) : (
-                                                <p className="text-sm">
-                                                  <span className="font-medium">
-                                                    {entry.wallet.name}:{' '}
-                                                  </span>
-                                                  <span>{entry.after}</span>
-                                                </p>
-                                              )}
-                                            </div>
-                                          ))}
-                                        </div>
-
-                                        {operation.description && (
-                                          <p className="text-sm text-muted-foreground">
-                                            {operation.description}
-                                          </p>
-                                        )}
-                                      </div>
-
-                                      <div className="text-left sm:text-right">
-                                        <p className="text-sm text-muted-foreground">
-                                          {operation.createdAt}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              </DropdownMenuTrigger>
-
-                              <DropdownMenuContent
-                                align="center"
-                                className="w-40 bg-background shadow-md rounded-md text-foreground"
+                        return (
+                          <DropdownMenu key={operation.id}>
+                            <DropdownMenuTrigger asChild>
+                              <Card
+                                ref={isLast ? lastOperationRef : null}
+                                className="relative cursor-pointer hover:bg-accent/50 transition-colors mb-2"
+                                onTouchStart={(e) => {
+                                  const timer = setTimeout(() => {
+                                    e.currentTarget.click();
+                                  }, 600);
+                                  const cancel = () => clearTimeout(timer);
+                                  e.currentTarget.addEventListener(
+                                    'touchend',
+                                    cancel,
+                                    {
+                                      once: true,
+                                    },
+                                  );
+                                  e.currentTarget.addEventListener(
+                                    'touchmove',
+                                    cancel,
+                                    {
+                                      once: true,
+                                    },
+                                  );
+                                }}
                               >
-                                <DropdownMenuItem
-                                  className="hover:bg-primary/60 dark:hover:bg-primary/60"
-                                  onClick={() =>
-                                    router.push(
-                                      ROUTER_MAP.OPERATIONS_EDIT +
-                                        '/' +
-                                        operation.id,
-                                    )
-                                  }
-                                >
-                                  <Pencil className="mr-2 h-4 w-4 text-primary" />{' '}
-                                  Редактировать
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="hover:bg-primary/60 dark:hover:bg-primary/60"
-                                  onClick={() =>
-                                    setExpandedIds((prev) =>
-                                      prev.includes(operation.id)
-                                        ? prev.filter(id => id !== operation.id)
-                                        : [...prev, operation.id],
-                                    )
-                                  }
-                                >
-                                  <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                                  {showDetails ? 'Скрыть' : 'Подробнее'}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="hover:bg-primary/60 dark:hover:bg-primary/60"
-                                  onClick={() => copyOperation(operation)}
-                                >
-                                  <Copy className="mr-2 h-4 w-4 text-primary" />{' '}
-                                  Копировать
-                                </DropdownMenuItem>
+                                <CardContent className="py-0">
+                                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                    <div className="space-y-2 flex-1">
+                                      <div className="flex items-center gap-2">
+                                        <p className="font-semibold">
+                                          {operation.type.name}
+                                        </p>
+                                      </div>
+                                      <p className="text-sm text-muted-foreground">
+                                        {operation.created_by?.username}
+                                      </p>
 
-                                <DropdownMenuItem
-                                  className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20"
-                                  onClick={() => deleteOperation(operation.id)}
-                                >
-                                  <Trash className="mr-2 h-4 w-4 text-destructive/60" />{' '}
-                                  Удалить
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          );
-                        })}
-                    </Fragment>
-                  ))}
-                </div>
-              )}
-            </div>
+                                      <div className="space-y-1.5">
+                                        {operation.entries.map((entry) => (
+                                          <div
+                                            key={entry.id}
+                                            className="p-2 rounded-md bg-muted/50"
+                                          >
+                                            {showDetails ? (
+                                              <p className="text-sm">
+                                                <span className="font-medium">
+                                                  {entry.wallet.name}:{' '}
+                                                </span>
+                                                {entry.direction ===
+                                                'credit' ? (
+                                                  <>
+                                                    <span className="text-muted-foreground">
+                                                      {entry.before} +{' '}
+                                                    </span>
+                                                    <span className="text-emerald-600 font-semibold">
+                                                      {entry.amount}
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                      {' '}
+                                                      = {entry.after}
+                                                    </span>
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    <span className="text-muted-foreground">
+                                                      {entry.before} -{' '}
+                                                    </span>
+                                                    <span className="text-red-600 font-semibold">
+                                                      {entry.amount}
+                                                    </span>
+                                                    <span className="text-muted-foreground">
+                                                      {' '}
+                                                      = {entry.after}
+                                                    </span>
+                                                  </>
+                                                )}
+                                              </p>
+                                            ) : (
+                                              <p className="text-sm">
+                                                <span className="font-medium">
+                                                  {entry.wallet.name}:{' '}
+                                                </span>
+                                                <span>{entry.after}</span>
+                                              </p>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+
+                                      {operation.description && (
+                                        <p className="text-sm text-muted-foreground">
+                                          {operation.description}
+                                        </p>
+                                      )}
+                                    </div>
+
+                                    <div className="text-left sm:text-right">
+                                      <p className="text-sm text-muted-foreground">
+                                        {operation.createdAt}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </DropdownMenuTrigger>
+
+                            <DropdownMenuContent
+                              align="center"
+                              className="w-40 bg-background shadow-md rounded-md text-foreground"
+                            >
+                              <DropdownMenuItem
+                                className="hover:bg-primary/60 dark:hover:bg-primary/60"
+                                onClick={() =>
+                                  router.push(
+                                    ROUTER_MAP.OPERATIONS_EDIT +
+                                      '/' +
+                                      operation.id,
+                                  )
+                                }
+                              >
+                                <Pencil className="mr-2 h-4 w-4 text-primary" />{' '}
+                                Редактировать
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="hover:bg-primary/60 dark:hover:bg-primary/60"
+                                onClick={() =>
+                                  setExpandedIds((prev) =>
+                                    prev.includes(operation.id)
+                                      ? prev.filter((id) => id !== operation.id)
+                                      : [...prev, operation.id],
+                                  )
+                                }
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
+                                {showDetails ? 'Скрыть' : 'Подробнее'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="hover:bg-primary/60 dark:hover:bg-primary/60"
+                                onClick={() => copyOperation(operation)}
+                              >
+                                <Copy className="mr-2 h-4 w-4 text-primary" />{' '}
+                                Копировать
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20"
+                                onClick={() => deleteOperation(operation.id)}
+                              >
+                                <Trash className="mr-2 h-4 w-4 text-destructive/60" />{' '}
+                                Удалить
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        );
+                      })}
+                  </Fragment>
+                ))}
+              </div>
+            )}
+          </div>
           {isFetching && hasNextPage && (
             <p className="text-center py-4">Загрузка...</p>
           )}

@@ -68,49 +68,51 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
 
   const form = useForm<CreateWalletFormValues>({
     resolver: zodResolver(CreateWalletSchema),
-    defaultValues: initialData ? {
-      name: initialData.name || '',
-      description: initialData.description || '',
-      amount: initialData.amount || 0,
-      walletKind: initialData.walletKind || WalletKind.simple,
-      walletTypeId: initialData.walletTypeId || undefined,
-      currencyId: initialData.currencyId || '',
-      active: initialData.active ?? true,
-      pinOnMain: initialData.pinOnMain ?? false,
-      pinned: initialData.pinned ?? false,
-      visible: initialData.visible ?? true,
-      details: {
-        phone: initialData.details?.phone || '',
-        card: initialData.details?.card || '',
-        ownerFullName: initialData.details?.ownerFullName || '',
-        address: initialData.details?.address || '',
-        accountId: initialData.details?.accountId || '',
-        exchangeUid: initialData.details?.exchangeUid || '',
-        networkId: initialData.details?.networkId || '',
-        networkTypeId: initialData.details?.networkTypeId || '',
-      },
-    } : {
-      name: '',
-      description: '',
-      amount: 0,
-      walletKind: WalletKind.simple,
-      walletTypeId: undefined,
-      currencyId: '',
-      active: true,
-      pinOnMain: false,
-      pinned: false,
-      visible: true,
-      details: {
-        phone: '',
-        card: '',
-        ownerFullName: '',
-        address: '',
-        accountId: '',
-        exchangeUid: '',
-        networkId: '',
-        networkTypeId: '',
-      },
-    },
+    defaultValues: initialData
+      ? {
+          name: initialData.name || '',
+          description: initialData.description || '',
+          amount: initialData.amount || 0,
+          walletKind: initialData.walletKind || WalletKind.simple,
+          walletTypeId: initialData.walletTypeId || undefined,
+          currencyId: initialData.currencyId || '',
+          active: initialData.active ?? true,
+          pinOnMain: initialData.pinOnMain ?? false,
+          pinned: initialData.pinned ?? false,
+          visible: initialData.visible ?? true,
+          details: {
+            phone: initialData.details?.phone || '',
+            card: initialData.details?.card || '',
+            ownerFullName: initialData.details?.ownerFullName || '',
+            address: initialData.details?.address || '',
+            accountId: initialData.details?.accountId || '',
+            exchangeUid: initialData.details?.exchangeUid || '',
+            networkId: initialData.details?.networkId || '',
+            networkTypeId: initialData.details?.networkTypeId || '',
+          },
+        }
+      : {
+          name: '',
+          description: '',
+          amount: 0,
+          walletKind: WalletKind.simple,
+          walletTypeId: undefined,
+          currencyId: '',
+          active: true,
+          pinOnMain: false,
+          pinned: false,
+          visible: true,
+          details: {
+            phone: '',
+            card: '',
+            ownerFullName: '',
+            address: '',
+            accountId: '',
+            exchangeUid: '',
+            networkId: '',
+            networkTypeId: '',
+          },
+        },
   });
 
   const walletKind = form.watch('walletKind');
@@ -605,11 +607,17 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           <Button
             type="submit"
             className="md:w-fit"
-            disabled={createWalletMutation.isPending || updateWalletMutation?.isPending}
+            disabled={
+              createWalletMutation.isPending || updateWalletMutation?.isPending
+            }
           >
             {isEditMode
-              ? (updateWalletMutation?.isPending ? 'Сохранение...' : 'Сохранить изменения')
-              : (createWalletMutation.isPending ? 'Создание...' : 'Создать кошелек')}
+              ? updateWalletMutation?.isPending
+                ? 'Сохранение...'
+                : 'Сохранить изменения'
+              : createWalletMutation.isPending
+                ? 'Создание...'
+                : 'Создать кошелек'}
           </Button>
         </div>
       </form>

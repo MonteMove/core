@@ -11,10 +11,10 @@ import {
 
 export default function CreateApplicationPage() {
   return (
-    <div>
-      <Card className="w-full max-w-5xl mx-auto ch ">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle>Создать новую заявку</CardTitle>
+          <CardTitle className="text-2xl">Создать заявку</CardTitle>
           <CardDescription>
             Заполните все необходимые поля ниже.
           </CardDescription>

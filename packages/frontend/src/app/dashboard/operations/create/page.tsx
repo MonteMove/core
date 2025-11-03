@@ -9,10 +9,10 @@ import {
 
 export default function CreateOperationsPage() {
   return (
-    <div className="items-center justify-center min-h-screen ">
-      <Card className="w-full max-w-5xl mx-auto">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle>Создать операцию</CardTitle>
+          <CardTitle className="text-2xl">Создать операцию</CardTitle>
           <CardDescription>
             Заполните все необходимые поля ниже.
           </CardDescription>

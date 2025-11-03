@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
   return (
-    <div className="w-full max-w-5xl mx-auto">
-      <Card className="mb-4">
+    <div className="max-w-5xl mx-auto space-y-6">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Настройки</CardTitle>
+          <CardTitle className="text-2xl">Настройки</CardTitle>
           <CardDescription>Настройте интерфейс под себя</CardDescription>
         </CardHeader>
       </Card>

@@ -21,8 +21,8 @@ export default function EditOperationPage() {
 
   if (isLoading) {
     return (
-      <div className="items-center justify-center min-h-screen">
-        <Card className="w-full max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
+        <Card>
           <CardHeader>
             <Skeleton className="h-8 w-64" />
             <Skeleton className="h-4 w-96" />
@@ -39,21 +39,19 @@ export default function EditOperationPage() {
 
   if (isError || !operation) {
     return (
-      <div className="items-center justify-center min-h-screen">
-        <Card className="w-full max-w-5xl mx-auto">
-          <CardContent className="p-8 text-center text-destructive">
-            Не удалось загрузить операцию
-          </CardContent>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-destructive">Не удалось загрузить операцию</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="items-center justify-center min-h-screen">
-      <Card className="w-full max-w-5xl mx-auto">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle>Редактировать операцию</CardTitle>
+          <CardTitle className="text-2xl">Редактировать операцию</CardTitle>
           <CardDescription>
             Измените необходимые поля ниже и сохраните изменения.
           </CardDescription>

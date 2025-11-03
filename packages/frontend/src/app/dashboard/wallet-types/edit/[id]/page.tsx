@@ -22,39 +22,29 @@ export default function EditWalletTypePage({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-start">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
-          </CardContent>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
       </div>
     );
   }
 
   if (!walletType) {
     return (
-      <div className="flex justify-center items-start">
-        <Card className="w-full max-w-2xl">
-          <CardContent className="pt-6">
-            <div className="text-center py-8 text-muted-foreground">
-              Тип кошелька не найден
-            </div>
-          </CardContent>
-        </Card>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Тип кошелька не найден</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center items-start">
-      <Card className="w-full max-w-2xl">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Редактировать тип кошелька
-          </CardTitle>
+          <CardTitle className="text-2xl">Редактировать тип кошелька</CardTitle>
           <CardDescription>Измените данные типа кошелька.</CardDescription>
         </CardHeader>
         <CardContent>

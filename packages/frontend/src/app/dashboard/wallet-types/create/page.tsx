@@ -15,12 +15,10 @@ export const metadata: Metadata = {
 
 export default function CreateWalletTypePage() {
   return (
-    <div className="flex justify-center items-start">
-      <Card className="w-full max-w-2xl">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Создать тип кошелька
-          </CardTitle>
+          <CardTitle className="text-2xl">Создать тип кошелька</CardTitle>
           <CardDescription>
             Заполните форму, чтобы добавить новый тип кошелька.
           </CardDescription>

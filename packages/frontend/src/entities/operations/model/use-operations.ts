@@ -135,7 +135,7 @@ export const useFilterOperations = (filter: GetOperationsParams) => {
 export const useUpdateOperation = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: ({ id, ...data }: { id: string } & UpdateOperationDto) =>
       OperationsService.update(id, data),

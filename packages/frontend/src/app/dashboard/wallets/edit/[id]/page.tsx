@@ -23,23 +23,29 @@ export default function EditWalletPage({ params }: EditWalletPageProps) {
   const router = useRouter();
   const { id } = use(params);
 
-  const { data: wallet, isLoading, error } = useQuery({
+  const {
+    data: wallet,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['wallet', id],
     queryFn: () => WalletService.getWalletById(id),
   });
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <p className="text-muted-foreground">Загрузка...</p>
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Загрузка...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !wallet) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-center">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center py-12">
           <p className="text-destructive mb-4">Ошибка загрузки кошелька</p>
           <button
             onClick={() => router.push(ROUTER_MAP.WALLETS)}
@@ -53,15 +59,11 @@ export default function EditWalletPage({ params }: EditWalletPageProps) {
   }
 
   return (
-    <div className="flex justify-center items-start">
-      <Card className="w-full max-w-4xl">
+    <div className="max-w-3xl mx-auto">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Редактировать кошелек
-          </CardTitle>
-          <CardDescription>
-            Обновите информацию о кошельке.
-          </CardDescription>
+          <CardTitle className="text-2xl">Редактировать кошелек</CardTitle>
+          <CardDescription>Обновите информацию о кошельке.</CardDescription>
         </CardHeader>
         <CardContent>
           <WalletForm initialData={wallet} walletId={id} />
