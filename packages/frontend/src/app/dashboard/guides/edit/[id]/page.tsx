@@ -1,10 +1,16 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 
-import { useGuide } from "@/features/guides/hooks/use-guide";
-import { GuideForm } from "@/features/guides/ui/guide-form/guide-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/shadcn/card";
+import { useGuide } from '@/features/guides/hooks/use-guide';
+import { GuideForm } from '@/features/guides/ui/guide-form/guide-form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/shadcn/card';
 
 export default function EditGuidePage() {
   const { id } = useParams<{ id: string }>();

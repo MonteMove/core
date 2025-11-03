@@ -1,14 +1,17 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { PaginationSchema } from "@/shared/utils/schemas/common-schemas";
+import { PaginationSchema } from '@/shared/utils/schemas/common-schemas';
 
 export const CreateGuideSchema = z.object({
-  fullName: z.string().min(1, "Полное имя обязательно").max(200, "Максимум 200 символов"),
-  description: z.string().max(1000, "Максимум 1000 символов").optional(),
-  phone: z.string().max(20, "Максимум 20 символов").optional(),
-  cardNumber: z.string().max(50, "Максимум 50 символов").optional(),
-  birthDate: z.string().max(100, "Максимум 100 символов").optional(),
-  address: z.string().max(500, "Максимум 500 символов").optional(),
+  fullName: z
+    .string()
+    .min(1, 'Полное имя обязательно')
+    .max(200, 'Максимум 200 символов'),
+  description: z.string().max(1000, 'Максимум 1000 символов').optional(),
+  phone: z.string().max(20, 'Максимум 20 символов').optional(),
+  cardNumber: z.string().max(50, 'Максимум 50 символов').optional(),
+  birthDate: z.string().max(100, 'Максимум 100 символов').optional(),
+  address: z.string().max(500, 'Максимум 500 символов').optional(),
 });
 
 export const GuideResponseSchema = z.object({
@@ -35,10 +38,10 @@ export const GetGuidesParamsSchema = z.object({
   userId: z.string().uuid().optional(),
   updatedById: z.string().uuid().optional(),
   sortField: z
-    .enum(["createdAt", "updatedAt", "fullName", "phone", "address"])
-    .default("createdAt")
+    .enum(['createdAt', 'updatedAt', 'fullName', 'phone', 'address'])
+    .default('createdAt')
     .optional(),
-  sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
+  sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
   page: z.number().int().min(1).default(1).optional(),
   limit: z.number().int().min(1).max(100).default(10).optional(),
 });

@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 
 import {
   type CalculationResult,
@@ -16,9 +16,9 @@ import {
   type SaleInputCurrency,
   type SaleOutputCurrency,
   calculate,
-} from "@/entities/calculator/model/calculator";
-import { type FintechRate } from "@/entities/calculator/model/rates";
-import { useRatesSnapshot } from "@/entities/calculator/model/use-rates-snapshot";
+} from '@/entities/calculator/model/calculator';
+import { type FintechRate } from '@/entities/calculator/model/rates';
+import { useRatesSnapshot } from '@/entities/calculator/model/use-rates-snapshot';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,146 +28,204 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/shared";
-import { Button } from "@/shared";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared";
-import { Progress } from "@/shared";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared";
-import { Input } from "@/shared/ui/shadcn/input";
-import { Switch } from "@/shared/ui/shadcn/switch";
+} from '@/shared';
+import { Button } from '@/shared';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared';
+import { Progress } from '@/shared';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Switch } from '@/shared/ui/shadcn/switch';
 
-type ProfitMode = "tier" | "custom" | "trusted";
+type ProfitMode = 'tier' | 'custom' | 'trusted';
 
-const saleInputCurrencies = ["RUB", "EUR", "USD_WHITE", "USD_BLUE"] as const satisfies Readonly<
-  SaleInputCurrency[]
+const saleInputCurrencies = [
+  'RUB',
+  'EUR',
+  'USD_WHITE',
+  'USD_BLUE',
+] as const satisfies Readonly<SaleInputCurrency[]>;
+const saleOutputCurrencies = ['EUR', 'RSD'] as const satisfies Readonly<
+  SaleOutputCurrency[]
 >;
-const saleOutputCurrencies = ["EUR", "RSD"] as const satisfies Readonly<SaleOutputCurrency[]>;
-const purchaseInputCurrencies = ["EUR", "RSD"] as const satisfies Readonly<PurchaseInputCurrency[]>;
+const purchaseInputCurrencies = ['EUR', 'RSD'] as const satisfies Readonly<
+  PurchaseInputCurrency[]
+>;
 const purchaseOutputCurrencies = [
-  "RUB",
-  "EUR",
-  "USD_WHITE",
-  "USD_BLUE",
+  'RUB',
+  'EUR',
+  'USD_WHITE',
+  'USD_BLUE',
 ] as const satisfies Readonly<PurchaseOutputCurrency[]>;
-const meetingPlaces = ["msk_office", "msk_field", "regions"] as const satisfies Readonly<
-  MeetingPlace[]
->;
+const meetingPlaces = [
+  'msk_office',
+  'msk_field',
+  'regions',
+] as const satisfies Readonly<MeetingPlace[]>;
 
 const currencyLabels: Record<string, string> = {
-  RUB: "RUB",
-  EUR: "EUR",
-  USD_WHITE: "USD бел.",
-  USD_BLUE: "USD син.",
-  RSD: "RSD",
+  RUB: 'RUB',
+  EUR: 'EUR',
+  USD_WHITE: 'USD бел.',
+  USD_BLUE: 'USD син.',
+  RSD: 'RSD',
 };
 
 const meetingPlaceLabels: Record<MeetingPlace, string> = {
-  msk_office: "МСК офис",
-  msk_field: "МСК выезд",
-  regions: "Регионы",
+  msk_office: 'МСК офис',
+  msk_field: 'МСК выезд',
+  regions: 'Регионы',
 };
 
-const scenarioLabels: Record<"sale" | "purchase", string> = {
-  sale: "Продажа",
-  purchase: "Покупка",
+const scenarioLabels: Record<'sale' | 'purchase', string> = {
+  sale: 'Продажа',
+  purchase: 'Покупка',
 };
 
 const countryLabels: Record<string, string> = {
-  russia: "РФ",
-  serbia: "Сербия",
-  montenegro: "Черногория",
+  russia: 'РФ',
+  serbia: 'Сербия',
+  montenegro: 'Черногория',
 };
 
 const SESSION_DURATION_MS = 10 * 60 * 1000;
 
 const formSchema = z
   .object({
-    scenario: z.enum(["sale", "purchase"] as const),
-    fromCountry: z.enum(["russia", "montenegro", "serbia"] as const),
-    toCountry: z.enum(["russia", "montenegro", "serbia"] as const),
-    inputCurrency: z.string().min(1, "Выберите входящую валюту"),
-    outputCurrency: z.string().min(1, "Выберите валюту выдачи"),
+    scenario: z.enum(['sale', 'purchase'] as const),
+    fromCountry: z.enum(['russia', 'montenegro', 'serbia'] as const),
+    toCountry: z.enum(['russia', 'montenegro', 'serbia'] as const),
+    inputCurrency: z.string().min(1, 'Выберите входящую валюту'),
+    outputCurrency: z.string().min(1, 'Выберите валюту выдачи'),
     amount: z.coerce
-      .number({ message: "Введите сумму" })
-      .positive("Сумма должна быть больше нуля")
+      .number({ message: 'Введите сумму' })
+      .positive('Сумма должна быть больше нуля')
       .optional()
-      .or(z.literal("").transform(() => undefined)),
+      .or(z.literal('').transform(() => undefined)),
     meetingPlace: z.enum(meetingPlaces),
-    expenses: z.coerce.number().min(0, "Расходы не могут быть отрицательными").optional(),
+    expenses: z.coerce
+      .number()
+      .min(0, 'Расходы не могут быть отрицательными')
+      .optional(),
     reverseMode: z.boolean(),
     targetAmount: z.coerce
-      .number({ message: "Введите сумму к выдаче" })
+      .number({ message: 'Введите сумму к выдаче' })
       .optional()
-      .or(z.literal("").transform(() => undefined)),
+      .or(z.literal('').transform(() => undefined)),
   })
   .superRefine((data, ctx) => {
-    if (data.scenario === "sale") {
-      if (!(saleInputCurrencies as readonly string[]).includes(data.inputCurrency)) {
-        ctx.addIssue({ code: "custom", path: ["inputCurrency"], message: "Недопустимая валюта" });
-      }
-      if (!(saleOutputCurrencies as readonly string[]).includes(data.outputCurrency)) {
-        ctx.addIssue({ code: "custom", path: ["outputCurrency"], message: "Недопустимая валюта" });
-      }
-      if (data.toCountry === "montenegro" && data.outputCurrency === "RSD") {
+    if (data.scenario === 'sale') {
+      if (
+        !(saleInputCurrencies as readonly string[]).includes(data.inputCurrency)
+      ) {
         ctx.addIssue({
-          code: "custom",
-          path: ["outputCurrency"],
-          message: "Для ЧГ доступен только EUR",
+          code: 'custom',
+          path: ['inputCurrency'],
+          message: 'Недопустимая валюта',
+        });
+      }
+      if (
+        !(saleOutputCurrencies as readonly string[]).includes(
+          data.outputCurrency,
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['outputCurrency'],
+          message: 'Недопустимая валюта',
+        });
+      }
+      if (data.toCountry === 'montenegro' && data.outputCurrency === 'RSD') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['outputCurrency'],
+          message: 'Для ЧГ доступен только EUR',
         });
       }
     } else {
-      if (!(purchaseInputCurrencies as readonly string[]).includes(data.inputCurrency)) {
-        ctx.addIssue({ code: "custom", path: ["inputCurrency"], message: "Недопустимая валюта" });
+      if (
+        !(purchaseInputCurrencies as readonly string[]).includes(
+          data.inputCurrency,
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['inputCurrency'],
+          message: 'Недопустимая валюта',
+        });
       }
-      if (!(purchaseOutputCurrencies as readonly string[]).includes(data.outputCurrency)) {
-        ctx.addIssue({ code: "custom", path: ["outputCurrency"], message: "Недопустимая валюта" });
+      if (
+        !(purchaseOutputCurrencies as readonly string[]).includes(
+          data.outputCurrency,
+        )
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['outputCurrency'],
+          message: 'Недопустимая валюта',
+        });
       }
     }
 
     if (data.fromCountry === data.toCountry) {
       ctx.addIssue({
-        code: "custom",
-        path: ["toCountry"],
-        message: "Страны отправления и получения должны быть разными",
+        code: 'custom',
+        path: ['toCountry'],
+        message: 'Страны отправления и получения должны быть разными',
       });
     }
 
     const isEurToEurAllowed =
-      data.scenario === "sale" &&
-      data.inputCurrency === "EUR" &&
-      (data.toCountry === "montenegro" || data.outputCurrency === "EUR");
+      data.scenario === 'sale' &&
+      data.inputCurrency === 'EUR' &&
+      (data.toCountry === 'montenegro' || data.outputCurrency === 'EUR');
 
     if (data.inputCurrency === data.outputCurrency && !isEurToEurAllowed) {
       ctx.addIssue({
-        code: "custom",
-        path: ["outputCurrency"],
-        message: "Исходная и целевая валюта должны быть разными",
+        code: 'custom',
+        path: ['outputCurrency'],
+        message: 'Исходная и целевая валюта должны быть разными',
       });
     }
 
     if (data.reverseMode) {
       if (data.targetAmount == null || Number(data.targetAmount) <= 0) {
         ctx.addIssue({
-          code: "custom",
-          path: ["targetAmount"],
-          message: "Укажите сумму для обратного расчёта",
+          code: 'custom',
+          path: ['targetAmount'],
+          message: 'Укажите сумму для обратного расчёта',
         });
       }
     } else {
       if (data.amount == null || Number(data.amount) <= 0) {
         ctx.addIssue({
-          code: "custom",
-          path: ["amount"],
-          message: "Введите сумму",
+          code: 'custom',
+          path: ['amount'],
+          message: 'Введите сумму',
         });
       }
     }
 
-    if (data.meetingPlace === "regions" && (data.expenses == null || Number(data.expenses) <= 0)) {
+    if (
+      data.meetingPlace === 'regions' &&
+      (data.expenses == null || Number(data.expenses) <= 0)
+    ) {
       ctx.addIssue({
-        code: "custom",
-        path: ["expenses"],
-        message: "Укажите расходы курьера для региональных встреч",
+        code: 'custom',
+        path: ['expenses'],
+        message: 'Укажите расходы курьера для региональных встреч',
       });
     }
   });
@@ -177,13 +235,13 @@ type CalculatorFormInput = z.input<CalculatorFormSchema>;
 type CalculatorFormValues = z.output<CalculatorFormSchema>;
 
 const defaultFormValues: CalculatorFormInput = {
-  scenario: "sale",
-  fromCountry: "russia",
-  toCountry: "serbia",
-  inputCurrency: "RUB",
-  outputCurrency: "EUR",
-  amount: "",
-  meetingPlace: "msk_office",
+  scenario: 'sale',
+  fromCountry: 'russia',
+  toCountry: 'serbia',
+  inputCurrency: 'RUB',
+  outputCurrency: 'EUR',
+  amount: '',
+  meetingPlace: 'msk_office',
   expenses: 0,
   reverseMode: false,
   targetAmount: undefined,
@@ -203,8 +261,8 @@ const defaultFormValues: CalculatorFormInput = {
  * ```
  */
 function formatAmount(value: number, currency: string) {
-  const digits = currency === "RSD" ? 0 : 2;
-  return value.toLocaleString("ru-RU", {
+  const digits = currency === 'RSD' ? 0 : 2;
+  return value.toLocaleString('ru-RU', {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   });
@@ -223,7 +281,10 @@ function formatAmount(value: number, currency: string) {
  * ```
  */
 function formatRate(value: number) {
-  return value.toLocaleString("ru-RU", { minimumFractionDigits: 0, maximumFractionDigits: 6 });
+  return value.toLocaleString('ru-RU', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 6,
+  });
 }
 
 /**
@@ -240,17 +301,17 @@ function formatRate(value: number) {
  * ```
  */
 function formatDate(value: string | null | undefined) {
-  if (!value) return "—";
+  if (!value) return '—';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString("ru-RU", {
-    timeZone: "Europe/Moscow",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+  return date.toLocaleString('ru-RU', {
+    timeZone: 'Europe/Moscow',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   });
 }
 
@@ -274,11 +335,11 @@ function formatFintechRate(rate: FintechRate) {
   const sell = rate.sell.value;
 
   if (buy == null && sell == null) {
-    return "нет данных";
+    return 'нет данных';
   }
 
-  const buyText = buy == null ? "нет данных" : formatRate(buy);
-  const sellText = sell == null ? "нет данных" : formatRate(sell);
+  const buyText = buy == null ? 'нет данных' : formatRate(buy);
+  const sellText = sell == null ? 'нет данных' : formatRate(sell);
 
   return `покупка: ${buyText} · продажа: ${sellText}`;
 }
@@ -323,16 +384,25 @@ type CustomEurPerUsdtState = {
  * ```
  */
 export default function CalculatorPage() {
-  const { data: snapshot, isLoading, isError, error: snapshotError } = useRatesSnapshot();
+  const {
+    data: snapshot,
+    isLoading,
+    isError,
+    error: snapshotError,
+  } = useRatesSnapshot();
   const [result, setResult] = useState<CalculationResult | null>(null);
   const [calcError, setCalcError] = useState<string | null>(null);
   const [issues, setIssues] = useState<string[]>([]);
-  const [profitState, setProfitState] = useState<ProfitState>({ mode: "tier", customValue: null });
+  const [profitState, setProfitState] = useState<ProfitState>({
+    mode: 'tier',
+    customValue: null,
+  });
   const [isProfitModalOpen, setProfitModalOpen] = useState(false);
-  const [profitDraft, setProfitDraft] = useState("0.98");
+  const [profitDraft, setProfitDraft] = useState('0.98');
   const [isCostModalOpen, setCostModalOpen] = useState(false);
-  const [costDraft, setCostDraft] = useState("0.99");
-  const [customEurState, setCustomEurState] = useState<CustomEurPerUsdtState | null>(null);
+  const [costDraft, setCostDraft] = useState('0.99');
+  const [customEurState, setCustomEurState] =
+    useState<CustomEurPerUsdtState | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<CalculatorFormInput, undefined, CalculatorFormValues>({
@@ -340,14 +410,17 @@ export default function CalculatorPage() {
     defaultValues: defaultFormValues,
   });
 
-  const scenario = useWatch({ control: form.control, name: "scenario" });
-  const fromCountry = useWatch({ control: form.control, name: "fromCountry" });
-  const toCountry = useWatch({ control: form.control, name: "toCountry" });
-  const meetingPlace = useWatch({ control: form.control, name: "meetingPlace" });
-  const reverseMode = useWatch({ control: form.control, name: "reverseMode" });
+  const scenario = useWatch({ control: form.control, name: 'scenario' });
+  const fromCountry = useWatch({ control: form.control, name: 'fromCountry' });
+  const toCountry = useWatch({ control: form.control, name: 'toCountry' });
+  const meetingPlace = useWatch({
+    control: form.control,
+    name: 'meetingPlace',
+  });
+  const reverseMode = useWatch({ control: form.control, name: 'reverseMode' });
 
   useEffect(() => {
-    setProfitState({ mode: "tier", customValue: null });
+    setProfitState({ mode: 'tier', customValue: null });
     setCustomEurState(null);
     setResult(null);
   }, [scenario, fromCountry, toCountry]);
@@ -355,8 +428,8 @@ export default function CalculatorPage() {
   useEffect(() => {
     setProfitState((prev) => {
       if (!prev.expiresAt || Date.now() <= prev.expiresAt) return prev;
-      if (prev.mode === "custom") {
-        return { mode: "tier", customValue: null };
+      if (prev.mode === 'custom') {
+        return { mode: 'tier', customValue: null };
       }
       return prev;
     });
@@ -367,14 +440,14 @@ export default function CalculatorPage() {
   }, [scenario, fromCountry, toCountry]);
 
   useEffect(() => {
-    if (meetingPlace !== "regions") {
-      form.setValue("expenses", "");
+    if (meetingPlace !== 'regions') {
+      form.setValue('expenses', '');
     }
   }, [meetingPlace, form]);
 
   useEffect(() => {
     if (!reverseMode) {
-      form.setValue("targetAmount", undefined);
+      form.setValue('targetAmount', undefined);
     }
   }, [reverseMode, form]);
 
@@ -388,20 +461,20 @@ export default function CalculatorPage() {
     if (
       profitState.expiresAt &&
       Date.now() > profitState.expiresAt &&
-      profitState.mode === "custom"
+      profitState.mode === 'custom'
     ) {
-      setProfitState({ mode: "tier", customValue: null });
+      setProfitState({ mode: 'tier', customValue: null });
     }
   }, [profitState]);
 
   const getCurrenciesForCountry = (country: string): string[] => {
     switch (country) {
-      case "russia":
-        return ["RUB", "EUR", "USD_WHITE", "USD_BLUE"];
-      case "serbia":
-        return ["RSD", "EUR"];
-      case "montenegro":
-        return ["EUR"];
+      case 'russia':
+        return ['RUB', 'EUR', 'USD_WHITE', 'USD_BLUE'];
+      case 'serbia':
+        return ['RSD', 'EUR'];
+      case 'montenegro':
+        return ['EUR'];
       default:
         return [];
     }
@@ -410,20 +483,23 @@ export default function CalculatorPage() {
   const availableInputCurrencies = useMemo((): readonly string[] => {
     const countryCurrencies = getCurrenciesForCountry(fromCountry);
 
-    if (scenario === "sale") {
+    if (scenario === 'sale') {
       return countryCurrencies.filter((currency) => {
-        if (!snapshot && (currency === "USD_WHITE" || currency === "USD_BLUE")) {
+        if (
+          !snapshot &&
+          (currency === 'USD_WHITE' || currency === 'USD_BLUE')
+        ) {
           return false;
         }
         if (!snapshot) return true;
 
-        if (currency === "USD_WHITE") {
+        if (currency === 'USD_WHITE') {
           return snapshot.fintech.usd_white.buy.value != null;
         }
-        if (currency === "USD_BLUE") {
+        if (currency === 'USD_BLUE') {
           return snapshot.fintech.usd_blue.buy.value != null;
         }
-        if (currency === "EUR") {
+        if (currency === 'EUR') {
           return snapshot.fintech.eur.buy.value != null;
         }
         return true;
@@ -436,20 +512,20 @@ export default function CalculatorPage() {
   const availableOutputCurrencies = useMemo((): readonly string[] => {
     const countryCurrencies = getCurrenciesForCountry(toCountry);
 
-    if (scenario === "sale") {
+    if (scenario === 'sale') {
       return countryCurrencies;
     }
 
     if (!snapshot) return countryCurrencies;
 
     return countryCurrencies.filter((currency) => {
-      if (currency === "USD_WHITE") {
+      if (currency === 'USD_WHITE') {
         return snapshot.fintech.usd_white.sell.value != null;
       }
-      if (currency === "USD_BLUE") {
+      if (currency === 'USD_BLUE') {
         return snapshot.fintech.usd_blue.sell.value != null;
       }
-      if (currency === "EUR") {
+      if (currency === 'EUR') {
         return snapshot.fintech.eur.sell.value != null;
       }
       return true;
@@ -457,67 +533,80 @@ export default function CalculatorPage() {
   }, [scenario, toCountry, snapshot]);
 
   useEffect(() => {
-    const currentInput = form.getValues("inputCurrency");
-    const currentOutput = form.getValues("outputCurrency");
+    const currentInput = form.getValues('inputCurrency');
+    const currentOutput = form.getValues('outputCurrency');
 
-    if (scenario === "sale") {
+    if (scenario === 'sale') {
       if (!availableInputCurrencies.includes(currentInput)) {
         const fallback =
-          availableInputCurrencies.find((c) => c === "RUB") ||
-          availableInputCurrencies.find((c) => c === "EUR") ||
+          availableInputCurrencies.find((c) => c === 'RUB') ||
+          availableInputCurrencies.find((c) => c === 'EUR') ||
           availableInputCurrencies[0];
-        if (fallback) form.setValue("inputCurrency", fallback);
+        if (fallback) form.setValue('inputCurrency', fallback);
       }
 
-      if (toCountry === "montenegro") {
-        form.setValue("outputCurrency", "EUR");
-      } else if (!currentOutput || !availableOutputCurrencies.includes(currentOutput)) {
-        const fallback = availableOutputCurrencies.includes("EUR")
-          ? "EUR"
+      if (toCountry === 'montenegro') {
+        form.setValue('outputCurrency', 'EUR');
+      } else if (
+        !currentOutput ||
+        !availableOutputCurrencies.includes(currentOutput)
+      ) {
+        const fallback = availableOutputCurrencies.includes('EUR')
+          ? 'EUR'
           : availableOutputCurrencies[0];
-        if (fallback) form.setValue("outputCurrency", fallback);
+        if (fallback) form.setValue('outputCurrency', fallback);
       }
     } else {
-      if (fromCountry === "montenegro") {
-        form.setValue("inputCurrency", "EUR");
+      if (fromCountry === 'montenegro') {
+        form.setValue('inputCurrency', 'EUR');
       } else if (!availableInputCurrencies.includes(currentInput)) {
-        const fallback = availableInputCurrencies.includes("EUR")
-          ? "EUR"
+        const fallback = availableInputCurrencies.includes('EUR')
+          ? 'EUR'
           : availableInputCurrencies[0];
-        if (fallback) form.setValue("inputCurrency", fallback);
+        if (fallback) form.setValue('inputCurrency', fallback);
       }
 
-      if (!currentOutput || !availableOutputCurrencies.includes(currentOutput)) {
+      if (
+        !currentOutput ||
+        !availableOutputCurrencies.includes(currentOutput)
+      ) {
         const fallback =
-          availableOutputCurrencies.find((c) => c === "RUB") ||
-          availableOutputCurrencies.find((c) => c === "EUR") ||
+          availableOutputCurrencies.find((c) => c === 'RUB') ||
+          availableOutputCurrencies.find((c) => c === 'EUR') ||
           availableOutputCurrencies[0];
-        if (fallback) form.setValue("outputCurrency", fallback);
+        if (fallback) form.setValue('outputCurrency', fallback);
       }
     }
-  }, [scenario, fromCountry, toCountry, availableInputCurrencies, availableOutputCurrencies, form]);
+  }, [
+    scenario,
+    fromCountry,
+    toCountry,
+    availableInputCurrencies,
+    availableOutputCurrencies,
+    form,
+  ]);
 
   useEffect(() => {
-    const currentOutput = form.getValues("outputCurrency");
+    const currentOutput = form.getValues('outputCurrency');
     if (currentOutput && !availableOutputCurrencies.includes(currentOutput)) {
       const fallback = availableOutputCurrencies[0];
       if (fallback) {
-        form.setValue("outputCurrency", fallback);
+        form.setValue('outputCurrency', fallback);
       }
     }
   }, [availableOutputCurrencies, form]);
 
   useEffect(() => {
-    if (scenario === "sale") {
-      form.setValue("fromCountry", "russia");
-      form.setValue("toCountry", "serbia");
-      form.setValue("inputCurrency", "RUB");
-      form.setValue("outputCurrency", "EUR");
-    } else if (scenario === "purchase") {
-      form.setValue("fromCountry", "serbia");
-      form.setValue("toCountry", "russia");
-      form.setValue("inputCurrency", "EUR");
-      form.setValue("outputCurrency", "RUB");
+    if (scenario === 'sale') {
+      form.setValue('fromCountry', 'russia');
+      form.setValue('toCountry', 'serbia');
+      form.setValue('inputCurrency', 'RUB');
+      form.setValue('outputCurrency', 'EUR');
+    } else if (scenario === 'purchase') {
+      form.setValue('fromCountry', 'serbia');
+      form.setValue('toCountry', 'russia');
+      form.setValue('inputCurrency', 'EUR');
+      form.setValue('outputCurrency', 'RUB');
     }
   }, [scenario, form]);
 
@@ -558,37 +647,39 @@ export default function CalculatorPage() {
    * const result = calculate(input, snapshot);
    * ```
    */
-  const buildCalculatorInput = (values: CalculatorFormValues): CalculatorInput => {
+  const buildCalculatorInput = (
+    values: CalculatorFormValues,
+  ): CalculatorInput => {
     let profit: ProfitConfig;
 
     switch (profitState.mode) {
-      case "trusted": {
-        profit = { mode: "trusted" };
+      case 'trusted': {
+        profit = { mode: 'trusted' };
         break;
       }
-      case "custom": {
+      case 'custom': {
         profit =
           profitState.customValue != null
-            ? { mode: "custom", coefficient: profitState.customValue }
-            : { mode: "tier" };
+            ? { mode: 'custom', coefficient: profitState.customValue }
+            : { mode: 'tier' };
         break;
       }
       default: {
-        profit = { mode: "tier" };
+        profit = { mode: 'tier' };
       }
     }
 
     const country: Country =
-      values.scenario === "sale"
-        ? values.toCountry === "serbia"
-          ? "serbia"
-          : "montenegro"
-        : values.fromCountry === "serbia"
-          ? "serbia"
-          : "montenegro";
+      values.scenario === 'sale'
+        ? values.toCountry === 'serbia'
+          ? 'serbia'
+          : 'montenegro'
+        : values.fromCountry === 'serbia'
+          ? 'serbia'
+          : 'montenegro';
 
     let expensesRub = 0;
-    if (values.meetingPlace === "regions") {
+    if (values.meetingPlace === 'regions') {
       expensesRub = values.expenses || 0;
     }
 
@@ -597,13 +688,15 @@ export default function CalculatorPage() {
       expensesRub,
       profit,
       reverseMode: values.reverseMode,
-      targetAmount: values.reverseMode ? Number(values.targetAmount) : undefined,
+      targetAmount: values.reverseMode
+        ? Number(values.targetAmount)
+        : undefined,
       customEurPerUsdt: appliedCustomEur,
     };
 
-    if (values.scenario === "sale") {
+    if (values.scenario === 'sale') {
       return {
-        scenario: "sale",
+        scenario: 'sale',
         country,
         inputCurrency: values.inputCurrency as SaleInputCurrency,
         outputCurrency: values.outputCurrency as SaleOutputCurrency,
@@ -613,7 +706,7 @@ export default function CalculatorPage() {
     }
 
     return {
-      scenario: "purchase",
+      scenario: 'purchase',
       country,
       inputCurrency: values.inputCurrency as PurchaseInputCurrency,
       outputCurrency: values.outputCurrency as PurchaseOutputCurrency,
@@ -658,13 +751,15 @@ export default function CalculatorPage() {
       setIssues([]);
 
       if (values.reverseMode) {
-        form.setValue("amount", calculation.inputAmount, { shouldValidate: true });
+        form.setValue('amount', calculation.inputAmount, {
+          shouldValidate: true,
+        });
       }
 
       setTimeout(() => {
         resultRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
+          behavior: 'smooth',
+          block: 'start',
         });
 
         setTimeout(() => {
@@ -674,7 +769,7 @@ export default function CalculatorPage() {
             const offset = 80;
             window.scrollBy({
               top: elementTop - offset,
-              behavior: "smooth",
+              behavior: 'smooth',
             });
           }
         }, 200);
@@ -684,7 +779,7 @@ export default function CalculatorPage() {
         setCalcError(error.message);
         setIssues(error.issues);
       } else {
-        setCalcError("Не удалось выполнить расчёт");
+        setCalcError('Не удалось выполнить расчёт');
         setIssues([]);
       }
       setResult(null);
@@ -707,12 +802,12 @@ export default function CalculatorPage() {
    * Сохраняется на 10 минут или до смены типа операции/страны
    */
   const handleProfitModalConfirm = () => {
-    const parsed = Number(profitDraft.replace(",", "."));
+    const parsed = Number(profitDraft.replace(',', '.'));
     if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 1.2) {
       return;
     }
     setProfitState({
-      mode: "custom",
+      mode: 'custom',
       customValue: parsed,
       expiresAt: Date.now() + SESSION_DURATION_MS,
     });
@@ -721,9 +816,9 @@ export default function CalculatorPage() {
 
   const currentTgCoef = useMemo(() => {
     if (!snapshot) return null;
-    const relevantCountry = scenario === "purchase" ? fromCountry : toCountry;
+    const relevantCountry = scenario === 'purchase' ? fromCountry : toCountry;
     const rate =
-      relevantCountry === "serbia"
+      relevantCountry === 'serbia'
         ? snapshot.tg.serbia.eur_usdt_coefficient.value
         : snapshot.tg.montenegro.eur_usdt_coefficient.value;
     return rate ?? null;
@@ -746,12 +841,13 @@ export default function CalculatorPage() {
    * Сохраняется на 10 минут или до смены типа операции/страны
    */
   const handleCostModalConfirm = () => {
-    const parsed = Number(costDraft.replace(",", "."));
+    const parsed = Number(costDraft.replace(',', '.'));
     if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 2) {
       return;
     }
-    const relevantCountry = scenario === "purchase" ? fromCountry : toCountry;
-    const mappedCountry = relevantCountry === "serbia" ? "serbia" : "montenegro";
+    const relevantCountry = scenario === 'purchase' ? fromCountry : toCountry;
+    const mappedCountry =
+      relevantCountry === 'serbia' ? 'serbia' : 'montenegro';
     setCustomEurState({
       value: parsed,
       expiresAt: Date.now() + SESSION_DURATION_MS,
@@ -772,16 +868,20 @@ export default function CalculatorPage() {
   const toggleTrusted = (checked: boolean) => {
     if (checked) {
       setProfitState({
-        mode: "trusted",
+        mode: 'trusted',
         customValue: profitState.customValue,
         expiresAt: profitState.expiresAt,
       });
     } else {
       setProfitState((prev) => {
         if (prev.customValue != null) {
-          return { mode: "custom", customValue: prev.customValue, expiresAt: prev.expiresAt };
+          return {
+            mode: 'custom',
+            customValue: prev.customValue,
+            expiresAt: prev.expiresAt,
+          };
         }
-        return { mode: "tier", customValue: null };
+        return { mode: 'tier', customValue: null };
       });
     }
   };
@@ -790,7 +890,9 @@ export default function CalculatorPage() {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center space-y-4">
         <div className="w-64 space-y-2">
-          <p className="text-center text-sm text-muted-foreground">Загрузка курсов…</p>
+          <p className="text-center text-sm text-muted-foreground">
+            Загрузка курсов…
+          </p>
           <Progress value={undefined} className="animate-pulse" />
         </div>
       </div>
@@ -801,9 +903,13 @@ export default function CalculatorPage() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="rounded-lg border border-destructive bg-destructive/10 p-6 text-center max-w-md">
-          <h2 className="text-lg font-semibold text-destructive mb-2">Ошибка загрузки</h2>
+          <h2 className="text-lg font-semibold text-destructive mb-2">
+            Ошибка загрузки
+          </h2>
           <p className="text-destructive">
-            {snapshotError instanceof Error ? snapshotError.message : "Неизвестная ошибка"}
+            {snapshotError instanceof Error
+              ? snapshotError.message
+              : 'Неизвестная ошибка'}
           </p>
         </div>
       </div>
@@ -815,7 +921,9 @@ export default function CalculatorPage() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="rounded-lg border bg-muted p-6 text-center max-w-md">
           <h2 className="text-lg font-semibold mb-2">Курсы недоступны</h2>
-          <p className="text-muted-foreground">Попробуйте перезагрузить страницу</p>
+          <p className="text-muted-foreground">
+            Попробуйте перезагрузить страницу
+          </p>
         </div>
       </div>
     );
@@ -830,15 +938,17 @@ export default function CalculatorPage() {
     snapshot.fintech.eur.buy.value != null ||
     snapshot.fintech.eur.sell.value != null;
   const appliedProfitLabel =
-    profitState.mode === "trusted"
-      ? "1% (проверенный)"
-      : profitState.mode === "custom" && profitState.customValue != null
+    profitState.mode === 'trusted'
+      ? '1% (проверенный)'
+      : profitState.mode === 'custom' && profitState.customValue != null
         ? `${(profitState.customValue * 100).toFixed(2)}%`
-        : "По таблице";
+        : 'По таблице';
   const customCostActive =
-    appliedCustomEur != null && customEurState != null && Date.now() <= customEurState.expiresAt;
+    appliedCustomEur != null &&
+    customEurState != null &&
+    Date.now() <= customEurState.expiresAt;
   const customCostExpires = customCostActive
-    ? new Date(customEurState.expiresAt).toLocaleTimeString("ru-RU")
+    ? new Date(customEurState.expiresAt).toLocaleTimeString('ru-RU')
     : null;
 
   return (
@@ -871,7 +981,7 @@ export default function CalculatorPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {(["sale", "purchase"] as const).map((value) => (
+                      {(['sale', 'purchase'] as const).map((value) => (
                         <SelectItem key={value} value={value}>
                           {scenarioLabels[value]}
                         </SelectItem>
@@ -898,14 +1008,14 @@ export default function CalculatorPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {scenario === "sale" && (
+                      {scenario === 'sale' && (
                         <>
                           <SelectItem value="russia">РФ</SelectItem>
                           <SelectItem value="montenegro">Черногория</SelectItem>
                           <SelectItem value="serbia">Сербия</SelectItem>
                         </>
                       )}
-                      {scenario === "purchase" && (
+                      {scenario === 'purchase' && (
                         <>
                           <SelectItem value="montenegro">Черногория</SelectItem>
                           <SelectItem value="serbia">Сербия</SelectItem>
@@ -933,13 +1043,15 @@ export default function CalculatorPage() {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {scenario === "sale" && (
+                      {scenario === 'sale' && (
                         <>
                           <SelectItem value="serbia">Сербия</SelectItem>
                           <SelectItem value="montenegro">Черногория</SelectItem>
                         </>
                       )}
-                      {scenario === "purchase" && <SelectItem value="russia">РФ</SelectItem>}
+                      {scenario === 'purchase' && (
+                        <SelectItem value="russia">РФ</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -1033,21 +1145,23 @@ export default function CalculatorPage() {
               name="amount"
               render={({ field }) => {
                 const numericValue =
-                  typeof field.value === "number"
+                  typeof field.value === 'number'
                     ? field.value
                     : field.value
                       ? Number(field.value)
                       : 0;
                 const displayValue =
                   numericValue && !isNaN(numericValue) && numericValue !== 0
-                    ? numericValue.toLocaleString("ru-RU")
-                    : "";
+                    ? numericValue.toLocaleString('ru-RU')
+                    : '';
 
                 return (
                   <FormItem>
                     <FormLabel>
-                      {reverseMode ? "Сумма" : "Сумма"}
-                      {!reverseMode && <span className="text-destructive">*</span>}
+                      {reverseMode ? 'Сумма' : 'Сумма'}
+                      {!reverseMode && (
+                        <span className="text-destructive">*</span>
+                      )}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -1059,8 +1173,14 @@ export default function CalculatorPage() {
                           ref={field.ref}
                           onBlur={field.onBlur}
                           onChange={(event) => {
-                            const rawValue = event.target.value.replace(/[\s,]/g, "");
-                            if (rawValue === "" || /^\d*\.?\d*$/.test(rawValue)) {
+                            const rawValue = event.target.value.replace(
+                              /[\s,]/g,
+                              '',
+                            );
+                            if (
+                              rawValue === '' ||
+                              /^\d*\.?\d*$/.test(rawValue)
+                            ) {
                               field.onChange(rawValue);
                             }
                           }}
@@ -1073,7 +1193,7 @@ export default function CalculatorPage() {
                             variant="ghost"
                             size="sm"
                             className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
-                            onClick={() => field.onChange("")}
+                            onClick={() => field.onChange('')}
                             title="Очистить поле"
                           >
                             ×
@@ -1095,7 +1215,10 @@ export default function CalculatorPage() {
                   <FormLabel>Реверсивный расчёт</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-2">
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                       <span className="text-sm text-muted-foreground">
                         Отталкиваемся от суммы выдачи
                       </span>
@@ -1112,20 +1235,21 @@ export default function CalculatorPage() {
                 name="targetAmount"
                 render={({ field }) => {
                   const numericValue =
-                    typeof field.value === "number"
+                    typeof field.value === 'number'
                       ? field.value
                       : field.value
                         ? Number(field.value)
                         : 0;
                   const displayValue =
                     numericValue && !isNaN(numericValue) && numericValue !== 0
-                      ? numericValue.toLocaleString("ru-RU")
-                      : "";
+                      ? numericValue.toLocaleString('ru-RU')
+                      : '';
 
                   return (
                     <FormItem>
                       <FormLabel>
-                        Итого к выдаче <span className="text-destructive">*</span>
+                        Итого к выдаче{' '}
+                        <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
@@ -1136,8 +1260,14 @@ export default function CalculatorPage() {
                             ref={field.ref}
                             onBlur={field.onBlur}
                             onChange={(event) => {
-                              const rawValue = event.target.value.replace(/[\s,]/g, "");
-                              if (rawValue === "" || /^\d*\.?\d*$/.test(rawValue)) {
+                              const rawValue = event.target.value.replace(
+                                /[\s,]/g,
+                                '',
+                              );
+                              if (
+                                rawValue === '' ||
+                                /^\d*\.?\d*$/.test(rawValue)
+                              ) {
                                 field.onChange(rawValue);
                               }
                             }}
@@ -1150,7 +1280,7 @@ export default function CalculatorPage() {
                               variant="ghost"
                               size="sm"
                               className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
-                              onClick={() => field.onChange("")}
+                              onClick={() => field.onChange('')}
                               title="Очистить поле"
                             >
                               ×
@@ -1165,26 +1295,27 @@ export default function CalculatorPage() {
               />
             )}
 
-            {meetingPlace === "regions" && (
+            {meetingPlace === 'regions' && (
               <FormField
                 control={form.control}
                 name="expenses"
                 render={({ field }) => {
                   const numericValue =
-                    typeof field.value === "number"
+                    typeof field.value === 'number'
                       ? field.value
                       : field.value
                         ? Number(field.value)
                         : 0;
                   const displayValue =
                     numericValue && !isNaN(numericValue) && numericValue !== 0
-                      ? numericValue.toLocaleString("ru-RU")
-                      : "";
+                      ? numericValue.toLocaleString('ru-RU')
+                      : '';
 
                   return (
                     <FormItem>
                       <FormLabel>
-                        Расходы на билеты/отель, RUB<span className="text-destructive">*</span>
+                        Расходы на билеты/отель, RUB
+                        <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
@@ -1195,8 +1326,14 @@ export default function CalculatorPage() {
                             ref={field.ref}
                             onBlur={field.onBlur}
                             onChange={(event) => {
-                              const rawValue = event.target.value.replace(/[\s,]/g, "");
-                              if (rawValue === "" || /^\d*\.?\d*$/.test(rawValue)) {
+                              const rawValue = event.target.value.replace(
+                                /[\s,]/g,
+                                '',
+                              );
+                              if (
+                                rawValue === '' ||
+                                /^\d*\.?\d*$/.test(rawValue)
+                              ) {
                                 field.onChange(rawValue);
                               }
                             }}
@@ -1210,7 +1347,7 @@ export default function CalculatorPage() {
                               variant="ghost"
                               size="sm"
                               className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted"
-                              onClick={() => field.onChange("")}
+                              onClick={() => field.onChange('')}
                               title="Очистить поле"
                             >
                               ×
@@ -1230,12 +1367,14 @@ export default function CalculatorPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="text-sm font-medium">Прибыль</p>
-                <p className="text-xs text-muted-foreground">Текущий режим: {appliedProfitLabel}</p>
+                <p className="text-xs text-muted-foreground">
+                  Текущий режим: {appliedProfitLabel}
+                </p>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex items-center gap-2 text-sm">
                   <Switch
-                    checked={profitState.mode === "trusted"}
+                    checked={profitState.mode === 'trusted'}
                     onCheckedChange={toggleTrusted}
                   />
                   <label>Сделка с проверенным (1%)</label>
@@ -1244,7 +1383,7 @@ export default function CalculatorPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  disabled={profitState.mode === "trusted"}
+                  disabled={profitState.mode === 'trusted'}
                   onClick={handleProfitModalOpen}
                   className="w-full sm:w-auto"
                 >
@@ -1254,30 +1393,38 @@ export default function CalculatorPage() {
             </div>
             {profitState.customValue != null && (
               <p className="text-xs text-muted-foreground">
-                Пользовательский коэффициент прибыли: {(profitState.customValue * 100).toFixed(2)}%
+                Пользовательский коэффициент прибыли:{' '}
+                {(profitState.customValue * 100).toFixed(2)}%
                 <br />
                 {profitState.expiresAt ? (
                   <>
-                    действует до {new Date(profitState.expiresAt).toLocaleTimeString("ru-RU")}
+                    действует до{' '}
+                    {new Date(profitState.expiresAt).toLocaleTimeString(
+                      'ru-RU',
+                    )}
                     <br />
                     (или до смены типа операции/страны)
                   </>
                 ) : (
-                  "действует до смены типа операции или страны."
+                  'действует до смены типа операции или страны.'
                 )}
               </p>
             )}
           </div>
 
-          {scenario === "purchase" && fromCountry && (
+          {scenario === 'purchase' && fromCountry && (
             <div className="space-y-3 rounded-md border bg-muted/30 p-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium">Себестоимость EUR/USDT</p>
                   <p className="text-xs text-muted-foreground">
-                    Текущее значение:{" "}
-                    {appliedCustomEur?.toFixed(6) ?? currentTgCoef?.toFixed(6) ?? "—"}{" "}
-                    {customCostActive && customCostExpires ? `(до ${customCostExpires})` : ""}
+                    Текущее значение:{' '}
+                    {appliedCustomEur?.toFixed(6) ??
+                      currentTgCoef?.toFixed(6) ??
+                      '—'}{' '}
+                    {customCostActive && customCostExpires
+                      ? `(до ${customCostExpires})`
+                      : ''}
                   </p>
                 </div>
                 <Button
@@ -1291,8 +1438,8 @@ export default function CalculatorPage() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Пользовательский коэффициент-множитель действует 10 минут либо до изменения типа
-                операции/страны.
+                Пользовательский коэффициент-множитель действует 10 минут либо
+                до изменения типа операции/страны.
               </p>
             </div>
           )}
@@ -1327,7 +1474,9 @@ export default function CalculatorPage() {
         <div ref={resultRef} className="space-y-6">
           {result.warnings.length > 0 && (
             <section className="rounded-lg border border-yellow-300/60 bg-yellow-50 p-4">
-              <h3 className="text-lg font-semibold text-yellow-800">Предупреждения</h3>
+              <h3 className="text-lg font-semibold text-yellow-800">
+                Предупреждения
+              </h3>
               <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-yellow-800">
                 {result.warnings.map((warning) => (
                   <li key={warning}>{warning}</li>
@@ -1337,30 +1486,33 @@ export default function CalculatorPage() {
           )}
 
           <section className="rounded-lg border p-4">
-            <h2 className="text-lg font-semibold mb-3">Итоговая сумма к выдаче</h2>
+            <h2 className="text-lg font-semibold mb-3">
+              Итоговая сумма к выдаче
+            </h2>
 
             <div className="mb-3">
               <p className="text-sm font-medium text-muted-foreground mb-1">
-                {scenarioLabels[result.scenario]} · {countryLabels[fromCountry]} →{" "}
-                {countryLabels[toCountry]}
+                {scenarioLabels[result.scenario]} · {countryLabels[fromCountry]}{' '}
+                → {countryLabels[toCountry]}
               </p>
             </div>
 
             {reverseMode && result.targetAmount ? (
               <>
                 <p className="text-xl font-bold">
-                  {formatAmount(result.inputAmount, result.inputCurrency)}{" "}
+                  {formatAmount(result.inputAmount, result.inputCurrency)}{' '}
                   {currencyLabels[result.inputCurrency] ?? result.inputCurrency}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Реверсивный расчет: для выдачи{" "}
-                  {formatAmount(result.targetAmount, result.outputCurrency)}{" "}
-                  {currencyLabels[result.outputCurrency] ?? result.outputCurrency}
+                  Реверсивный расчет: для выдачи{' '}
+                  {formatAmount(result.targetAmount, result.outputCurrency)}{' '}
+                  {currencyLabels[result.outputCurrency] ??
+                    result.outputCurrency}
                 </p>
               </>
             ) : (
               <p className="text-xl font-bold">
-                {formatAmount(result.outputAmount, result.outputCurrency)}{" "}
+                {formatAmount(result.outputAmount, result.outputCurrency)}{' '}
                 {currencyLabels[result.outputCurrency] ?? result.outputCurrency}
               </p>
             )}
@@ -1377,48 +1529,52 @@ export default function CalculatorPage() {
           <section className="rounded-lg border p-4 space-y-3">
             <h3 className="text-lg font-semibold">Логика расчета</h3>
             <div className="text-sm bg-muted/30 rounded p-3">
-              {result.scenario === "sale" ? (
+              {result.scenario === 'sale' ? (
                 <p>
-                  <strong>Продажа:</strong> Берем{" "}
-                  {formatAmount(result.inputAmount, result.inputCurrency)}{" "}
+                  <strong>Продажа:</strong> Берем{' '}
+                  {formatAmount(result.inputAmount, result.inputCurrency)}{' '}
                   {currencyLabels[result.inputCurrency]}
-                  {result.inputCurrency === "EUR" && result.outputCurrency === "EUR"
-                    ? " (прямая конвертация в Черногории)"
-                    : result.inputCurrency !== "RUB"
-                      ? ", меняем на рубли через FinTech"
-                      : ""}
+                  {result.inputCurrency === 'EUR' &&
+                  result.outputCurrency === 'EUR'
+                    ? ' (прямая конвертация в Черногории)'
+                    : result.inputCurrency !== 'RUB'
+                      ? ', меняем на рубли через FinTech'
+                      : ''}
                   , вычитаем вознаграждение сотрудника в РФ
-                  {result.expenses ? ", вычитаем расходы курьера" : ""}
-                  {result.inputCurrency !== "EUR" || result.outputCurrency !== "EUR"
-                    ? ", несем в Rapira и покупаем USDT, за эти USDT в " +
-                      (result.country === "serbia" ? "Сербии" : "Черногории") +
-                      " покупаем "
-                    : ""}
-                  {currencyLabels[result.outputCurrency]}, убираем из этой суммы{" "}
-                  {((1 - result.profitCoefficient) * 100).toFixed(1)}% (наша прибыль), выдаем
-                  клиенту.
+                  {result.expenses ? ', вычитаем расходы курьера' : ''}
+                  {result.inputCurrency !== 'EUR' ||
+                  result.outputCurrency !== 'EUR'
+                    ? ', несем в Rapira и покупаем USDT, за эти USDT в ' +
+                      (result.country === 'serbia' ? 'Сербии' : 'Черногории') +
+                      ' покупаем '
+                    : ''}
+                  {currencyLabels[result.outputCurrency]}, убираем из этой суммы{' '}
+                  {((1 - result.profitCoefficient) * 100).toFixed(1)}% (наша
+                  прибыль), выдаем клиенту.
                 </p>
               ) : (
                 <p>
-                  <strong>Покупка:</strong> Берем{" "}
-                  {formatAmount(result.inputAmount, result.inputCurrency)}{" "}
+                  <strong>Покупка:</strong> Берем{' '}
+                  {formatAmount(result.inputAmount, result.inputCurrency)}{' '}
                   {currencyLabels[result.inputCurrency]}
-                  {result.inputCurrency === "RSD"
+                  {result.inputCurrency === 'RSD'
                     ? `, меняем на EUR по курсу ${formatRate(snapshot.business.rsd_per_eur.value ?? 0)}`
-                    : ""}
+                    : ''}
                   , продаем за USDT
                   {result.warnings.includes(
-                    "Использован пользовательский коэффициент-множитель EUR/USDT"
+                    'Использован пользовательский коэффициент-множитель EUR/USDT',
                   )
-                    ? " (пользовательский коэффициент-множитель)"
-                    : ""}
-                  , покупаем в Rapira за эти USDT рубли, вычитаем вознаграждение сотрудника в РФ,{" "}
-                  {result.outputCurrency !== "RUB"
-                    ? "несем рубли в FinTech и меняем на нужную валюту,"
-                    : ""}{" "}
-                  убираем из этой суммы {((1 - result.profitCoefficient) * 100).toFixed(1)}% (наша
+                    ? ' (пользовательский коэффициент-множитель)'
+                    : ''}
+                  , покупаем в Rapira за эти USDT рубли, вычитаем вознаграждение
+                  сотрудника в РФ,{' '}
+                  {result.outputCurrency !== 'RUB'
+                    ? 'несем рубли в FinTech и меняем на нужную валюту,'
+                    : ''}{' '}
+                  убираем из этой суммы{' '}
+                  {((1 - result.profitCoefficient) * 100).toFixed(1)}% (наша
                   прибыль)
-                  {result.expenses ? ", вычитаем расходы" : ""}, выдаем клиенту.
+                  {result.expenses ? ', вычитаем расходы' : ''}, выдаем клиенту.
                 </p>
               )}
             </div>
@@ -1428,13 +1584,16 @@ export default function CalculatorPage() {
             <h3 className="text-lg font-semibold">Отчёт по шагам (подробно)</h3>
             <ul className="space-y-4 text-sm">
               {result.steps.map((step, index) => (
-                <li key={`${step.label}-${index}`} className="rounded bg-muted/30 p-3">
+                <li
+                  key={`${step.label}-${index}`}
+                  className="rounded bg-muted/30 p-3"
+                >
                   <div className="flex items-baseline justify-between gap-4 mb-2">
                     <span className="font-bold text-base">
                       Шаг {index + 1}: {step.label}
                     </span>
                     <span className="font-bold text-base">
-                      {formatAmount(step.amount, step.currency)}{" "}
+                      {formatAmount(step.amount, step.currency)}{' '}
                       {currencyLabels[step.currency] ?? step.currency}
                     </span>
                   </div>
@@ -1447,11 +1606,17 @@ export default function CalculatorPage() {
                   )}
                   {step.rate && (
                     <div className="mt-2 p-2 bg-background rounded text-xs">
-                      <div className="font-medium mb-1">Курс: {step.rate.label}</div>
+                      <div className="font-medium mb-1">
+                        Курс: {step.rate.label}
+                      </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm">{formatRate(step.rate.value)}</span>
+                        <span className="font-mono text-sm">
+                          {formatRate(step.rate.value)}
+                        </span>
                         {step.rate.source && (
-                          <span className="text-muted-foreground">({step.rate.source})</span>
+                          <span className="text-muted-foreground">
+                            ({step.rate.source})
+                          </span>
                         )}
                         {step.rate.override && (
                           <span className="inline-flex rounded-full border border-yellow-500 bg-yellow-50 px-2 py-0.5 text-yellow-700">
@@ -1480,41 +1645,60 @@ export default function CalculatorPage() {
           <section className="rounded-lg border p-4 space-y-2 text-sm">
             <h3 className="text-lg font-semibold">Маржа</h3>
             <p>
-              Тир:{" "}
+              Тир:{' '}
               {result.marginTier
-                ? `от ${formatAmount(result.marginTier.min_eur, "EUR")}${result.marginTier.max_eur ? ` до ${formatAmount(result.marginTier.max_eur, "EUR")}` : "+"}`
-                : "не найден"}
+                ? `от ${formatAmount(result.marginTier.min_eur, 'EUR')}${result.marginTier.max_eur ? ` до ${formatAmount(result.marginTier.max_eur, 'EUR')}` : '+'}`
+                : 'не найден'}
             </p>
             <p>Коэффициент: {result.profitCoefficient.toFixed(6)}</p>
             <p>
-              Сумма до маржи: {formatAmount(result.margin.baseAmount, result.margin.baseCurrency)}{" "}
-              {currencyLabels[result.margin.baseCurrency] ?? result.margin.baseCurrency}
+              Сумма до маржи:{' '}
+              {formatAmount(
+                result.margin.baseAmount,
+                result.margin.baseCurrency,
+              )}{' '}
+              {currencyLabels[result.margin.baseCurrency] ??
+                result.margin.baseCurrency}
             </p>
             <p>
-              Сумма после маржи:{" "}
-              {formatAmount(result.margin.afterAmount, result.margin.afterCurrency)}{" "}
-              {currencyLabels[result.margin.afterCurrency] ?? result.margin.afterCurrency}
+              Сумма после маржи:{' '}
+              {formatAmount(
+                result.margin.afterAmount,
+                result.margin.afterCurrency,
+              )}{' '}
+              {currencyLabels[result.margin.afterCurrency] ??
+                result.margin.afterCurrency}
             </p>
           </section>
 
           {result.employeeCommission && (
             <section className="rounded-lg border p-4 space-y-2 text-sm">
-              <h3 className="text-lg font-semibold">Вознаграждение сотрудника в РФ</h3>
+              <h3 className="text-lg font-semibold">
+                Вознаграждение сотрудника в РФ
+              </h3>
               <div className="space-y-1">
                 <p className="font-medium">
-                  Объем сделки: {formatAmount(result.employeeCommission.eurEquivalent, "EUR")} EUR
+                  Объем сделки:{' '}
+                  {formatAmount(result.employeeCommission.eurEquivalent, 'EUR')}{' '}
+                  EUR
                 </p>
                 <p className="font-medium">
-                  Вознаграждение: {formatAmount(result.employeeCommission.usd, "USD")} USD
+                  Вознаграждение:{' '}
+                  {formatAmount(result.employeeCommission.usd, 'USD')} USD
                   <span className="text-xs text-muted-foreground ml-2">
                     (базовое 20 USD + комиссия по таблице)
                   </span>
                 </p>
                 <p>
-                  Эквивалент в рублях: {formatAmount(result.employeeCommission.rub, "RUB")} RUB
+                  Эквивалент в рублях:{' '}
+                  {formatAmount(result.employeeCommission.rub, 'RUB')} RUB
                   <span className="text-xs text-muted-foreground ml-2">
-                    (курс USD/RUB:{" "}
-                    {formatRate(result.employeeCommission.rub / result.employeeCommission.usd)})
+                    (курс USD/RUB:{' '}
+                    {formatRate(
+                      result.employeeCommission.rub /
+                        result.employeeCommission.usd,
+                    )}
+                    )
                   </span>
                 </p>
               </div>
@@ -1523,40 +1707,49 @@ export default function CalculatorPage() {
 
           {result.expenses && (
             <section className="rounded-lg border p-4 space-y-2 text-sm">
-              <h3 className="text-lg font-semibold">Расходы курьера (билеты/отель)</h3>
+              <h3 className="text-lg font-semibold">
+                Расходы курьера (билеты/отель)
+              </h3>
               <div className="space-y-1">
                 <p className="font-medium">
-                  Расходы в рублях: {formatAmount(result.expenses.rub, "RUB")} RUB
+                  Расходы в рублях: {formatAmount(result.expenses.rub, 'RUB')}{' '}
+                  RUB
                 </p>
-                {result.expenses.currency !== "RUB" && (
+                {result.expenses.currency !== 'RUB' && (
                   <p>
-                    Эквивалент в {currencyLabels[result.expenses.currency]}:{" "}
-                    {formatAmount(result.expenses.converted, result.expenses.currency)}{" "}
-                    {currencyLabels[result.expenses.currency] ?? result.expenses.currency}
+                    Эквивалент в {currencyLabels[result.expenses.currency]}:{' '}
+                    {formatAmount(
+                      result.expenses.converted,
+                      result.expenses.currency,
+                    )}{' '}
+                    {currencyLabels[result.expenses.currency] ??
+                      result.expenses.currency}
                   </p>
                 )}
               </div>
             </section>
           )}
 
-          {result.scenario === "purchase" &&
-            result.inputCurrency === "EUR" &&
-            result.outputCurrency === "RUB" &&
+          {result.scenario === 'purchase' &&
+            result.inputCurrency === 'EUR' &&
+            result.outputCurrency === 'RUB' &&
             (result.rubPerEurCalc || result.cbrRubPerEur) && (
               <section className="rounded-lg border p-4 space-y-2">
                 <h3 className="text-lg font-semibold">Дополнительно</h3>
                 {result.rubPerEurCalc && (
                   <p>
-                    Расчетный курс RUB/EUR: {formatAmount(result.rubPerEurCalc, "RUB")}
+                    Расчетный курс RUB/EUR:{' '}
+                    {formatAmount(result.rubPerEurCalc, 'RUB')}
                     <span className="text-sm text-muted-foreground ml-2">
-                      (={formatAmount(result.outputAmount, "RUB")} ÷{" "}
-                      {formatAmount(result.inputAmount, "EUR")})
+                      (={formatAmount(result.outputAmount, 'RUB')} ÷{' '}
+                      {formatAmount(result.inputAmount, 'EUR')})
                     </span>
                   </p>
                 )}
                 {result.cbrRubPerEur && (
                   <p className="text-sm text-muted-foreground">
-                    Для сравнения, курс ЦБ EUR: {formatAmount(result.cbrRubPerEur, "RUB")}
+                    Для сравнения, курс ЦБ EUR:{' '}
+                    {formatAmount(result.cbrRubPerEur, 'RUB')}
                   </p>
                 )}
               </section>
@@ -1567,10 +1760,18 @@ export default function CalculatorPage() {
             <div className="grid gap-2 text-sm">
               {hasFintech && (
                 <div className="space-y-1">
-                  <p className="font-medium text-muted-foreground">FinTech Exchange:</p>
+                  <p className="font-medium text-muted-foreground">
+                    FinTech Exchange:
+                  </p>
                   <div className="pl-4 space-y-1">
-                    <p>• USD «белый»: {formatFintechRate(snapshot.fintech.usd_white)}</p>
-                    <p>• USD «синий»: {formatFintechRate(snapshot.fintech.usd_blue)}</p>
+                    <p>
+                      • USD «белый»:{' '}
+                      {formatFintechRate(snapshot.fintech.usd_white)}
+                    </p>
+                    <p>
+                      • USD «синий»:{' '}
+                      {formatFintechRate(snapshot.fintech.usd_blue)}
+                    </p>
                     <p>• EUR: {formatFintechRate(snapshot.fintech.eur)}</p>
                   </div>
                 </div>
@@ -1580,24 +1781,42 @@ export default function CalculatorPage() {
                 <p className="font-medium text-muted-foreground">Rapira:</p>
                 <div className="pl-4 space-y-1">
                   <p>• USDT/RUB: {formatRate(snapshot.rapira.value || 0)}</p>
-                  <p>• Комиссия: {((1 - snapshot.business.rapira_multiplier) * 100).toFixed(1)}%</p>
+                  <p>
+                    • Комиссия:{' '}
+                    {((1 - snapshot.business.rapira_multiplier) * 100).toFixed(
+                      1,
+                    )}
+                    %
+                  </p>
                 </div>
               </div>
 
               <div className="space-y-1">
                 <p className="font-medium text-muted-foreground">XE:</p>
                 <div className="pl-4">
-                  <p>• USD/EUR: {formatRate(snapshot.usd_variants.usd.value || 0)}</p>
+                  <p>
+                    • USD/EUR:{' '}
+                    {formatRate(snapshot.usd_variants.usd.value || 0)}
+                  </p>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <p className="font-medium text-muted-foreground">TG боты коэффициенты:</p>
+                <p className="font-medium text-muted-foreground">
+                  TG боты коэффициенты:
+                </p>
                 <div className="pl-4 space-y-1">
-                  <p>• Сербия: {formatRate(snapshot.tg.serbia.eur_usdt_coefficient.value || 0)}</p>
                   <p>
-                    • Черногория:{" "}
-                    {formatRate(snapshot.tg.montenegro.eur_usdt_coefficient.value || 0)}
+                    • Сербия:{' '}
+                    {formatRate(
+                      snapshot.tg.serbia.eur_usdt_coefficient.value || 0,
+                    )}
+                  </p>
+                  <p>
+                    • Черногория:{' '}
+                    {formatRate(
+                      snapshot.tg.montenegro.eur_usdt_coefficient.value || 0,
+                    )}
                   </p>
                 </div>
               </div>
@@ -1605,17 +1824,25 @@ export default function CalculatorPage() {
               <div className="space-y-1">
                 <p className="font-medium text-muted-foreground">Справочные:</p>
                 <div className="pl-4 space-y-1">
-                  <p>• RSD/EUR: {formatRate(snapshot.business.rsd_per_eur.value ?? 0)}</p>
-                  <p>• Курс ЦБ RUB/EUR: {formatRate(snapshot.cbr.rub_per_eur.value || 0)}</p>
+                  <p>
+                    • RSD/EUR:{' '}
+                    {formatRate(snapshot.business.rsd_per_eur.value ?? 0)}
+                  </p>
+                  <p>
+                    • Курс ЦБ RUB/EUR:{' '}
+                    {formatRate(snapshot.cbr.rub_per_eur.value || 0)}
+                  </p>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <p className="font-medium text-muted-foreground">Конфигурация:</p>
+                <p className="font-medium text-muted-foreground">
+                  Конфигурация:
+                </p>
                 <div className="pl-4 space-y-1">
                   <p>
-                    • Коэффициент прибыли: {result.profitCoefficient.toFixed(3)} (
-                    {((1 - result.profitCoefficient) * 100).toFixed(1)}%)
+                    • Коэффициент прибыли: {result.profitCoefficient.toFixed(3)}{' '}
+                    ({((1 - result.profitCoefficient) * 100).toFixed(1)}%)
                   </p>
                   <p>• Расходы курьера: 20 USD</p>
                 </div>
@@ -1652,7 +1879,9 @@ export default function CalculatorPage() {
 
           <AlertDialogFooter>
             <AlertDialogCancel>Отменить</AlertDialogCancel>
-            <AlertDialogAction onClick={handleProfitModalConfirm}>Применить</AlertDialogAction>
+            <AlertDialogAction onClick={handleProfitModalConfirm}>
+              Применить
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -1662,16 +1891,17 @@ export default function CalculatorPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>
               {(() => {
-                const relevantCountry = scenario === "purchase" ? fromCountry : toCountry;
-                return relevantCountry === "serbia" ? "Сербия" : "Черногория";
-              })()}{" "}
+                const relevantCountry =
+                  scenario === 'purchase' ? fromCountry : toCountry;
+                return relevantCountry === 'serbia' ? 'Сербия' : 'Черногория';
+              })()}{' '}
               коэффициент-множитель EUR/USDT
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Текущий коэффициент-множитель из TG бота:{" "}
-              {currentTgCoef ? currentTgCoef.toFixed(6) : "—"}. Это значение умножается на базовый
-              курс USD/EUR для получения финального курса EUR/USDT. Новое значение будет действовать
-              10 минут.
+              Текущий коэффициент-множитель из TG бота:{' '}
+              {currentTgCoef ? currentTgCoef.toFixed(6) : '—'}. Это значение
+              умножается на базовый курс USD/EUR для получения финального курса
+              EUR/USDT. Новое значение будет действовать 10 минут.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -1687,7 +1917,9 @@ export default function CalculatorPage() {
 
           <AlertDialogFooter>
             <AlertDialogCancel>Отменить</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCostModalConfirm}>Применить</AlertDialogAction>
+            <AlertDialogAction onClick={handleCostModalConfirm}>
+              Применить
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

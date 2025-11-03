@@ -1,11 +1,11 @@
-import z from "zod";
+import z from 'zod';
 
 import {
   ReportsConversionSchema,
   ReportsGeneralSchema,
   ReportsPeriodSchema,
-} from "@/entities/reports";
-import { PaginationSchema } from "@/shared/utils/schemas/common-schemas";
+} from '@/entities/reports';
+import { PaginationSchema } from '@/shared/utils/schemas/common-schemas';
 
 export const OperationSchema = z.object({
   id: z.string().uuid(),
@@ -18,7 +18,7 @@ export const OperationEntryDtoSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
   }),
-  direction: z.enum(["credit", "debit"]),
+  direction: z.enum(['credit', 'debit']),
   before: z.number().nullable(),
   amount: z.number().min(1),
   after: z.number().nullable(),
@@ -33,7 +33,7 @@ export const OperationEntryCreateDtoSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
   }),
-  direction: z.enum(["credit", "debit"]),
+  direction: z.enum(['credit', 'debit']),
   amount: z.number(),
 });
 
@@ -51,7 +51,7 @@ export const OperationEntryUpdateDtoSchema = z.object({
     id: z.string().uuid(),
     name: z.string(),
   }),
-  direction: z.enum(["credit", "debit"]),
+  direction: z.enum(['credit', 'debit']),
   before: z.number().nullable(),
   amount: z.number(),
   after: z.number().nullable(),
@@ -64,7 +64,11 @@ export const OperationEntryUpdateDtoSchema = z.object({
 export const UpdateOperationDtoSchema = z.object({
   typeId: z.string().uuid(),
   applicationId: z.number(),
-  description: z.string().max(2000, "Максимум 2000 символов").optional().nullable(),
+  description: z
+    .string()
+    .max(2000, 'Максимум 2000 символов')
+    .optional()
+    .nullable(),
   entries: z.array(OperationEntryDtoSchema),
   creatureDate: z.string(),
 });
@@ -74,7 +78,11 @@ export const OperationResponseDtoSchema = z.object({
   userId: z.string().uuid(),
   updateById: z.string().uuid(),
   typeId: z.string().uuid(),
-  description: z.string().max(2000, "Максиммум 2000 символов").optional().nullable(),
+  description: z
+    .string()
+    .max(2000, 'Максиммум 2000 символов')
+    .optional()
+    .nullable(),
   conversionGroupId: z.string().uuid(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -103,6 +111,7 @@ export const GetOperationsParamsSchema = z.object({
   search: z.string().optional(),
   typeId: z.string().uuid().nullable().optional(),
   userId: z.string().uuid().nullable().optional(),
+  applicationId: z.string().nullable().optional(),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
   page: z.number().int().min(1).default(1).optional(),
@@ -111,11 +120,15 @@ export const GetOperationsParamsSchema = z.object({
 
 export type OperationResponseDto = z.infer<typeof OperationResponseDtoSchema>;
 export type UpdateOperationDto = z.infer<typeof UpdateOperationDtoSchema>;
-export type GetOperationsResponseDto = z.infer<typeof GetOperationsResponseDtoSchema>;
+export type GetOperationsResponseDto = z.infer<
+  typeof GetOperationsResponseDtoSchema
+>;
 export type GetOperationsParams = z.infer<typeof GetOperationsParamsSchema>;
 export type ReportsGeneral = z.infer<typeof ReportsGeneralSchema>;
 export type ReportsConversion = z.infer<typeof ReportsConversionSchema>;
 export type ReportsPeriod = z.infer<typeof ReportsPeriodSchema>;
 export type OperationEntryDto = z.infer<typeof OperationEntryDtoSchema>;
 export type CreateOperationDto = z.infer<typeof CreateOperationDtoSchema>;
-export type OperationEntryCreateDto = z.infer<typeof OperationEntryCreateDtoSchema>;
+export type OperationEntryCreateDto = z.infer<
+  typeof OperationEntryCreateDtoSchema
+>;

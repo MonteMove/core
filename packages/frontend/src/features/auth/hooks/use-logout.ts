@@ -1,11 +1,11 @@
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from '@tanstack/react-query';
 
-import { AuthService } from "@/entities/auth/api/auth-service";
-import { useAuthStore } from "@/features/users/ui/user-stores/user-store";
-import { LOGOUT_QUERY_KEY } from "@/shared/utils/constants/auth-query-key";
-import { ROUTER_MAP } from "@/shared/utils/constants/router-map";
+import { AuthService } from '@/entities/auth/api/auth-service';
+import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
+import { LOGOUT_QUERY_KEY } from '@/shared/utils/constants/auth-query-key';
+import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 export const useLogout = () => {
   const clearToken = useAuthStore().clearToken;

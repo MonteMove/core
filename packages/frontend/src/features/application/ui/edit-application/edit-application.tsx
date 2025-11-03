@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import React from "react";
+import { useEffect } from 'react';
+import React from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 import {
   ApplicationResponse,
@@ -10,12 +10,17 @@ import {
   CreateApplicationRequestSchema,
   DateTimePicker,
   useUpdateApplication,
-} from "@/entities/application";
-import { useCurrency } from "@/entities/currency";
-import { useOperationTypes } from "@/entities/operations";
-import { useCouriers } from "@/entities/users";
-import { cn, findPhoneRule, formatByRule, normalizeDigits } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/shadcn/button";
+} from '@/entities/application';
+import { useCurrency } from '@/entities/currency';
+import { useOperationTypes } from '@/entities/operations';
+import { useCouriers } from '@/entities/users';
+import {
+  cn,
+  findPhoneRule,
+  formatByRule,
+  normalizeDigits,
+} from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
@@ -23,30 +28,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared/ui/shadcn/form";
-import { Input } from "@/shared/ui/shadcn/input";
+} from '@/shared/ui/shadcn/form';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/shadcn/select";
-import { Separator } from "@/shared/ui/shadcn/separator";
-import { Skeleton } from "@/shared/ui/shadcn/skeleton";
-import { Textarea } from "@/shared/ui/shadcn/textarea";
+} from '@/shared/ui/shadcn/select';
+import { Separator } from '@/shared/ui/shadcn/separator';
+import { Skeleton } from '@/shared/ui/shadcn/skeleton';
+import { Textarea } from '@/shared/ui/shadcn/textarea';
 
 const formatTelegramUsername = (value: string): string => {
   return value
-    .replace(/@/g, "")
-    .replace(/[^a-zA-Z0-9_]/g, "")
+    .replace(/@/g, '')
+    .replace(/[^a-zA-Z0-9_]/g, '')
     .substring(0, 32);
 };
 
 export function EditApplicationForm({
   initialData,
-}: { initialData?: ApplicationResponse } & React.ComponentProps<"form">) {
-  const { data: operationTypes, isLoading: operationTypesLoading } = useOperationTypes();
+}: { initialData?: ApplicationResponse } & React.ComponentProps<'form'>) {
+  const { data: operationTypes, isLoading: operationTypesLoading } =
+    useOperationTypes();
   const { data: couriers, isLoading: couriersLoading } = useCouriers();
   const { data: currency, isLoading: currencyLoading } = useCurrency();
   const updateMutation = useUpdateApplication();
@@ -55,25 +61,25 @@ export function EditApplicationForm({
     resolver: zodResolver(CreateApplicationRequestSchema),
     defaultValues: initialData
       ? {
-          currencyId: initialData.currencyId ?? "",
-          operationTypeId: initialData.operationTypeId ?? "",
-          assigneeUserId: initialData.assigneeUserId ?? "",
-          description: initialData.description ?? "",
+          currencyId: initialData.currencyId ?? '',
+          operationTypeId: initialData.operationTypeId ?? '',
+          assigneeUserId: initialData.assigneeUserId ?? '',
+          description: initialData.description ?? '',
           amount: initialData.amount ?? 0,
           telegramUsername: initialData.telegramUsername
-            ? initialData.telegramUsername.replace("@", "")
-            : "",
-          phone: initialData.phone ?? "",
-          meetingDate: initialData.meetingDate ?? "",
+            ? initialData.telegramUsername.replace('@', '')
+            : '',
+          phone: initialData.phone ?? '',
+          meetingDate: initialData.meetingDate ?? '',
         }
       : {
-          currencyId: "",
-          operationTypeId: "",
-          assigneeUserId: "",
-          description: "",
+          currencyId: '',
+          operationTypeId: '',
+          assigneeUserId: '',
+          description: '',
           amount: 0,
-          telegramUsername: "",
-          phone: "",
+          telegramUsername: '',
+          phone: '',
           meetingDate: undefined,
         },
   });
@@ -81,7 +87,9 @@ export function EditApplicationForm({
   const onSubmit = (data: CreateApplicationRequest) => {
     const formData = {
       ...data,
-      telegramUsername: data.telegramUsername ? `@${data.telegramUsername}` : "",
+      telegramUsername: data.telegramUsername
+        ? `@${data.telegramUsername}`
+        : '',
     };
 
     if (initialData) {
@@ -92,16 +100,16 @@ export function EditApplicationForm({
   useEffect(() => {
     if (initialData) {
       form.reset({
-        currencyId: initialData.currencyId ?? "",
-        operationTypeId: initialData.operationTypeId ?? "",
-        assigneeUserId: initialData.assigneeUserId ?? "",
-        description: initialData.description ?? "",
+        currencyId: initialData.currencyId ?? '',
+        operationTypeId: initialData.operationTypeId ?? '',
+        assigneeUserId: initialData.assigneeUserId ?? '',
+        description: initialData.description ?? '',
         amount: initialData.amount ?? 0,
         telegramUsername: initialData.telegramUsername
-          ? initialData.telegramUsername.replace("@", "")
-          : "",
-        phone: initialData.phone ?? "",
-        meetingDate: initialData.meetingDate ?? "",
+          ? initialData.telegramUsername.replace('@', '')
+          : '',
+        phone: initialData.phone ?? '',
+        meetingDate: initialData.meetingDate ?? '',
       });
     }
   }, [initialData, form]);
@@ -121,7 +129,10 @@ export function EditApplicationForm({
                   {couriersLoading ? (
                     <Skeleton className="h-8" />
                   ) : (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl className="w-full">
                         <SelectTrigger>
                           <SelectValue placeholder="Выберите исполнителя" />
@@ -151,8 +162,8 @@ export function EditApplicationForm({
                     value={field.value}
                     onChange={field.onChange}
                     className={cn(
-                      "max-sm:flex-col max-sm:items-stretch",
-                      fieldState.error && "*:border-red-500 *:border-2"
+                      'max-sm:flex-col max-sm:items-stretch',
+                      fieldState.error && '*:border-red-500 *:border-2',
                     )}
                   />
                   <FormMessage />
@@ -171,13 +182,24 @@ export function EditApplicationForm({
                   {operationTypesLoading ? (
                     <Skeleton className="h-8" />
                   ) : (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger className={cn("w-full", fieldState.error && "border-red-500")}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger
+                        className={cn(
+                          'w-full',
+                          fieldState.error && 'border-red-500',
+                        )}
+                      >
                         <SelectValue placeholder="Выберите тип" />
                       </SelectTrigger>
                       <SelectContent>
                         {operationTypes?.map((operationType) => (
-                          <SelectItem key={operationType.id} value={operationType.id}>
+                          <SelectItem
+                            key={operationType.id}
+                            value={operationType.id}
+                          >
                             {operationType.name}
                           </SelectItem>
                         ))}
@@ -199,7 +221,7 @@ export function EditApplicationForm({
                       type="number"
                       placeholder="1000"
                       {...field}
-                      value={field.value === undefined ? "" : field.value}
+                      value={field.value === undefined ? '' : field.value}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                     />
                   </FormControl>
@@ -216,7 +238,10 @@ export function EditApplicationForm({
                   {currencyLoading ? (
                     <Skeleton className="h-8" />
                   ) : (
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl className="w-full">
                         <SelectTrigger>
                           <SelectValue placeholder="Выберите валюту" />
@@ -254,13 +279,16 @@ export function EditApplicationForm({
                       className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
                       value={field.value}
                       onChange={(e) => {
-                        const formattedValue = formatTelegramUsername(e.target.value);
+                        const formattedValue = formatTelegramUsername(
+                          e.target.value,
+                        );
                         field.onChange(formattedValue);
                       }}
                       onPaste={(e) => {
                         e.preventDefault();
-                        const pastedText = e.clipboardData.getData("text");
-                        const formattedValue = formatTelegramUsername(pastedText);
+                        const pastedText = e.clipboardData.getData('text');
+                        const formattedValue =
+                          formatTelegramUsername(pastedText);
                         field.onChange(formattedValue);
                       }}
                     />
@@ -274,7 +302,7 @@ export function EditApplicationForm({
               control={form.control}
               name="phone"
               render={({ field }) => {
-                const rule = findPhoneRule(field.value ?? "");
+                const rule = findPhoneRule(field.value ?? '');
                 return (
                   <FormItem className="col-span-1 self-end">
                     <FormLabel>Номер телефона</FormLabel>
@@ -285,7 +313,7 @@ export function EditApplicationForm({
                           const normalized = normalizeDigits(e.target.value);
                           field.onChange(normalized);
                         }}
-                        placeholder={rule?.example ?? "+XXX XX XXX XX XX"}
+                        placeholder={rule?.example ?? '+XXX XX XXX XX XX'}
                         inputMode="numeric"
                         maxLength={20}
                       />
@@ -311,8 +339,12 @@ export function EditApplicationForm({
           />
         </div>
 
-        <Button type="submit" disabled={updateMutation.isPending} className="w-full cursor-pointer">
-          {updateMutation.isPending ? "Сохраняем..." : "Сохранить"}
+        <Button
+          type="submit"
+          disabled={updateMutation.isPending}
+          className="w-full cursor-pointer"
+        >
+          {updateMutation.isPending ? 'Сохраняем...' : 'Сохранить'}
         </Button>
       </form>
     </Form>

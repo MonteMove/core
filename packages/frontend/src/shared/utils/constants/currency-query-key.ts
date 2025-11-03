@@ -1,1 +1,1 @@
-export const CURRENCY_QUERY_KEY = "currency";
+export const CURRENCY_QUERY_KEY = 'currency';

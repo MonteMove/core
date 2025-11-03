@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { AuthService } from "@/entities/auth/api/auth-service";
-import { LoginRequest } from "@/entities/auth/model/auth-schemas";
-import { useAuthStore } from "@/features/users/ui/user-stores/user-store";
-import { LOGIN_QUERY_KEY } from "@/shared/utils/constants/auth-query-key";
-import { ROUTER_MAP } from "@/shared/utils/constants/router-map";
+import { AuthService } from '@/entities/auth/api/auth-service';
+import { LoginRequest } from '@/entities/auth/model/auth-schemas';
+import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
+import { LOGIN_QUERY_KEY } from '@/shared/utils/constants/auth-query-key';
+import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 export const useLogin = () => {
   const { setToken, setUser, clearToken } = useAuthStore();
@@ -25,16 +25,16 @@ export const useLogin = () => {
     onSuccess: (data) => {
       setToken(data.accessToken);
       setUser(data.user);
-      toast.success("Вход выполнен успешно");
+      toast.success('Вход выполнен успешно');
 
-      const nextPath = searchParams.get("next");
+      const nextPath = searchParams.get('next');
       const redirectPath = nextPath || ROUTER_MAP.DASHBOARD;
 
       navigate.push(redirectPath);
     },
     onError: (error) => {
-      console.log("Error: ", error);
-      toast.error("Ошибка входа. Проверьте имя пользователя или пароль.");
+      console.log('Error: ', error);
+      toast.error('Ошибка входа. Проверьте имя пользователя или пароль.');
     },
   });
 };

@@ -5,18 +5,21 @@ import { DeactivateMySessionByIdOutput } from '../types';
 
 @Injectable()
 export class DeactivateMySessionByIdUseCase {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(userId: string, sessionId?: string): Promise<DeactivateMySessionByIdOutput> {
-        await this.prisma.session.updateMany({
-            where: { userId, id: sessionId },
-            data: {
-                revoked: true,
-            },
-        });
+  public async execute(
+    userId: string,
+    sessionId?: string,
+  ): Promise<DeactivateMySessionByIdOutput> {
+    await this.prisma.session.updateMany({
+      where: { userId, id: sessionId },
+      data: {
+        revoked: true,
+      },
+    });
 
-        return {
-            message: 'Сессии пользователя успешно деактивированы',
-        };
-    }
+    return {
+      message: 'Сессии пользователя успешно деактивированы',
+    };
+  }
 }

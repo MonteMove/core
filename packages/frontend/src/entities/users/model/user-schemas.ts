@@ -1,11 +1,9 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export enum UserRole {
-  ADMIN = "admin",
-  MODERATOR = "moderator",
-  HOLDER = "holder",
-  COURIER = "courier",
-  USER = "user",
+  ADMIN = 'admin',
+  MODERATOR = 'moderator',
+  USER = 'user',
 }
 
 export const UserRoleSchema = z.object({
@@ -13,8 +11,6 @@ export const UserRoleSchema = z.object({
   code: z.enum([
     UserRole.ADMIN,
     UserRole.MODERATOR,
-    UserRole.HOLDER,
-    UserRole.COURIER,
     UserRole.USER,
   ]),
   name: z.string(),
@@ -29,6 +25,8 @@ export const UserAuthSchema = z.object({
   blocked: z.boolean(),
   deleted: z.boolean(),
   telegramNotifications: z.boolean(),
+  isHolder: z.boolean().default(false),
+  isCourier: z.boolean().default(false),
   lastLogin: z.string().datetime().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -41,6 +39,8 @@ export const UserSchema = z.object({
   roles: z.array(UserRoleSchema).default([]),
   blocked: z.boolean().default(false),
   telegramNotifications: z.boolean(),
+  isHolder: z.boolean().default(false),
+  isCourier: z.boolean().default(false),
   lastLogin: z.string().datetime().nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -58,12 +58,16 @@ export const UsersResponseSchema = z.object({
 
 export const GetUsersParamsSchema = z.object({
   search: z.string().optional(),
-  roleCode: z.enum(["admin", "moderator", "holder", "courier", "user"]).optional(),
+  roleCode: z.enum(['admin', 'moderator', 'user']).optional(),
+  isHolder: z.boolean().optional(),
+  isCourier: z.boolean().optional(),
   blocked: z.boolean().optional(),
   telegramNotifications: z.boolean().optional(),
   telegramId: z.string().optional(),
-  sortField: z.enum(["username", "createdAt", "updatedAt", "lastLogin"]).optional(),
-  sortOrder: z.enum(["asc", "desc"]).optional(),
+  sortField: z
+    .enum(['username', 'createdAt', 'updatedAt', 'lastLogin'])
+    .optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
   page: z.number().int().positive().default(1),
   limit: z.number().int().positive().max(100).default(100),
 });

@@ -1,9 +1,9 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-import { AuthService } from "@/entities/auth/api/auth-service";
-import { useAuthStore } from "@/features/users/ui/user-stores/user-store";
-import { env } from "@/shared/lib/env-config";
-import { AUTH_TOKEN_KEY } from "@/shared/utils/constants/storage-keys";
+import { AuthService } from '@/entities/auth/api/auth-service';
+import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
+import { env } from '@/shared/lib/env-config';
+import { AUTH_TOKEN_KEY } from '@/shared/utils/constants/storage-keys';
 
 export const BASE_URL = env.NEXT_PUBLIC_BASE_URL;
 
@@ -27,13 +27,16 @@ function onRefreshed(token: string | null) {
 axiosInstance.interceptors.request.use((config) => {
   const token =
     useAuthStore.getState().token ||
-    (typeof window !== "undefined" ? localStorage.getItem(AUTH_TOKEN_KEY) : null);
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(AUTH_TOKEN_KEY)
+      : null);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  config.headers["Content-Type"] = config.headers["Content-Type"] ?? "application/json";
+  config.headers['Content-Type'] =
+    config.headers['Content-Type'] ?? 'application/json';
 
   return config;
 });
@@ -70,9 +73,13 @@ axiosInstance.interceptors.response.use(
         const { setToken, token: stateToken } = useAuthStore.getState();
         const currentToken =
           stateToken ||
-          (typeof window !== "undefined" ? localStorage.getItem(AUTH_TOKEN_KEY) : null);
+          (typeof window !== 'undefined'
+            ? localStorage.getItem(AUTH_TOKEN_KEY)
+            : null);
 
-        const data = await AuthService.refreshTokenRaw(currentToken || undefined);
+        const data = await AuthService.refreshTokenRaw(
+          currentToken || undefined,
+        );
         await setToken(data.accessToken);
 
         isRefreshing = false;
@@ -89,8 +96,11 @@ axiosInstance.interceptors.response.use(
         const { clearToken } = useAuthStore.getState();
         await clearToken();
 
-        if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
-          window.location.href = "/login";
+        if (
+          typeof window !== 'undefined' &&
+          !window.location.pathname.includes('/login')
+        ) {
+          window.location.href = '/login';
         }
 
         return Promise.reject(refreshError);
@@ -98,5 +108,5 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );

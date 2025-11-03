@@ -1,13 +1,16 @@
-"use client";
+'use client';
 
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import dynamic from "next/dynamic";
-import Head from "next/head";
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
 
-const PageTransition = dynamic(() => import("@/shared/ui/components/page-transition"), {
-  ssr: false,
-});
+const PageTransition = dynamic(
+  () => import('@/shared/ui/components/page-transition'),
+  {
+    ssr: false,
+  },
+);
 
 export default function OfflinePage() {
   return (

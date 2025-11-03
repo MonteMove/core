@@ -1,5 +1,5 @@
-import { axiosInstance } from "@/shared";
-import { API_MAP } from "@/shared/utils/constants/api-map";
+import { axiosInstance } from '@/shared';
+import { API_MAP } from '@/shared/utils/constants/api-map';
 
 import {
   CreateOperationDto,
@@ -8,26 +8,40 @@ import {
   GetOperationsParamsSchema,
   GetOperationsResponseDto,
   GetOperationsResponseDtoSchema,
+  OperationResponseDto,
+  OperationResponseDtoSchema,
   UpdateOperationDto,
   UpdateOperationDtoSchema,
-} from "../model/opeartions-schemas";
+} from '../model/opeartions-schemas';
 
 export class OperationsService {
   public static async create(data: CreateOperationDto): Promise<void> {
     const validated = CreateOperationDtoSchema.parse(data);
-    await axiosInstance.post("/operations", validated);
+    await axiosInstance.post('/operations', validated);
   }
   public static async getOperations(
-    params?: GetOperationsParams
+    params?: GetOperationsParams,
   ): Promise<GetOperationsResponseDto> {
-    const validatedParams = params ? GetOperationsParamsSchema.parse(params) : undefined;
+    const validatedParams = params
+      ? GetOperationsParamsSchema.parse(params)
+      : undefined;
     const response = await axiosInstance.get(API_MAP.OPERATIONS.OPERATIONS, {
       params: validatedParams,
     });
     return GetOperationsResponseDtoSchema.parse(response.data);
   }
 
-  public static async update(id: string, data: UpdateOperationDto): Promise<void> {
+  public static async getById(id: string): Promise<OperationResponseDto> {
+    const { data } = await axiosInstance.get(
+      API_MAP.OPERATIONS.OPERATIONS_BY_ID(id),
+    );
+    return OperationResponseDtoSchema.parse(data);
+  }
+
+  public static async update(
+    id: string,
+    data: UpdateOperationDto,
+  ): Promise<void> {
     const validated = UpdateOperationDtoSchema.parse(data);
     await axiosInstance.put(API_MAP.OPERATIONS.OPERATIONS_BY_ID(id), validated);
   }

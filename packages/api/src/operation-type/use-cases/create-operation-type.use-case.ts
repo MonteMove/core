@@ -6,35 +6,35 @@ import { CreateOperationTypeResponse } from '../types';
 
 @Injectable()
 export class CreateOperationTypeUseCase {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(
-        createOperationTypeDto: CreateOperationTypeDto,
-        userId: string,
-    ): Promise<CreateOperationTypeResponse> {
-        const { name, description } = createOperationTypeDto;
+  public async execute(
+    createOperationTypeDto: CreateOperationTypeDto,
+    userId: string,
+  ): Promise<CreateOperationTypeResponse> {
+    const { name, description } = createOperationTypeDto;
 
-        const operationType = await this.prisma.operationType.create({
-            data: {
-                userId,
-                updatedById: userId,
-                name,
-                description,
-            },
-            select: {
-                id: true,
-                userId: true,
-                updatedById: true,
-                name: true,
-                description: true,
-                createdAt: true,
-                updatedAt: true,
-            },
-        });
+    const operationType = await this.prisma.operationType.create({
+      data: {
+        userId,
+        updatedById: userId,
+        name,
+        description,
+      },
+      select: {
+        id: true,
+        userId: true,
+        updatedById: true,
+        name: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-        return {
-            message: 'Тип операции успешно создан',
-            operationType,
-        };
-    }
+    return {
+      message: 'Тип операции успешно создан',
+      operationType,
+    };
+  }
 }

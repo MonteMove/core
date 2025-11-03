@@ -1,11 +1,16 @@
-"use client";
+'use client';
 
-import { ReportGeneralForm } from "@/entities/reports";
-import { ReportsConversionForm } from "@/entities/reports";
-import { ReportsPeriodForm } from "@/entities/reports";
-import { usePopapStore } from "@/entities/reports";
-import { Sheet, SheetContent } from "@/shared/ui/shadcn/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/shadcn/tabs";
+import { ReportGeneralForm } from '@/entities/reports';
+import { ReportsConversionForm } from '@/entities/reports';
+import { ReportsPeriodForm } from '@/entities/reports';
+import { usePopapStore } from '@/entities/reports';
+import { Sheet, SheetContent } from '@/shared/ui/shadcn/sheet';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/shared/ui/shadcn/tabs';
 
 export function ReportsSheet() {
   const active = usePopapStore((state) => state.active);

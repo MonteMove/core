@@ -6,61 +6,77 @@ import { CreateNetworkResponse } from '../types';
 
 @Injectable()
 export class CreateNetworkUseCase {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(createNetworkDto: CreateNetworkDto, userId: string): Promise<CreateNetworkResponse> {
-        const { code, name } = createNetworkDto;
+  public async execute(
+    createNetworkDto: CreateNetworkDto,
+    userId: string,
+  ): Promise<CreateNetworkResponse> {
+    const { code, name } = createNetworkDto;
 
-        const existingNetworkByCode = await this.prisma.network.findFirst({
-            where: {
-                code,
-                deleted: false,
-            },
-        });
+    const existingNetworkByCode = await this.prisma.network.findFirst({
+      where: {
+        code,
+        deleted: false,
+      },
+    });
 
-        if (existingNetworkByCode) {
-            throw new BadRequestException(`Сеть с кодом "${code}" уже существует`);
-        }
-
-        const existingNetworkByName = await this.prisma.network.findFirst({
-            where: {
-                name,
-                deleted: false,
-            },
-        });
-
-        if (existingNetworkByName) {
-            throw new BadRequestException(`Сеть с названием "${name}" уже существует`);
-        }
-
-        const network = await this.prisma.network.create({
-            data: {
-                userId,
-                updatedById: userId,
-                code,
-                name,
-            },
-            include: {
-                created_by: {
-                    select: {
-                        id: true,
-                        username: true,
-                    },
-                },
-                updated_by: {
-                    select: {
-                        id: true,
-                        username: true,
-                    },
-                },
-            },
-        });
-
-        const { deleted: _, ...networkResponse } = network;
-
-        return {
-            message: 'Сеть успешно создана',
-            network: networkResponse,
-        };
+    if (existingNetworkByCode) {
+      throw new BadRequestException(`Сеть с кодом "${code}" уже существует`);
     }
+
+    const deletedNetworkByCode = await this.prisma.network.findFirst({
+      where: {
+        code,
+        deleted: true,
+      },
+    });
+
+    if (deletedNetworkByCode) {
+      throw new BadRequestException(
+        `Сеть с кодом "${code}" была удалена. Восстановите её или используйте другой код`,
+      );
+    }
+
+    const existingNetworkByName = await this.prisma.network.findFirst({
+      where: {
+        name,
+        deleted: false,
+      },
+    });
+
+    if (existingNetworkByName) {
+      throw new BadRequestException(
+        `Сеть с названием "${name}" уже существует`,
+      );
+    }
+
+    const network = await this.prisma.network.create({
+      data: {
+        userId,
+        updatedById: userId,
+        code,
+        name,
+      },
+      include: {
+        created_by: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        updated_by: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+
+    return {
+      message: 'Сеть успешно создана',
+      network,
+    };
+  }
 }

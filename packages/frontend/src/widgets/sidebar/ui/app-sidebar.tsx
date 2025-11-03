@@ -1,21 +1,25 @@
-"use client";
+'use client';
 
-import { ComponentProps } from "react";
+import { ComponentProps } from 'react';
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   Book,
   ChartColumnIncreasing,
+  Coins,
+  FolderKanban,
   HandshakeIcon,
   Home,
+  Layers,
   LifeBuoy,
   MessageCircle,
+  Network,
   Ticket,
   Users,
   Wallet,
-} from "lucide-react";
+} from 'lucide-react';
 
 import {
   ROUTER_MAP,
@@ -26,72 +30,92 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/shared";
-import { NavMain } from "@/widgets";
-import { NavSecondary } from "@/widgets";
-import { NavUser } from "@/widgets";
-import { ThemeToggle } from "@/widgets";
+} from '@/shared';
+import { NavMain } from '@/widgets';
+import { NavSecondary } from '@/widgets';
+import { NavUser } from '@/widgets';
+import { ThemeToggle } from '@/widgets';
 
 const data = {
   user: {
-    name: "Admin",
-    email: "admin@example.com",
-    avatar: "/avatars/admin.jpg",
+    name: 'Admin',
+    email: 'admin@example.com',
+    avatar: '/avatars/admin.jpg',
   },
   navMain: [
     {
-      title: "Главная",
+      title: 'Главная',
       url: ROUTER_MAP.DASHBOARD,
       icon: Home,
       isActive: true,
     },
     {
-      title: "Операции",
+      title: 'Операции',
       url: ROUTER_MAP.OPERATIONS,
       icon: HandshakeIcon,
     },
     {
-      title: "Кошельки",
+      title: 'Кошельки',
       url: ROUTER_MAP.WALLETS,
       icon: Wallet,
     },
     {
-      title: "Заявки",
+      title: 'Заявки',
       url: ROUTER_MAP.APPLICATIONS,
       icon: Ticket,
     },
     {
-      title: "Справочники",
+      title: 'Справочники',
       url: ROUTER_MAP.GUIDES,
       icon: Book,
     },
     {
-      title: "Пользователи",
+      title: 'Пользователи',
       url: ROUTER_MAP.USERS,
       icon: Users,
+    },
+    {
+      title: 'Валюты',
+      url: ROUTER_MAP.CURRENCIES,
+      icon: Coins,
+    },
+    {
+      title: 'Сети',
+      url: ROUTER_MAP.NETWORKS,
+      icon: Network,
+    },
+    {
+      title: 'Типы сетей',
+      url: ROUTER_MAP.NETWORK_TYPES,
+      icon: Layers,
+    },
+    {
+      title: 'Типы кошельков',
+      url: ROUTER_MAP.WALLET_TYPES,
+      icon: FolderKanban,
     },
   ],
   navSecondary: [
     {
-      title: "Помощь",
+      title: 'Помощь',
       url: ROUTER_MAP.HELP,
       icon: LifeBuoy,
     },
     {
-      title: "Обратная связь",
+      title: 'Обратная связь',
       url: ROUTER_MAP.FEEDBACK,
       icon: MessageCircle,
     },
   ],
   projects: [
     {
-      title: "Аналитика",
+      title: 'Аналитика',
       url: ROUTER_MAP.ANALYTICS,
       icon: ChartColumnIncreasing,
     },
     {
-      title: "Отчеты",
-      url: "#",
+      title: 'Отчеты',
+      url: '#',
       isAction: true,
       icon: ChartColumnIncreasing,
     },
@@ -124,7 +148,11 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} label="Главное" />
         <NavSecondary items={data.projects} label="Данные" />
-        <NavSecondary items={data.navSecondary} className="mt-auto" label="Другое" />
+        <NavSecondary
+          items={data.navSecondary}
+          className="mt-auto"
+          label="Другое"
+        />
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center justify-between gap-2">

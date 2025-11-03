@@ -1,20 +1,29 @@
-"use client";
+'use client';
 
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import dynamic from "next/dynamic";
-import Head from "next/head";
-import Link from "next/link";
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
+import Link from 'next/link';
 
-import { Search } from "lucide-react";
+import { Search } from 'lucide-react';
 
-import { Button } from "@/shared/ui/shadcn/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/shadcn/card";
-import { ROUTER_MAP } from "@/shared/utils/constants/router-map";
+import { Button } from '@/shared/ui/shadcn/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/shadcn/card';
+import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
-const PageTransition = dynamic(() => import("@/shared/ui/components/page-transition"), {
-  ssr: false,
-});
+const PageTransition = dynamic(
+  () => import('@/shared/ui/components/page-transition'),
+  {
+    ssr: false,
+  },
+);
 
 export default function NotFound() {
   return (

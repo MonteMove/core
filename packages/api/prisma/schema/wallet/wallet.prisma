@@ -1,0 +1,58 @@
+enum BalanceStatus {
+  unknown
+  positive
+  negative
+  neutral
+
+  @@map("balance_status")
+}
+
+enum WalletKind {
+  crypto
+  bank
+  simple
+
+  @@map("wallet_kind")
+}
+
+model Wallet {
+  id            String        @id @default(uuid()) @db.Uuid
+  userId        String        @map("user_id") @db.Uuid
+  updatedById   String        @map("updated_by_id") @db.Uuid
+  currencyId    String        @map("currency_id") @db.Uuid
+  name          String
+  description   String?
+  amount        Int
+  balanceStatus BalanceStatus @map("balance_status")
+  walletKind    WalletKind    @default(simple) @map("wallet_kind")
+  walletTypeId  String?       @map("wallet_type_id") @db.Uuid
+  active        Boolean       @default(true)
+  pinOnMain     Boolean       @default(false) @map("pin_on_main")
+  pinned        Boolean       @default(false)
+  visible       Boolean       @default(true)
+  deleted       Boolean       @default(false)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  user       User           @relation("wallet_owner", fields: [userId], references: [id])
+  created_by User           @relation("wallets_created_by", fields: [updatedById], references: [id], map: "wallets_created_by_fkey")
+  updated_by User           @relation("wallets_updated_by", fields: [updatedById], references: [id], map: "wallets_updated_by_fkey")
+  currency   Currency       @relation(fields: [currencyId], references: [id])
+  walletType WalletType?    @relation(fields: [walletTypeId], references: [id])
+  operations Operation[]
+  details    WalletDetail?
+
+  @@index([userId], map: "wallets_user_idx")
+  @@index([updatedById], map: "wallets_updated_by_idx")
+  @@index([currencyId], map: "wallets_currency_idx")
+  @@index([walletKind], map: "wallets_wallet_kind_idx")
+  @@index([walletTypeId], map: "wallets_wallet_type_idx")
+  @@index([active], map: "wallets_active_idx")
+  @@index([pinOnMain], map: "wallet_settings_pin_on_main_idx")
+  @@index([pinned], map: "wallet_settings_pinned_idx")
+  @@index([visible], map: "wallet_settings_visible_idx")
+  @@index([deleted], map: "wallets_deleted_idx")
+  @@index([createdAt], map: "wallets_created_at_idx")
+  @@index([updatedAt], map: "wallets_updated_at_idx")
+  @@map("wallets")
+}

@@ -1,10 +1,16 @@
-"use client";
+'use client';
 
-import { useParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 
-import { useApplications } from "@/entities/application";
-import { EditApplicationForm } from "@/features/application/ui/edit-application/edit-application";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/shadcn/card";
+import { useApplications } from '@/entities/application';
+import { EditApplicationForm } from '@/features/application/ui/edit-application/edit-application';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/shadcn/card';
 
 export default function EditApplicationPage() {
   const params = useParams<{ id: string }>();

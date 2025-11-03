@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import { RegisterRequestSchema } from "@/entities/auth";
-import { UserRole } from "@/entities/users/model/user-schemas";
-import { useCreateUser } from "@/features/users/hooks/use-user-create";
-import { Button } from "@/shared/ui/shadcn/button";
+import { RegisterRequestSchema } from '@/entities/auth';
+import { UserRole } from '@/entities/users/model/user-schemas';
+import { useCreateUser } from '@/features/users/hooks/use-user-create';
+import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
@@ -16,15 +16,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared/ui/shadcn/form";
-import { Input } from "@/shared/ui/shadcn/input";
+} from '@/shared/ui/shadcn/form';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/shadcn/select";
+} from '@/shared/ui/shadcn/select';
 
 export function CreateUserForm() {
   const createUserMutation = useCreateUser();
@@ -32,8 +32,8 @@ export function CreateUserForm() {
   const form = useForm<z.infer<typeof RegisterRequestSchema>>({
     resolver: zodResolver(RegisterRequestSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
       roles: [UserRole.USER],
     },
   });
@@ -70,7 +70,11 @@ export function CreateUserForm() {
               <FormLabel>Пароль</FormLabel>
               <FormDescription>Укажите пароль пользователю</FormDescription>
               <FormControl>
-                <Input type="password" placeholder="Введите пароль" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Введите пароль"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,9 +87,14 @@ export function CreateUserForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Роли</FormLabel>
-              <FormDescription>Укажите роли для нового пользователя.</FormDescription>
+              <FormDescription>
+                Укажите роли для нового пользователя.
+              </FormDescription>
               <FormControl>
-                <Select onValueChange={(value) => field.onChange([value])} value={field.value?.[0]}>
+                <Select
+                  onValueChange={(value) => field.onChange([value])}
+                  value={field.value?.[0]}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Выберите роль" />
                   </SelectTrigger>
@@ -103,8 +112,12 @@ export function CreateUserForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={createUserMutation.isPending}>
-          {createUserMutation.isPending ? "Создание..." : "Создать"}
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={createUserMutation.isPending}
+        >
+          {createUserMutation.isPending ? 'Создание...' : 'Создать'}
         </Button>
       </form>
     </Form>

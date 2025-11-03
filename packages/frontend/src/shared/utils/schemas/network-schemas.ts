@@ -1,6 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { PaginationSchema } from "./common-schemas";
+import { PaginationSchema } from './common-schemas';
 
 export const NetworkSchema = z.object({
   id: z.string().uuid(),
@@ -35,4 +35,6 @@ export const GetNetworkTypesResponseSchema = z.object({
 export type Network = z.infer<typeof NetworkSchema>;
 export type NetworksResponse = z.infer<typeof GetNetworksResponseSchema>;
 export type NetworkType = z.infer<typeof NetworkTypeSchema>;
-export type NetworkTypesResponse = z.infer<typeof GetNetworkTypesResponseSchema>;
+export type NetworkTypesResponse = z.infer<
+  typeof GetNetworkTypesResponseSchema
+>;

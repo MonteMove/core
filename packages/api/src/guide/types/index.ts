@@ -1,7 +1,7 @@
 export {
-    CreateGuideOutput,
-    DeleteGuideOutput,
-    GetGuideByIdOutput,
-    GetGuidesOutput,
-    UpdateGuideOutput,
+  CreateGuideOutput,
+  DeleteGuideOutput,
+  GetGuideByIdOutput,
+  GetGuidesOutput,
+  UpdateGuideOutput,
 } from './use-cases';

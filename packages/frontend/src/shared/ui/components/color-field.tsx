@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-import { HexColorPicker } from "react-colorful";
+import { HexColorPicker } from 'react-colorful';
 
 type ColorFieldProps = {
   name: string;
@@ -17,12 +17,15 @@ export function ColorField({ label, value, onChange }: ColorFieldProps) {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
@@ -33,12 +36,15 @@ export function ColorField({ label, value, onChange }: ColorFieldProps) {
     >
       <span className="select-none text-sm">{label}</span>
 
-      <div className="w-5 h-5 border rounded-sm" style={{ backgroundColor: value }}></div>
+      <div
+        className="w-5 h-5 border rounded-sm"
+        style={{ backgroundColor: value }}
+      ></div>
 
       {open && (
         <div
           className="absolute top-full left-1/2 mt-2"
-          style={{ transform: "translateX(-50%)", zIndex: 50 }}
+          style={{ transform: 'translateX(-50%)', zIndex: 50 }}
         >
           <HexColorPicker
             className="border-4 border-primary rounded-[12]"

@@ -1,0 +1,24 @@
+model Currency {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  updatedById String   @map("updated_by_id") @db.Uuid
+  code        String
+  name        String
+  deleted     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  created_by   User          @relation("currencies_created_by", fields: [userId], references: [id])
+  updated_by   User          @relation("currencies_updated_by", fields: [updatedById], references: [id])
+  wallets      Wallet[]
+  applications Application[]
+
+  @@unique([code, deleted], map: "currencies_code_deleted_unique")
+  @@unique([name, deleted], map: "currencies_name_deleted_unique")
+  @@index([userId], map: "currencies_user_id_idx")
+  @@index([updatedById], map: "currencies_updated_by_id_idx")
+  @@index([createdAt], map: "currencies_created_at_idx")
+  @@index([updatedAt], map: "currencies_updated_at_idx")
+  @@index([deleted, createdAt(sort: Desc)], map: "currencies_deleted_created_idx")
+  @@map("currencies")
+}

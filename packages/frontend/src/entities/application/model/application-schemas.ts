@@ -1,35 +1,54 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { CurrencyInfoSchema } from "../../currency/model/currency-schemas";
+import { CurrencyInfoSchema } from '../../currency/model/currency-schemas';
 import {
   OperationInfoSchema,
   OperationTypeInfoSchema,
-} from "../../operations/model/operation-type-schemas";
-import { UserInfoSchema } from "../../users/model/user-schemas";
+} from '../../operations/model/operation-type-schemas';
+import { UserInfoSchema } from '../../users/model/user-schemas';
 
 export const CreateApplicationRequestSchema = z.object({
-  currencyId: z.string().uuid("ID валюты должен быть валидным UUID"),
-  operationTypeId: z.string().uuid("ID типа операции должен быть валидным UUID"),
-  assigneeUserId: z.string().uuid("ID исполнителя должен быть валидным UUID"),
-  description: z.string().max(2000, "Описание не должно превышать 2000 символов").optional(),
-  amount: z.number().int().min(0, "Сумма не может быть отрицательной"),
+  currencyId: z.string().uuid('ID валюты должен быть валидным UUID'),
+  operationTypeId: z
+    .string()
+    .uuid('ID типа операции должен быть валидным UUID'),
+  assigneeUserId: z.string().uuid('ID исполнителя должен быть валидным UUID'),
+  description: z
+    .string()
+    .max(2000, 'Описание не должно превышать 2000 символов')
+    .optional(),
+  amount: z.number().int().min(0, 'Сумма не может быть отрицательной'),
   telegramUsername: z
     .string()
-    .max(100, "Telegram username не должен превышать 100 символов")
-    .regex(/^@?[a-zA-Z0-9_]*$/, "Можно использовать только буквы, цифры и подчеркивания")
-    .transform((val) => val.replace(/^@/, ""))
+    .max(100, 'Telegram username не должен превышать 100 символов')
+    .regex(
+      /^@?[a-zA-Z0-9_]*$/,
+      'Можно использовать только буквы, цифры и подчеркивания',
+    )
+    .transform((val) => val.replace(/^@/, ''))
     .optional()
-    .or(z.literal("")),
-  phone: z.string().max(20, "Телефон не должен превышать 20 символов").optional(),
-  meetingDate: z.string().datetime("Неверный формат даты"),
+    .or(z.literal('')),
+  phone: z
+    .string()
+    .max(20, 'Телефон не должен превышать 20 символов')
+    .optional(),
+  meetingDate: z.string().datetime('Неверный формат даты'),
   advance: z.boolean().optional(),
 });
 
-export type CreateApplicationRequest = z.infer<typeof CreateApplicationRequestSchema>;
+export type CreateApplicationRequest = z.infer<
+  typeof CreateApplicationRequestSchema
+>;
 
-const ApplicationStatus = z.enum(["all", "open", "done"]);
-const ApplicationSortField = z.enum(["status", "amount", "meetingDate", "createdAt", "updatedAt"]);
-const SortOrder = z.enum(["asc", "desc"]);
+const ApplicationStatus = z.enum(['all', 'open', 'done']);
+const ApplicationSortField = z.enum([
+  'status',
+  'amount',
+  'meetingDate',
+  'createdAt',
+  'updatedAt',
+]);
+const SortOrder = z.enum(['asc', 'desc']);
 
 export const getApplicationsFiltersSchema = z.object({
   search: z.string().optional(),
@@ -56,7 +75,9 @@ export const getApplicationsFiltersSchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional(),
 });
 
-export type GetApplicationsFilters = z.infer<typeof getApplicationsFiltersSchema>;
+export type GetApplicationsFilters = z.infer<
+  typeof getApplicationsFiltersSchema
+>;
 
 export const ApplicationResponseSchema = z.object({
   id: z.number().int(),
@@ -87,7 +108,9 @@ export const CreateApplicationResponseSchema = z.object({
   application: ApplicationResponseSchema,
 });
 
-export type CreateApplicationResponse = z.infer<typeof CreateApplicationResponseSchema>;
+export type CreateApplicationResponse = z.infer<
+  typeof CreateApplicationResponseSchema
+>;
 
 export type ApplicationResponse = z.infer<typeof ApplicationResponseSchema>;
 
@@ -101,13 +124,17 @@ export const GetApplicationsResponseSchema = z.object({
   }),
 });
 
-export type GetApplicationsResponse = z.infer<typeof GetApplicationsResponseSchema>;
+export type GetApplicationsResponse = z.infer<
+  typeof GetApplicationsResponseSchema
+>;
 
 export const GetApplicationByIdSchema = z.object({
   id: z.number().int().positive(),
 });
 
-export type GetApplicationByIdRequest = z.infer<typeof GetApplicationByIdSchema>;
+export type GetApplicationByIdRequest = z.infer<
+  typeof GetApplicationByIdSchema
+>;
 export type GetApplicationByIdResponse = ApplicationResponse;
 
 export const UpdateApplicationSchema = z.object({
@@ -131,7 +158,9 @@ export const UpdateApplicationResponseSchema = z.object({
   application: ApplicationResponseSchema,
 });
 
-export type UpdateApplicationResponse = z.infer<typeof UpdateApplicationResponseSchema>;
+export type UpdateApplicationResponse = z.infer<
+  typeof UpdateApplicationResponseSchema
+>;
 
 export const DeleteApplicationSchema = z.object({
   id: z.number().int().positive(),
@@ -143,4 +172,6 @@ export const DeleteApplicationResponseSchema = z.object({
   message: z.string(),
 });
 
-export type DeleteApplicationResponse = z.infer<typeof DeleteApplicationResponseSchema>;
+export type DeleteApplicationResponse = z.infer<
+  typeof DeleteApplicationResponseSchema
+>;

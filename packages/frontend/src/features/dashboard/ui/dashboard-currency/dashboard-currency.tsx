@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { A11y, Navigation, Scrollbar } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { A11y, Navigation, Scrollbar } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
-import type { WalletCurrencyGroup } from "@/entities/wallet";
-import { Card, CardContent } from "@/shared";
-import { Skeleton } from "@/shared";
+import type { WalletCurrencyGroup } from '@/entities/wallet';
+import { Card, CardContent } from '@/shared';
+import { Skeleton } from '@/shared';
 
 interface DashboardCurrencyProps {
   isLoading: boolean;
@@ -22,20 +22,28 @@ const getWalletsLabel = (count: number) => {
   const mod100 = count % 100;
   const mod10 = count % 10;
 
-  if (mod100 >= 11 && mod100 <= 14) return "кошельков";
-  if (mod10 === 1) return "кошелек";
-  if (mod10 >= 2 && mod10 <= 4) return "кошелька";
-  return "кошельков";
+  if (mod100 >= 11 && mod100 <= 14) return 'кошельков';
+  if (mod10 === 1) return 'кошелек';
+  if (mod10 >= 2 && mod10 <= 4) return 'кошелька';
+  return 'кошельков';
 };
 
-export function DashboardCurrency({ isLoading, hasError, currencyGroups }: DashboardCurrencyProps) {
+export function DashboardCurrency({
+  isLoading,
+  hasError,
+  currencyGroups,
+}: DashboardCurrencyProps) {
   const summaries = useMemo(
     () =>
       currencyGroups.map((group) => {
-        const totalAmount = group.wallets.reduce((acc, wallet) => acc + wallet.amount, 0);
+        const totalAmount = group.wallets.reduce(
+          (acc, wallet) => acc + wallet.amount,
+          0,
+        );
         const walletsCount = group.wallets.length;
         const firstWallet = group.wallets[0];
-        const currencyCode = firstWallet?.currency.code ?? group.currency.toUpperCase();
+        const currencyCode =
+          firstWallet?.currency.code ?? group.currency.toUpperCase();
         const currencyName = firstWallet?.currency.name ?? currencyCode;
 
         return {
@@ -46,7 +54,7 @@ export function DashboardCurrency({ isLoading, hasError, currencyGroups }: Dashb
           currencyName,
         };
       }),
-    [currencyGroups]
+    [currencyGroups],
   );
 
   if (hasError) {
@@ -107,15 +115,21 @@ export function DashboardCurrency({ isLoading, hasError, currencyGroups }: Dashb
             spaceBetween={16}
             slidesPerView={1}
             navigation={{
-              nextEl: ".next",
-              prevEl: ".prev",
+              nextEl: '.next',
+              prevEl: '.prev',
             }}
             scrollbar={{ draggable: true }}
             breakpoints={{
               600: { slidesPerView: 1 },
-              620: { slidesPerView: summaries.length > 2 ? 2 : summaries.length },
-              800: { slidesPerView: summaries.length > 3 ? 3 : summaries.length },
-              1280: { slidesPerView: summaries.length > 4 ? 4 : summaries.length },
+              620: {
+                slidesPerView: summaries.length > 2 ? 2 : summaries.length,
+              },
+              800: {
+                slidesPerView: summaries.length > 3 ? 3 : summaries.length,
+              },
+              1280: {
+                slidesPerView: summaries.length > 4 ? 4 : summaries.length,
+              },
             }}
             className="w-full"
           >
@@ -123,13 +137,11 @@ export function DashboardCurrency({ isLoading, hasError, currencyGroups }: Dashb
               <SwiperSlide key={summary.key} className="h-auto">
                 <Card className="w-full h-fit p-0">
                   <CardContent className="flex flex-col p-4 gap-1">
-                    <p className="text-2xl font-semibold">{summary.totalAmount.toLocaleString()}</p>
+                    <p className="text-2xl font-semibold">
+                      {summary.totalAmount.toLocaleString()}
+                    </p>
                     <p className="text-sm font-medium text-muted-foreground uppercase">
                       {summary.currencyCode}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{summary.currencyName}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {summary.walletsCount} {getWalletsLabel(summary.walletsCount)}
                     </p>
                   </CardContent>
                 </Card>

@@ -1,0 +1,22 @@
+model WalletType {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+
+  showInTabs Boolean @default(false) @map("show_in_tabs")
+  tabOrder   Int     @default(0) @map("tab_order")
+
+  active    Boolean  @default(true)
+  deleted   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  wallets Wallet[]
+
+  @@index([code], map: "wallet_types_code_idx")
+  @@index([showInTabs], map: "wallet_types_show_in_tabs_idx")
+  @@index([active], map: "wallet_types_active_idx")
+  @@index([deleted], map: "wallet_types_deleted_idx")
+  @@map("wallet_types")
+}

@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight, type LucideIcon } from 'lucide-react';
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/shared/ui/shadcn/collapsible";
+} from '@/shared/ui/shadcn/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -22,9 +22,9 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/shared/ui/shadcn/sidebar";
-import { useSidebar } from "@/shared/ui/shadcn/sidebar";
-import { ROUTER_MAP } from "@/shared/utils/constants/router-map";
+} from '@/shared/ui/shadcn/sidebar';
+import { useSidebar } from '@/shared/ui/shadcn/sidebar';
+import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 export function NavMain({
   items,

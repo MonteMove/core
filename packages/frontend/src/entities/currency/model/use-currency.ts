@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { CurrencyService } from "@/entities/currency/api/currency-service";
-import { CURRENCY_QUERY_KEY } from "@/shared/utils/constants/currency-query-key";
+import { CurrencyService } from '@/entities/currency/api/currency-service';
+import { CURRENCY_QUERY_KEY } from '@/shared/utils/constants/currency-query-key';
 
 export const useCurrency = () => {
   const queryResult = useQuery({
@@ -16,7 +16,7 @@ export const useCurrency = () => {
 
   useEffect(() => {
     if (queryResult.isError && queryResult.error) {
-      toast.error("Не удалось загрузить валюты");
+      toast.error('Не удалось загрузить валюты');
     }
   }, [queryResult.isError, queryResult.error]);
 

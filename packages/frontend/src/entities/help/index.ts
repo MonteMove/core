@@ -1,2 +1,2 @@
-export * from "@/entities/help/api/help-service";
-export * from "@/entities/help/model/help-schema";
+export * from '@/entities/help/api/help-service';
+export * from '@/entities/help/model/help-schema';

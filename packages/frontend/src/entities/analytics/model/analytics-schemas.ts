@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // TODO:Поменять схему на актуальную
 export const AnalyticsItemResponseSchema = z.object({

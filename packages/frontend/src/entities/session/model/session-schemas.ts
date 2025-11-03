@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const SessionResponseDtoSchema = z.object({
   id: z.string(),
@@ -36,9 +36,13 @@ export const DeactivateMySessionByldResponseDtoSchema = z.object({
 });
 
 export type SessionResponseDto = z.infer<typeof SessionResponseDtoSchema>;
-export type GetSessionsResponseDto = z.infer<typeof GetSessionsResponseDtoSchema>;
+export type GetSessionsResponseDto = z.infer<
+  typeof GetSessionsResponseDtoSchema
+>;
 export type DeactivateSessionsDto = z.infer<typeof DeactivateSessionsDtoSchema>;
-export type DeactivateSessionsResponseDto = z.infer<typeof DeactivateSessionsResponseDtoSchema>;
+export type DeactivateSessionsResponseDto = z.infer<
+  typeof DeactivateSessionsResponseDtoSchema
+>;
 export type DeactivateMySessionByldResponseDto = z.infer<
   typeof DeactivateMySessionByldResponseDtoSchema
 >;

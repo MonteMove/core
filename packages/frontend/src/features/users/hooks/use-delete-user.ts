@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { UserService } from "@/entities/users/api/users-service";
+import { UserService } from '@/entities/users/api/users-service';
 
 export function useDeleteUser() {
   const queryClient = useQueryClient();
@@ -10,11 +10,11 @@ export function useDeleteUser() {
       return UserService.deleteUser(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success(`Пользователь удалён`);
     },
     onError: () => {
-      toast.error("Не удалось удалить пользователя");
+      toast.error('Не удалось удалить пользователя');
     },
   });
 }

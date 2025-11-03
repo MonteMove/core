@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { OperationTypeService } from "@/entities/operations/api/operation-type-sevice";
-import { OPERATION_TYPES_QUERY_KEY } from "@/shared/utils/constants/operation-types-query-key";
+import { OperationTypeService } from '@/entities/operations/api/operation-type-sevice';
+import { OPERATION_TYPES_QUERY_KEY } from '@/shared/utils/constants/operation-types-query-key';
 
 export const useOperationTypes = () => {
   const queryResult = useQuery({
@@ -16,7 +16,7 @@ export const useOperationTypes = () => {
 
   useEffect(() => {
     if (queryResult.isError && queryResult.error) {
-      toast.error("Не удалось загрузить типы операций");
+      toast.error('Не удалось загрузить типы операций');
     }
   }, [queryResult.isError, queryResult.error]);
 

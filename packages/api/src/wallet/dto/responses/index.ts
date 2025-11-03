@@ -1,3 +1,4 @@
+export * from './change-wallet-owner-response.dto';
 export * from './create-wallet-response.dto';
 export * from './delete-wallet-response.dto';
 export * from './get-pinned-wallets-response.dto';

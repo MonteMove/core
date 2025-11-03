@@ -1,10 +1,16 @@
-import { Metadata } from "next";
+import { Metadata } from 'next';
 
-import { CreateWalletForm } from "@/features/wallets/ui/create-wallet-form/create-wallet-form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/shadcn/card";
+import { WalletForm } from '@/features/wallets/ui/wallet-form/wallet-form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/shadcn/card';
 
 export const metadata: Metadata = {
-  title: "Создать кошелек",
+  title: 'Создать кошелек',
 };
 
 export default function CreateWalletPage() {
@@ -13,10 +19,12 @@ export default function CreateWalletPage() {
       <Card className="w-full max-w-4xl">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Создать кошелек</CardTitle>
-          <CardDescription>Заполните форму, чтобы добавить новый кошелек.</CardDescription>
+          <CardDescription>
+            Заполните форму, чтобы добавить новый кошелек.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <CreateWalletForm />
+          <WalletForm />
         </CardContent>
       </Card>
     </div>

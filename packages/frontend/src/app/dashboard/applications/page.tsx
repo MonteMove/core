@@ -1,8 +1,13 @@
-"use client";
+'use client';
 
-import { ApplicationsFilters } from "@/features/application/ui/application-filters/filters-applications";
-import { InfiniteApplicationsList } from "@/features/application/ui/infinite-applications/infinite-applications";
-import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/shadcn/card";
+import { ApplicationsFilters } from '@/features/application/ui/application-filters/filters-applications';
+import { InfiniteApplicationsList } from '@/features/application/ui/infinite-applications/infinite-applications';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/shadcn/card';
 
 export default function ApplicationsPage() {
   return (

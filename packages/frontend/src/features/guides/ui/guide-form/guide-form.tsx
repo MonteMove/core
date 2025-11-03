@@ -1,26 +1,33 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PopoverTrigger } from "@radix-ui/react-popover";
-import { ru } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { PopoverTrigger } from '@radix-ui/react-popover';
+import { ru } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
-import { CreateGuideRequest, CreateGuideSchema, GuideResponse } from "@/entities/guides";
-import { useCreateGuide, useUpdateGuide } from "@/features/guides/hooks/use-guide";
+import {
+  CreateGuideRequest,
+  CreateGuideSchema,
+  GuideResponse,
+} from '@/entities/guides';
+import {
+  useCreateGuide,
+  useUpdateGuide,
+} from '@/features/guides/hooks/use-guide';
 import {
   findPhoneRule,
   formatByRule,
   formatCardNumber,
   formatDate,
   normalizeDigits,
-} from "@/shared/lib/utils";
-import { cn } from "@/shared/lib/utils";
+} from '@/shared/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
-import { Button } from "../../../../shared/ui/shadcn/button";
-import { Calendar } from "../../../../shared/ui/shadcn/calendar";
+import { Button } from '../../../../shared/ui/shadcn/button';
+import { Calendar } from '../../../../shared/ui/shadcn/calendar';
 import {
   Form,
   FormControl,
@@ -28,16 +35,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../../../shared/ui/shadcn/form";
-import { Input } from "../../../../shared/ui/shadcn/input";
-import { Popover, PopoverContent } from "../../../../shared/ui/shadcn/popover";
-import { Textarea } from "../../../../shared/ui/shadcn/textarea";
+} from '../../../../shared/ui/shadcn/form';
+import { Input } from '../../../../shared/ui/shadcn/input';
+import { Popover, PopoverContent } from '../../../../shared/ui/shadcn/popover';
+import { Textarea } from '../../../../shared/ui/shadcn/textarea';
 
 export function GuideForm({
   initialData,
   className,
   ...props
-}: { initialData?: GuideResponse } & React.ComponentProps<"form">) {
+}: { initialData?: GuideResponse } & React.ComponentProps<'form'>) {
   const createMutation = useCreateGuide();
   const updateMutation = useUpdateGuide();
 
@@ -45,20 +52,20 @@ export function GuideForm({
     resolver: zodResolver(CreateGuideSchema),
     defaultValues: initialData
       ? {
-          fullName: initialData.fullName ?? "",
-          birthDate: initialData.birthDate ?? "",
-          address: initialData.address ?? "",
-          phone: initialData.phone ?? "",
-          cardNumber: initialData.cardNumber ?? "",
-          description: initialData.description ?? "",
+          fullName: initialData.fullName ?? '',
+          birthDate: initialData.birthDate ?? '',
+          address: initialData.address ?? '',
+          phone: initialData.phone ?? '',
+          cardNumber: initialData.cardNumber ?? '',
+          description: initialData.description ?? '',
         }
       : {
-          fullName: "",
-          birthDate: "",
-          address: "",
-          phone: "",
-          cardNumber: "",
-          description: "",
+          fullName: '',
+          birthDate: '',
+          address: '',
+          phone: '',
+          cardNumber: '',
+          description: '',
         },
   });
 
@@ -72,19 +79,19 @@ export function GuideForm({
 
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(
-    initialData?.birthDate ? new Date(initialData.birthDate) : undefined
+    initialData?.birthDate ? new Date(initialData.birthDate) : undefined,
   );
   const [month, setMonth] = React.useState<Date | undefined>(date);
 
   useEffect(() => {
     if (initialData) {
       form.reset({
-        fullName: initialData.fullName ?? "",
-        birthDate: initialData.birthDate ?? "",
-        address: initialData.address ?? "",
-        phone: initialData.phone ?? "",
-        cardNumber: initialData.cardNumber ?? "",
-        description: initialData.description ?? "",
+        fullName: initialData.fullName ?? '',
+        birthDate: initialData.birthDate ?? '',
+        address: initialData.address ?? '',
+        phone: initialData.phone ?? '',
+        cardNumber: initialData.cardNumber ?? '',
+        description: initialData.description ?? '',
       });
       if (initialData.birthDate) {
         const initialDate = new Date(initialData.birthDate);
@@ -98,7 +105,7 @@ export function GuideForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("flex flex-col gap-6", className)}
+        className={cn('flex flex-col gap-6', className)}
         {...props}
       >
         <div className="relative max-w-full">
@@ -129,9 +136,9 @@ export function GuideForm({
                       <div className="relative flex gap-2">
                         <FormControl>
                           <Input
-                            value={date ? formatDate(date) : ""}
+                            value={date ? formatDate(date) : ''}
                             placeholder="Выберите дату"
-                            className={cn("bg-background pr-10")}
+                            className={cn('bg-background pr-10')}
                             readOnly
                           />
                         </FormControl>
@@ -163,7 +170,9 @@ export function GuideForm({
                                 setDate(newDate ?? undefined);
                                 setMonth(newDate ?? undefined);
                                 setOpen(false);
-                                field.onChange(newDate ? newDate.toISOString() : "");
+                                field.onChange(
+                                  newDate ? newDate.toISOString() : '',
+                                );
                               }}
                               fromYear={1900}
                               toYear={new Date().getFullYear()}
@@ -198,7 +207,7 @@ export function GuideForm({
                 control={form.control}
                 name="phone"
                 render={({ field }) => {
-                  const rule = findPhoneRule(field.value ?? "");
+                  const rule = findPhoneRule(field.value ?? '');
                   return (
                     <FormItem>
                       <FormLabel>Номер телефона</FormLabel>
@@ -209,7 +218,7 @@ export function GuideForm({
                             const normalized = normalizeDigits(e.target.value);
                             field.onChange(normalized);
                           }}
-                          placeholder={rule?.example ?? "+XXX XX XXX XX XX"}
+                          placeholder={rule?.example ?? '+XXX XX XXX XX XX'}
                           inputMode="numeric"
                           maxLength={20}
                         />
@@ -231,7 +240,9 @@ export function GuideForm({
                       <Input
                         value={formatCardNumber(field.value)}
                         onChange={(e) => {
-                          const digitsOnly = e.target.value.replace(/[^\d]/g, "").slice(0, 16);
+                          const digitsOnly = e.target.value
+                            .replace(/[^\d]/g, '')
+                            .slice(0, 16);
                           field.onChange(digitsOnly);
                         }}
                         placeholder="0000 0000 0000 0000"
@@ -252,7 +263,7 @@ export function GuideForm({
                   <FormItem>
                     <FormLabel>Описание</FormLabel>
                     <FormControl>
-                      <Textarea className={cn("mt-[5] h-[250]")} {...field} />
+                      <Textarea className={cn('mt-[5] h-[250]')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -266,10 +277,10 @@ export function GuideForm({
                 disabled={createMutation.isPending || updateMutation.isPending}
               >
                 {createMutation.isPending || updateMutation.isPending
-                  ? "Сохраняем..."
+                  ? 'Сохраняем...'
                   : initialData
-                    ? "Сохранить"
-                    : "Создать"}
+                    ? 'Сохранить'
+                    : 'Создать'}
               </Button>
             </div>
           </div>

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from 'react';
 
 export function useLastItemObserver<T extends Element = HTMLElement>(
   fetchNextPage: () => void,
   isLoading: boolean,
-  hasNextPage: boolean
+  hasNextPage: boolean,
 ): (node: T | null) => void {
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -26,7 +26,7 @@ export function useLastItemObserver<T extends Element = HTMLElement>(
 
       observer.current.observe(node);
     },
-    [fetchNextPage, isLoading, hasNextPage]
+    [fetchNextPage, isLoading, hasNextPage],
   );
 
   useEffect(() => {

@@ -1,7 +1,7 @@
-import { Metadata } from "next";
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Обратная связь",
+  title: 'Обратная связь',
 };
 
 export default function FeedbackPage() {

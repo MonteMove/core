@@ -1,11 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsOptional } from 'class-validator';
-
-import { WalletType } from '../../../../prisma/generated/prisma';
+import { IsOptional, IsString } from 'class-validator';
 
 export class GetClosingPeriodReportDto {
-    @ApiPropertyOptional({ description: 'Фильтр по типу кошелька', enum: WalletType })
-    @IsOptional()
-    @IsEnum(WalletType)
-    public walletType?: WalletType;
+  @ApiPropertyOptional({
+    description: 'Фильтр по коду типа кошелька',
+    example: 'inskech',
+  })
+  @IsOptional()
+  @IsString()
+  public walletTypeCode?: string;
 }

@@ -3,7 +3,7 @@ import {
   type MarginTier,
   type RateValue,
   type RatesSnapshot,
-} from "@/entities/calculator/model/rates";
+} from '@/entities/calculator/model/rates';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════
@@ -67,50 +67,50 @@ import {
 /**
  * Доступные страны для операций
  */
-export type Country = "serbia" | "montenegro";
+export type Country = 'serbia' | 'montenegro';
 
 /**
  * Тип операции: продажа или покупка валюты
  */
-export type Scenario = "sale" | "purchase";
+export type Scenario = 'sale' | 'purchase';
 
 /**
  * Место встречи с клиентом
  */
-export type MeetingPlace = "msk_office" | "msk_field" | "regions";
+export type MeetingPlace = 'msk_office' | 'msk_field' | 'regions';
 
 /**
  * Канал для расчета комиссий (соответствует местам встречи)
  */
-export type CommissionChannel = "office" | "msk_field" | "regions";
+export type CommissionChannel = 'office' | 'msk_field' | 'regions';
 
 /**
  * Доступные входные валюты для операции продажи
  */
-export type SaleInputCurrency = "RUB" | "EUR" | "USD_WHITE" | "USD_BLUE";
+export type SaleInputCurrency = 'RUB' | 'EUR' | 'USD_WHITE' | 'USD_BLUE';
 
 /**
  * Доступные выходные валюты для операции продажи
  */
-export type SaleOutputCurrency = "EUR" | "RSD";
+export type SaleOutputCurrency = 'EUR' | 'RSD';
 
 /**
  * Доступные входные валюты для операции покупки
  */
-export type PurchaseInputCurrency = "EUR" | "RSD";
+export type PurchaseInputCurrency = 'EUR' | 'RSD';
 
 /**
  * Доступные выходные валюты для операции покупки
  */
-export type PurchaseOutputCurrency = "RUB" | "EUR" | "USD_WHITE" | "USD_BLUE";
+export type PurchaseOutputCurrency = 'RUB' | 'EUR' | 'USD_WHITE' | 'USD_BLUE';
 
 /**
  * Конфигурация коэффициента прибыли
  */
 export type ProfitConfig =
-  | { mode: "tier" }
-  | { mode: "trusted" }
-  | { mode: "custom"; coefficient: number };
+  | { mode: 'tier' }
+  | { mode: 'trusted' }
+  | { mode: 'custom'; coefficient: number };
 
 /**
  * Базовые входные данные для расчета (общие для продажи и покупки)
@@ -138,7 +138,7 @@ export interface BaseCalculationInput {
  * Входные данные для операции продажи валюты
  */
 export interface SaleInput extends BaseCalculationInput {
-  scenario: "sale";
+  scenario: 'sale';
   /** Входная валюта */
   inputCurrency: SaleInputCurrency;
   /** Выходная валюта */
@@ -151,7 +151,7 @@ export interface SaleInput extends BaseCalculationInput {
  * Входные данные для операции покупки валюты
  */
 export interface PurchaseInput extends BaseCalculationInput {
-  scenario: "purchase";
+  scenario: 'purchase';
   /** Входная валюта */
   inputCurrency: PurchaseInputCurrency;
   /** Выходная валюта */
@@ -286,7 +286,7 @@ export interface CalculationResult {
   /** Примененный коэффициент прибыли */
   profitCoefficient: number;
   /** Режим прибыли (tier/trusted/custom) */
-  profitMode: ProfitConfig["mode"];
+  profitMode: ProfitConfig['mode'];
   /** Тир маржи (если применимо) */
   marginTier: MarginTier | null;
   /** Информация о марже и прибыли */
@@ -309,8 +309,8 @@ export class CalculatorError extends Error {
   public readonly issues: string[];
 
   constructor(issues: string[]) {
-    super("Недостаточно данных для расчёта");
-    this.name = "CalculatorError";
+    super('Недостаточно данных для расчёта');
+    this.name = 'CalculatorError';
     this.issues = issues;
   }
 }
@@ -326,7 +326,7 @@ export class CalculatorError extends Error {
 function resolveRate(
   container: RateValue | undefined,
   label: string,
-  issues: string[]
+  issues: string[],
 ): number | null {
   const value = container?.value;
   if (value == null || Number.isNaN(value) || value <= 0) {
@@ -343,7 +343,10 @@ function resolveRate(
  * @param tiers - Массив доступных тиров маржи
  * @returns Подходящий тир маржи или null если не найден
  */
-function pickMarginTier(amountEur: number, tiers: MarginTier[]): MarginTier | null {
+function pickMarginTier(
+  amountEur: number,
+  tiers: MarginTier[],
+): MarginTier | null {
   if (!tiers.length) {
     return null;
   }
@@ -372,14 +375,20 @@ function pickMarginTier(amountEur: number, tiers: MarginTier[]): MarginTier | nu
 function determineProfitCoefficient(
   profit: ProfitConfig,
   marginTier: MarginTier | null,
-  issues: string[]
+  issues: string[],
 ): number {
-  if (profit.mode === "trusted") {
+  if (profit.mode === 'trusted') {
     return 0.99;
   }
-  if (profit.mode === "custom") {
-    if (profit.coefficient == null || profit.coefficient <= 0 || profit.coefficient > 1.2) {
-      issues.push("Некорректное значение пользовательского коэффициента прибыли");
+  if (profit.mode === 'custom') {
+    if (
+      profit.coefficient == null ||
+      profit.coefficient <= 0 ||
+      profit.coefficient > 1.2
+    ) {
+      issues.push(
+        'Некорректное значение пользовательского коэффициента прибыли',
+      );
       return marginTier?.coefficient ?? 1;
     }
     return profit.coefficient;
@@ -397,8 +406,8 @@ function determineProfitCoefficient(
  */
 function getFintechRate(
   snapshot: RatesSnapshot,
-  currency: "usd_white" | "usd_blue" | "eur",
-  side: "buy" | "sell"
+  currency: 'usd_white' | 'usd_blue' | 'eur',
+  side: 'buy' | 'sell',
 ): RateValue {
   return snapshot.fintech[currency][side];
 }
@@ -418,7 +427,7 @@ function buildRateDescriptor(
   value: number,
   override = false,
   source?: string,
-  fallbackUsed = false
+  fallbackUsed = false,
 ): RateDescriptor {
   return {
     label,
@@ -443,25 +452,29 @@ function buildRateDescriptor(
  * const eurAmount = convertToEur(1000, 'USD_WHITE', snapshot); // 920.00 EUR (примерный расчет)
  * ```
  */
-function convertToEur(amount: number, currency: string, snapshot: RatesSnapshot): number | null {
+function convertToEur(
+  amount: number,
+  currency: string,
+  snapshot: RatesSnapshot,
+): number | null {
   switch (currency) {
-    case "RSD": {
+    case 'RSD': {
       const rsdPerEur = snapshot.business.rsd_per_eur.value;
       if (!rsdPerEur) return null;
       return amount / rsdPerEur;
     }
-    case "USD_WHITE":
-    case "USD_BLUE": {
+    case 'USD_WHITE':
+    case 'USD_BLUE': {
       const usdToEur = snapshot.usd_variants.usd.value;
       if (!usdToEur) return null;
       return amount * usdToEur;
     }
-    case "RUB": {
+    case 'RUB': {
       const rubToEur = snapshot.cbr.rub_per_eur.value;
       if (!rubToEur) return null;
       return amount / rubToEur;
     }
-    case "EUR":
+    case 'EUR':
     default:
       return amount;
   }
@@ -473,8 +486,8 @@ function convertToEur(amount: number, currency: string, snapshot: RatesSnapshot)
  */
 function formatNumberWithSpaces(num: number, decimals: number = 2): string {
   const fixed = num.toFixed(decimals);
-  const [intPart, decPart] = fixed.split(".");
-  const withSpaces = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  const [intPart, decPart] = fixed.split('.');
+  const withSpaces = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
   return decPart ? `${withSpaces}.${decPart}` : withSpaces;
 }
 
@@ -515,23 +528,30 @@ function formatNumberWithSpaces(num: number, decimals: number = 2): string {
  * Сделка 100,000 EUR в офисе → 100 USD + база 20 USD = ИТОГО 120 USD
  * Сделка 50,000 EUR в регионах → 150 USD + база 20 USD = ИТОГО 170 USD (+ расходы на билеты)
  */
-function calculateEmployeeCommission(eurAmount: number, meetingPlace: MeetingPlace): number {
+function calculateEmployeeCommission(
+  eurAmount: number,
+  meetingPlace: MeetingPlace,
+): number {
   // Таблица порогов и комиссий (от Дениса)
   const commissionTiers = [
-    { place: "msk_office" as MeetingPlace, threshold: 100000, commission: 100 },
-    { place: "msk_office" as MeetingPlace, threshold: 50000, commission: 80 },
+    { place: 'msk_office' as MeetingPlace, threshold: 100000, commission: 100 },
+    { place: 'msk_office' as MeetingPlace, threshold: 50000, commission: 80 },
 
-    { place: "msk_field" as MeetingPlace, threshold: 100000, commission: 120 },
-    { place: "msk_field" as MeetingPlace, threshold: 70000, commission: 100 },
+    { place: 'msk_field' as MeetingPlace, threshold: 100000, commission: 120 },
+    { place: 'msk_field' as MeetingPlace, threshold: 70000, commission: 100 },
 
-    { place: "regions" as MeetingPlace, threshold: 100000, commission: 200 },
-    { place: "regions" as MeetingPlace, threshold: 70000, commission: 180 },
-    { place: "regions" as MeetingPlace, threshold: 50000, commission: 150 },
+    { place: 'regions' as MeetingPlace, threshold: 100000, commission: 200 },
+    { place: 'regions' as MeetingPlace, threshold: 70000, commission: 180 },
+    { place: 'regions' as MeetingPlace, threshold: 50000, commission: 150 },
   ];
 
-  const applicableTiers = commissionTiers.filter((tier) => tier.place === meetingPlace);
+  const applicableTiers = commissionTiers.filter(
+    (tier) => tier.place === meetingPlace,
+  );
 
-  for (const tier of applicableTiers.sort((a, b) => b.threshold - a.threshold)) {
+  for (const tier of applicableTiers.sort(
+    (a, b) => b.threshold - a.threshold,
+  )) {
     if (eurAmount >= tier.threshold) {
       return tier.commission;
     }
@@ -609,29 +629,40 @@ function performSale({
   const steps: CalculationStep[] = [];
 
   if (collectSteps) {
-    steps.push({ label: "Сумма на входе", amount, currency: input.inputCurrency });
+    steps.push({
+      label: 'Сумма на входе',
+      amount,
+      currency: input.inputCurrency,
+    });
   }
 
   const minEmployeeRewardUsd = 100;
   const estimatedUsdRate =
-    snapshot.fintech.usd_white?.buy?.value || snapshot.fintech.usd_blue?.buy?.value || 80;
+    snapshot.fintech.usd_white?.buy?.value ||
+    snapshot.fintech.usd_blue?.buy?.value ||
+    80;
   const minRequiredRub = minEmployeeRewardUsd * estimatedUsdRate;
 
   let estimatedInputRub = amount;
-  if (input.inputCurrency !== "RUB") {
+  if (input.inputCurrency !== 'RUB') {
     const eurRate = snapshot.fintech.eur?.buy?.value || 100;
     const usdRate =
-      snapshot.fintech.usd_white?.buy?.value || snapshot.fintech.usd_blue?.buy?.value || 80;
-    if (input.inputCurrency === "EUR") {
+      snapshot.fintech.usd_white?.buy?.value ||
+      snapshot.fintech.usd_blue?.buy?.value ||
+      80;
+    if (input.inputCurrency === 'EUR') {
       estimatedInputRub = amount * eurRate;
-    } else if (input.inputCurrency === "USD_WHITE" || input.inputCurrency === "USD_BLUE") {
+    } else if (
+      input.inputCurrency === 'USD_WHITE' ||
+      input.inputCurrency === 'USD_BLUE'
+    ) {
       estimatedInputRub = amount * usdRate;
     }
   }
 
   if (collectSteps && estimatedInputRub < minRequiredRub) {
     warnings.push(
-      `⚠️ Сумма может быть недостаточной. Минимальное вознаграждение сотрудника составляет около ${minRequiredRub.toFixed(0)} RUB (${minEmployeeRewardUsd} USD)`
+      `⚠️ Сумма может быть недостаточной. Минимальное вознаграждение сотрудника составляет около ${minRequiredRub.toFixed(0)} RUB (${minEmployeeRewardUsd} USD)`,
     );
   }
 
@@ -647,7 +678,7 @@ function performSale({
 
   const applyFintechConversion = (
     rateValue: RateValue | undefined,
-    label: string
+    label: string,
   ): number | null => {
     const rate = resolveRate(rateValue, label, issues);
     if (rate == null) {
@@ -660,67 +691,82 @@ function performSale({
 
   /** Шаг 1: Конвертация входной валюты в RUB через FinTech */
   switch (input.inputCurrency) {
-    case "EUR": {
+    case 'EUR': {
       /** Конвертация EUR в RUB (покупаем EUR за рубли) */
       const rate = applyFintechConversion(
-        getFintechRate(snapshot, "eur", "buy"),
-        "FinTech: покупка EUR (курс RUB/EUR)"
+        getFintechRate(snapshot, 'eur', 'buy'),
+        'FinTech: покупка EUR (курс RUB/EUR)',
       );
       if (rate != null) {
         rubAmount = amount * rate;
         addStep({
-          label: "EUR → RUB (FinTech)",
+          label: 'EUR → RUB (FinTech)',
           amount: rubAmount,
-          currency: "RUB",
-          rate: buildRateDescriptor("FinTech покупка EUR", rate, false, "FinTech Exchange"),
+          currency: 'RUB',
+          rate: buildRateDescriptor(
+            'FinTech покупка EUR',
+            rate,
+            false,
+            'FinTech Exchange',
+          ),
           formula: `${formatNumberWithSpaces(amount)} EUR × ${rate.toFixed(6)} = ${formatNumberWithSpaces(rubAmount)} RUB`,
           previousAmount: amount,
-          previousCurrency: "EUR",
+          previousCurrency: 'EUR',
         });
       }
       break;
     }
-    case "USD_WHITE": {
+    case 'USD_WHITE': {
       /** Конвертация белого USD в RUB */
       const rate = applyFintechConversion(
-        getFintechRate(snapshot, "usd_white", "buy"),
-        "FinTech: покупка USD белый (курс RUB/USD)"
+        getFintechRate(snapshot, 'usd_white', 'buy'),
+        'FinTech: покупка USD белый (курс RUB/USD)',
       );
       if (rate != null) {
         rubAmount = amount * rate;
         addStep({
-          label: "USD бел. → RUB (FinTech)",
+          label: 'USD бел. → RUB (FinTech)',
           amount: rubAmount,
-          currency: "RUB",
-          rate: buildRateDescriptor("FinTech покупка USD бел.", rate, false, "FinTech Exchange"),
+          currency: 'RUB',
+          rate: buildRateDescriptor(
+            'FinTech покупка USD бел.',
+            rate,
+            false,
+            'FinTech Exchange',
+          ),
           formula: `${formatNumberWithSpaces(amount)} USD × ${rate.toFixed(6)} = ${formatNumberWithSpaces(rubAmount)} RUB`,
           previousAmount: amount,
-          previousCurrency: "USD",
+          previousCurrency: 'USD',
         });
       }
       break;
     }
-    case "USD_BLUE": {
+    case 'USD_BLUE': {
       /** Конвертация синего USD в RUB */
       const rate = applyFintechConversion(
-        getFintechRate(snapshot, "usd_blue", "buy"),
-        "FinTech: покупка USD синий (курс RUB/USD)"
+        getFintechRate(snapshot, 'usd_blue', 'buy'),
+        'FinTech: покупка USD синий (курс RUB/USD)',
       );
       if (rate != null) {
         rubAmount = amount * rate;
         addStep({
-          label: "USD син. → RUB (FinTech)",
+          label: 'USD син. → RUB (FinTech)',
           amount: rubAmount,
-          currency: "RUB",
-          rate: buildRateDescriptor("FinTech покупка USD син.", rate, false, "FinTech Exchange"),
+          currency: 'RUB',
+          rate: buildRateDescriptor(
+            'FinTech покупка USD син.',
+            rate,
+            false,
+            'FinTech Exchange',
+          ),
           formula: `${formatNumberWithSpaces(amount)} USD × ${rate.toFixed(6)} = ${formatNumberWithSpaces(rubAmount)} RUB`,
           previousAmount: amount,
-          previousCurrency: "USD",
+          previousCurrency: 'USD',
         });
       }
       break;
     }
-    case "RUB":
+    case 'RUB':
     default:
       rubAmount = amount;
       break;
@@ -736,9 +782,9 @@ function performSale({
    * Есть таблица порогов (например: до 5000 EUR - одна ставка, от 5000 до 10000 - другая).
    * Поэтому нам нужно знать полный объем сделки в EUR ДО вычета комиссий.
    */
-  const eurAmountForCommission = convertToEur(rubAmount, "RUB", snapshot);
+  const eurAmountForCommission = convertToEur(rubAmount, 'RUB', snapshot);
   if (eurAmountForCommission == null) {
-    issues.push("Не удалось рассчитать сумму в EUR для комиссии сотрудника");
+    issues.push('Не удалось рассчитать сумму в EUR для комиссии сотрудника');
     return {
       inputAmount: amount,
       outputAmount: 0,
@@ -775,11 +821,13 @@ function performSale({
    * - Потом переводим в RUB (потому что вычитаем из рублей)
    */
   const baseEmployeeRewardUsd = 20; // Фиксированная база - всегда 20 USD
-  const usdWhiteRate = getFintechRate(snapshot, "usd_white", "buy").value;
-  const usdBlueRate = getFintechRate(snapshot, "usd_blue", "buy").value;
+  const usdWhiteRate = getFintechRate(snapshot, 'usd_white', 'buy').value;
+  const usdBlueRate = getFintechRate(snapshot, 'usd_blue', 'buy').value;
   const usdToRubRate = usdWhiteRate || usdBlueRate; // Берем любой доступный курс USD/RUB
   if (!usdToRubRate) {
-    issues.push("Не удалось получить курс USD/RUB для расчета вознаграждения сотрудника");
+    issues.push(
+      'Не удалось получить курс USD/RUB для расчета вознаграждения сотрудника',
+    );
     return {
       inputAmount: amount,
       outputAmount: 0,
@@ -797,12 +845,14 @@ function performSale({
 
   const additionalEmployeeRewardUsd = calculateEmployeeCommission(
     eurAmountForCommission,
-    input.meetingPlace
+    input.meetingPlace,
   );
-  const additionalEmployeeRewardRub = additionalEmployeeRewardUsd * usdToRubRate;
+  const additionalEmployeeRewardRub =
+    additionalEmployeeRewardUsd * usdToRubRate;
   rubAmount -= additionalEmployeeRewardRub;
 
-  const totalEmployeeRewardUsd = baseEmployeeRewardUsd + additionalEmployeeRewardUsd;
+  const totalEmployeeRewardUsd =
+    baseEmployeeRewardUsd + additionalEmployeeRewardUsd;
   const totalEmployeeRewardRub = totalEmployeeRewardUsd * usdToRubRate;
 
   const employeeCommissionInfo: EmployeeCommissionInfo = {
@@ -813,45 +863,49 @@ function performSale({
 
   if (rubAmount < 0) {
     issues.push(
-      `Сумма недостаточна для покрытия вознаграждения сотрудника (требуется минимум ${totalEmployeeRewardRub.toFixed(2)} RUB)`
+      `Сумма недостаточна для покрытия вознаграждения сотрудника (требуется минимум ${totalEmployeeRewardRub.toFixed(2)} RUB)`,
     );
     assertNoIssues(issues);
   }
 
   const rubBeforeEmployeeReward = rubAmount + totalEmployeeRewardRub;
   addStep({
-    label: "Вознаграждение сотрудника в РФ",
+    label: 'Вознаграждение сотрудника в РФ',
     amount: rubAmount,
-    currency: "RUB",
+    currency: 'RUB',
     note: `Вычтено ${totalEmployeeRewardUsd.toFixed(2)} USD (базовое 20 + комиссия ${additionalEmployeeRewardUsd}) × ${usdToRubRate.toFixed(2)} RUB/USD = ${totalEmployeeRewardRub.toFixed(2)} RUB`,
     formula: `${formatNumberWithSpaces(rubBeforeEmployeeReward)} RUB − ${formatNumberWithSpaces(totalEmployeeRewardRub)} RUB = ${formatNumberWithSpaces(rubAmount)} RUB`,
     previousAmount: rubBeforeEmployeeReward,
-    previousCurrency: "RUB",
+    previousCurrency: 'RUB',
   });
 
   /** Шаг 4: Вычитаем расходы курьера (только для региональных встреч) */
   let expensesInfo: ExpensesInfo | undefined;
-  if (input.meetingPlace === "regions" && input.expensesRub > 0) {
+  if (input.meetingPlace === 'regions' && input.expensesRub > 0) {
     const rubBeforeExpenses = rubAmount;
     rubAmount = Math.max(rubAmount - input.expensesRub, 0);
     expensesInfo = {
       rub: input.expensesRub,
       converted: input.expensesRub,
-      currency: "RUB",
+      currency: 'RUB',
     };
     addStep({
-      label: "Расходы курьера (билеты/отель)",
+      label: 'Расходы курьера (билеты/отель)',
       amount: rubAmount,
-      currency: "RUB",
+      currency: 'RUB',
       note: `Вычтено ${input.expensesRub.toFixed(2)} RUB расходов`,
       formula: `${formatNumberWithSpaces(rubBeforeExpenses)} RUB − ${formatNumberWithSpaces(input.expensesRub)} RUB = ${formatNumberWithSpaces(rubAmount)} RUB`,
       previousAmount: rubBeforeExpenses,
-      previousCurrency: "RUB",
+      previousCurrency: 'RUB',
     });
   }
 
   /** Шаг 5: Конвертация RUB в USDT через Rapira */
-  const rapiraRate = resolveRate(snapshot.rapira, "Курс USDT/RUB (Rapira)", issues);
+  const rapiraRate = resolveRate(
+    snapshot.rapira,
+    'Курс USDT/RUB (Rapira)',
+    issues,
+  );
   assertNoIssues(issues);
 
   /**
@@ -876,14 +930,19 @@ function performSale({
   const rapiraMultiplier = snapshot.business.rapira_multiplier;
   const usdtAfterRapira = (rubAmount / rapiraRate!) * rapiraMultiplier;
   addStep({
-    label: "RUB → USDT (Rapira)",
+    label: 'RUB → USDT (Rapira)',
     amount: usdtAfterRapira,
-    currency: "USDT",
-    rate: buildRateDescriptor("Rapira курс", rapiraRate!, snapshot.rapira.override, "Rapira"),
+    currency: 'USDT',
+    rate: buildRateDescriptor(
+      'Rapira курс',
+      rapiraRate!,
+      snapshot.rapira.override,
+      'Rapira',
+    ),
     note: `Комиссия платформы ${Math.round((1 - rapiraMultiplier) * 10000) / 100}%`,
     formula: `${formatNumberWithSpaces(rubAmount)} RUB ÷ ${rapiraRate!.toFixed(6)} × ${rapiraMultiplier.toFixed(4)} = ${formatNumberWithSpaces(usdtAfterRapira, 6)} USDT`,
     previousAmount: rubAmount,
-    previousCurrency: "RUB",
+    previousCurrency: 'RUB',
   });
 
   /**
@@ -910,37 +969,48 @@ function performSale({
    * Есть 1,216 USDT, USD/EUR = 0.858588 (из XE), коэффициент Сербии = 0.922
    * Итоговый курс = 0.858588 × 0.922 = 0.7916, получим: 1,216 × 0.7916 = 962.79 EUR
    */
-  const usdEurRate = resolveRate(snapshot.usd_variants.usd, "Курс USD/EUR (XE)", issues);
+  const usdEurRate = resolveRate(
+    snapshot.usd_variants.usd,
+    'Курс USD/EUR (XE)',
+    issues,
+  );
   const tgCoefDefault = resolveRate(
-    input.country === "serbia"
+    input.country === 'serbia'
       ? snapshot.tg.serbia.eur_usdt_coefficient
       : snapshot.tg.montenegro.eur_usdt_coefficient,
-    `Коэффициент-множитель EUR/USDT (${input.country === "serbia" ? "Сербия" : "Черногория"})`,
-    issues
+    `Коэффициент-множитель EUR/USDT (${input.country === 'serbia' ? 'Сербия' : 'Черногория'})`,
+    issues,
   );
   assertNoIssues(issues);
 
   const tgRateDefault = usdEurRate! * tgCoefDefault!;
   const effectiveTgRate = input.customEurPerUsdt ?? tgRateDefault; // Используем кастомный курс если задан
 
-  if (input.customEurPerUsdt && Math.abs(input.customEurPerUsdt - tgRateDefault) > 1e-9) {
-    warnings.push("Использован пользовательский коэффициент-множитель EUR/USDT");
+  if (
+    input.customEurPerUsdt &&
+    Math.abs(input.customEurPerUsdt - tgRateDefault) > 1e-9
+  ) {
+    warnings.push(
+      'Использован пользовательский коэффициент-множитель EUR/USDT',
+    );
   }
 
   eurAmount = usdtAfterRapira * effectiveTgRate;
   addStep({
-    label: "USDT → EUR",
+    label: 'USDT → EUR',
     amount: eurAmount,
-    currency: "EUR",
+    currency: 'EUR',
     rate: buildRateDescriptor(
-      "EUR/USDT",
+      'EUR/USDT',
       effectiveTgRate,
       false,
-      input.customEurPerUsdt ? "Пользовательский коэффициент-множитель" : "TG бот"
+      input.customEurPerUsdt
+        ? 'Пользовательский коэффициент-множитель'
+        : 'TG бот',
     ),
     formula: `${formatNumberWithSpaces(usdtAfterRapira, 6)} USDT × ${effectiveTgRate.toFixed(6)} = ${formatNumberWithSpaces(eurAmount)} EUR`,
     previousAmount: usdtAfterRapira,
-    previousCurrency: "USDT",
+    previousCurrency: 'USDT',
   });
 
   /**
@@ -971,32 +1041,39 @@ function performSale({
    * - Например: 10,000 EUR × 0.98 = 9,800 EUR (мы забрали 200 EUR прибыли)
    */
   marginTier = pickMarginTier(eurAmount, snapshot.business.margin_tiers);
-  profitCoefficient = determineProfitCoefficient(input.profit, marginTier, issues);
+  profitCoefficient = determineProfitCoefficient(
+    input.profit,
+    marginTier,
+    issues,
+  );
   assertNoIssues(issues);
 
-  if (input.profit.mode === "custom") {
-    warnings.push("Использован пользовательский коэффициент прибыли");
+  if (input.profit.mode === 'custom') {
+    warnings.push('Использован пользовательский коэффициент прибыли');
   }
 
   amountAfterMargin = eurAmount * profitCoefficient;
   const profitPercent = ((1 - profitCoefficient) * 100).toFixed(1);
   addStep({
-    label: "Применение прибыли",
+    label: 'Применение прибыли',
     amount: amountAfterMargin,
-    currency: "EUR",
-    rate: buildRateDescriptor("Коэффициент прибыли", profitCoefficient),
-    note: profitCoefficient !== marginTier?.coefficient ? "Изменённое значение" : undefined,
+    currency: 'EUR',
+    rate: buildRateDescriptor('Коэффициент прибыли', profitCoefficient),
+    note:
+      profitCoefficient !== marginTier?.coefficient
+        ? 'Изменённое значение'
+        : undefined,
     formula: `${formatNumberWithSpaces(eurAmount)} EUR × ${profitCoefficient.toFixed(6)} = ${formatNumberWithSpaces(amountAfterMargin)} EUR (убрано ${profitPercent}%)`,
     previousAmount: eurAmount,
-    previousCurrency: "EUR",
+    previousCurrency: 'EUR',
   });
 
   /** Шаг 8: Конвертация в целевую валюту (если не EUR) */
   let outputAmount = amountAfterMargin;
-  if (input.outputCurrency === "RSD") {
+  if (input.outputCurrency === 'RSD') {
     const rsdPerEur = snapshot.business.rsd_per_eur.value;
     if (!rsdPerEur) {
-      issues.push("Не удалось получить курс RSD/EUR");
+      issues.push('Не удалось получить курс RSD/EUR');
       return {
         inputAmount: amount,
         outputAmount: 0,
@@ -1012,13 +1089,13 @@ function performSale({
     }
     outputAmount = amountAfterMargin * rsdPerEur;
     addStep({
-      label: "EUR → RSD",
+      label: 'EUR → RSD',
       amount: outputAmount,
-      currency: "RSD",
-      rate: buildRateDescriptor("Фиксированный курс RSD/EUR", rsdPerEur),
+      currency: 'RSD',
+      rate: buildRateDescriptor('Фиксированный курс RSD/EUR', rsdPerEur),
       formula: `${formatNumberWithSpaces(amountAfterMargin)} EUR × ${rsdPerEur.toFixed(4)} = ${formatNumberWithSpaces(outputAmount, 0)} RSD`,
       previousAmount: amountAfterMargin,
-      previousCurrency: "EUR",
+      previousCurrency: 'EUR',
     });
   }
 
@@ -1104,33 +1181,41 @@ function performPurchase({
   const steps: CalculationStep[] = [];
 
   if (collectSteps) {
-    steps.push({ label: "Сумма на входе", amount, currency: input.inputCurrency });
+    steps.push({
+      label: 'Сумма на входе',
+      amount,
+      currency: input.inputCurrency,
+    });
   }
 
   const minEmployeeRewardUsd = 100;
   const estimatedUsdRate =
-    snapshot.fintech.usd_white?.buy?.value || snapshot.fintech.usd_blue?.buy?.value || 80;
+    snapshot.fintech.usd_white?.buy?.value ||
+    snapshot.fintech.usd_blue?.buy?.value ||
+    80;
   const minRequiredRub = minEmployeeRewardUsd * estimatedUsdRate;
 
   let estimatedInputEur = amount;
-  if (input.inputCurrency === "RSD") {
+  if (input.inputCurrency === 'RSD') {
     const rsdPerEur = snapshot.business.rsd_per_eur.value || 117;
     estimatedInputEur = amount / rsdPerEur;
   }
 
   const usdEurRateEstimate = snapshot.usd_variants.usd?.value || 0.85;
   const tgCoefEstimate =
-    input.country === "serbia"
+    input.country === 'serbia'
       ? snapshot.tg.serbia?.eur_usdt_coefficient?.value || 0.99
       : snapshot.tg.montenegro?.eur_usdt_coefficient?.value || 0.99;
-  const estimatedUsdt = estimatedInputEur / (usdEurRateEstimate * tgCoefEstimate);
+  const estimatedUsdt =
+    estimatedInputEur / (usdEurRateEstimate * tgCoefEstimate);
   const rapiraRateEstimate = snapshot.rapira?.value || 82;
   const rapiraMultiplierEstimate = snapshot.business.rapira_multiplier;
-  const estimatedRub = estimatedUsdt * rapiraRateEstimate * rapiraMultiplierEstimate;
+  const estimatedRub =
+    estimatedUsdt * rapiraRateEstimate * rapiraMultiplierEstimate;
 
   if (collectSteps && estimatedRub < minRequiredRub) {
     warnings.push(
-      `⚠️ Сумма может быть недостаточной. Минимальное вознаграждение сотрудника составляет около ${minRequiredRub.toFixed(0)} RUB (${minEmployeeRewardUsd} USD)`
+      `⚠️ Сумма может быть недостаточной. Минимальное вознаграждение сотрудника составляет около ${minRequiredRub.toFixed(0)} RUB (${minEmployeeRewardUsd} USD)`,
     );
   }
 
@@ -1147,10 +1232,10 @@ function performPurchase({
   let marginTier: MarginTier | null = null;
   let profitCoefficient = 1;
 
-  if (input.inputCurrency === "RSD") {
+  if (input.inputCurrency === 'RSD') {
     const rsdPerEur = snapshot.business.rsd_per_eur.value;
     if (!rsdPerEur) {
-      issues.push("Не удалось получить курс RSD/EUR");
+      issues.push('Не удалось получить курс RSD/EUR');
       return {
         inputAmount: amount,
         outputAmount: 0,
@@ -1166,23 +1251,27 @@ function performPurchase({
     }
     eurAmount = amount / rsdPerEur;
     addStep({
-      label: "RSD → EUR",
+      label: 'RSD → EUR',
       amount: eurAmount,
-      currency: "EUR",
-      rate: buildRateDescriptor("Фиксированный курс RSD/EUR", rsdPerEur),
+      currency: 'EUR',
+      rate: buildRateDescriptor('Фиксированный курс RSD/EUR', rsdPerEur),
     });
   }
 
   /** Шаг 2: Конвертация EUR в USDT через TG бот */
   const tgCoefDefault = resolveRate(
-    input.country === "serbia"
+    input.country === 'serbia'
       ? snapshot.tg.serbia.eur_usdt_coefficient
       : snapshot.tg.montenegro.eur_usdt_coefficient,
-    `Коэффициент-множитель EUR/USDT (${input.country === "serbia" ? "Сербия" : "Черногория"})`,
-    issues
+    `Коэффициент-множитель EUR/USDT (${input.country === 'serbia' ? 'Сербия' : 'Черногория'})`,
+    issues,
   );
 
-  const usdEurRate = resolveRate(snapshot.usd_variants.usd, "Курс USD/EUR (XE)", issues);
+  const usdEurRate = resolveRate(
+    snapshot.usd_variants.usd,
+    'Курс USD/EUR (XE)',
+    issues,
+  );
   assertNoIssues(issues);
 
   const tgRateDefault = usdEurRate! * tgCoefDefault!;
@@ -1190,43 +1279,61 @@ function performPurchase({
   const usdtPerEur = 1 / effectiveEurPerUsdt;
   const usdtAmount = eurAmount * usdtPerEur;
 
-  if (input.customEurPerUsdt && Math.abs(input.customEurPerUsdt - tgRateDefault) > 1e-9) {
-    warnings.push("Использован пользовательский коэффициент-множитель EUR/USDT");
+  if (
+    input.customEurPerUsdt &&
+    Math.abs(input.customEurPerUsdt - tgRateDefault) > 1e-9
+  ) {
+    warnings.push(
+      'Использован пользовательский коэффициент-множитель EUR/USDT',
+    );
   }
 
   addStep({
-    label: "EUR → USDT",
+    label: 'EUR → USDT',
     amount: usdtAmount,
-    currency: "USDT",
+    currency: 'USDT',
     rate: buildRateDescriptor(
-      "USDT/EUR",
+      'USDT/EUR',
       usdtPerEur,
       false,
-      input.customEurPerUsdt ? "Пользовательский коэффициент-множитель" : "TG бот"
+      input.customEurPerUsdt
+        ? 'Пользовательский коэффициент-множитель'
+        : 'TG бот',
     ),
   });
 
   /** Шаг 3: Конвертация USDT в RUB через Rapira */
-  const rapiraRate = resolveRate(snapshot.rapira, "Курс USDT/RUB (Rapira)", issues);
+  const rapiraRate = resolveRate(
+    snapshot.rapira,
+    'Курс USDT/RUB (Rapira)',
+    issues,
+  );
   assertNoIssues(issues);
 
   const rapiraMultiplier = snapshot.business.rapira_multiplier;
   rubAmount = usdtAmount * rapiraRate! * rapiraMultiplier;
   addStep({
-    label: "USDT → RUB (Rapira)",
+    label: 'USDT → RUB (Rapira)',
     amount: rubAmount,
-    currency: "RUB",
-    rate: buildRateDescriptor("Rapira курс", rapiraRate!, snapshot.rapira.override, "Rapira"),
+    currency: 'RUB',
+    rate: buildRateDescriptor(
+      'Rapira курс',
+      rapiraRate!,
+      snapshot.rapira.override,
+      'Rapira',
+    ),
     note: `Комиссия платформы ${Math.round((1 - rapiraMultiplier) * 10000) / 100}%`,
   });
 
   /** Шаг 4: Рассчитываем вознаграждение сотрудника */
   const baseEmployeeRewardUsd = 20;
-  const usdWhiteRate = getFintechRate(snapshot, "usd_white", "buy").value;
-  const usdBlueRate = getFintechRate(snapshot, "usd_blue", "buy").value;
+  const usdWhiteRate = getFintechRate(snapshot, 'usd_white', 'buy').value;
+  const usdBlueRate = getFintechRate(snapshot, 'usd_blue', 'buy').value;
   const usdToRubRate = usdWhiteRate || usdBlueRate;
   if (!usdToRubRate) {
-    issues.push("Не удалось получить курс USD/RUB для расчета вознаграждения сотрудника");
+    issues.push(
+      'Не удалось получить курс USD/RUB для расчета вознаграждения сотрудника',
+    );
     return {
       inputAmount: amount,
       outputAmount: 0,
@@ -1243,11 +1350,16 @@ function performPurchase({
   const baseEmployeeRewardRub = baseEmployeeRewardUsd * usdToRubRate;
   rubAmount -= baseEmployeeRewardRub;
 
-  const additionalEmployeeRewardUsd = calculateEmployeeCommission(eurAmount, input.meetingPlace);
-  const additionalEmployeeRewardRub = additionalEmployeeRewardUsd * usdToRubRate;
+  const additionalEmployeeRewardUsd = calculateEmployeeCommission(
+    eurAmount,
+    input.meetingPlace,
+  );
+  const additionalEmployeeRewardRub =
+    additionalEmployeeRewardUsd * usdToRubRate;
   rubAmount -= additionalEmployeeRewardRub;
 
-  const totalEmployeeRewardUsd = baseEmployeeRewardUsd + additionalEmployeeRewardUsd;
+  const totalEmployeeRewardUsd =
+    baseEmployeeRewardUsd + additionalEmployeeRewardUsd;
   const totalEmployeeRewardRub = totalEmployeeRewardUsd * usdToRubRate;
 
   const employeeCommissionInfo: EmployeeCommissionInfo = {
@@ -1258,121 +1370,134 @@ function performPurchase({
 
   if (rubAmount < 0) {
     issues.push(
-      `Сумма недостаточна для покрытия вознаграждения сотрудника (требуется минимум ${totalEmployeeRewardRub.toFixed(2)} RUB)`
+      `Сумма недостаточна для покрытия вознаграждения сотрудника (требуется минимум ${totalEmployeeRewardRub.toFixed(2)} RUB)`,
     );
     assertNoIssues(issues);
   }
 
   addStep({
-    label: "Вознаграждение сотрудника в РФ",
+    label: 'Вознаграждение сотрудника в РФ',
     amount: rubAmount,
-    currency: "RUB",
+    currency: 'RUB',
     note: `Вычтено ${totalEmployeeRewardUsd.toFixed(2)} USD (базовое 20 + комиссия ${additionalEmployeeRewardUsd}) × ${usdToRubRate.toFixed(2)} RUB/USD = ${totalEmployeeRewardRub.toFixed(2)} RUB`,
   });
 
   let rubPerEurCalc: number | null = null;
 
   /** Шаг 5: Конвертация RUB в целевую валюту через FinTech */
-  if (input.outputCurrency === "EUR") {
+  if (input.outputCurrency === 'EUR') {
     const eurSellRate = resolveRate(
-      getFintechRate(snapshot, "eur", "sell"),
-      "FinTech продажа EUR (курс RUB/EUR)",
-      issues
+      getFintechRate(snapshot, 'eur', 'sell'),
+      'FinTech продажа EUR (курс RUB/EUR)',
+      issues,
     );
     assertNoIssues(issues);
     outputAmount = rubAmount / eurSellRate!;
     addStep({
-      label: "RUB → EUR (FinTech)",
+      label: 'RUB → EUR (FinTech)',
       amount: outputAmount,
-      currency: "EUR",
-      rate: buildRateDescriptor("FinTech продажа EUR", eurSellRate!, false, "FinTech Exchange"),
+      currency: 'EUR',
+      rate: buildRateDescriptor(
+        'FinTech продажа EUR',
+        eurSellRate!,
+        false,
+        'FinTech Exchange',
+      ),
     });
-  } else if (input.outputCurrency === "USD_WHITE") {
+  } else if (input.outputCurrency === 'USD_WHITE') {
     const usdWhiteSellRate = resolveRate(
-      getFintechRate(snapshot, "usd_white", "sell"),
-      "FinTech продажа USD бел. (курс RUB/USD)",
-      issues
+      getFintechRate(snapshot, 'usd_white', 'sell'),
+      'FinTech продажа USD бел. (курс RUB/USD)',
+      issues,
     );
     assertNoIssues(issues);
     outputAmount = rubAmount / usdWhiteSellRate!;
     addStep({
-      label: "RUB → USD бел. (FinTech)",
+      label: 'RUB → USD бел. (FinTech)',
       amount: outputAmount,
-      currency: "USD_WHITE",
+      currency: 'USD_WHITE',
       rate: buildRateDescriptor(
-        "FinTech продажа USD бел.",
+        'FinTech продажа USD бел.',
         usdWhiteSellRate!,
         false,
-        "FinTech Exchange"
+        'FinTech Exchange',
       ),
     });
-  } else if (input.outputCurrency === "USD_BLUE") {
+  } else if (input.outputCurrency === 'USD_BLUE') {
     const usdBlueSellRate = resolveRate(
-      getFintechRate(snapshot, "usd_blue", "sell"),
-      "FinTech продажа USD син. (курс RUB/USD)",
-      issues
+      getFintechRate(snapshot, 'usd_blue', 'sell'),
+      'FinTech продажа USD син. (курс RUB/USD)',
+      issues,
     );
     assertNoIssues(issues);
     outputAmount = rubAmount / usdBlueSellRate!;
     addStep({
-      label: "RUB → USD син. (FinTech)",
+      label: 'RUB → USD син. (FinTech)',
       amount: outputAmount,
-      currency: "USD_BLUE",
+      currency: 'USD_BLUE',
       rate: buildRateDescriptor(
-        "FinTech продажа USD син.",
+        'FinTech продажа USD син.',
         usdBlueSellRate!,
         false,
-        "FinTech Exchange"
+        'FinTech Exchange',
       ),
     });
-  } else if (input.outputCurrency === "RUB") {
+  } else if (input.outputCurrency === 'RUB') {
     outputAmount = rubAmount;
   }
 
   /** Шаг 6: Применяем коэффициент прибыли */
   marginTier = pickMarginTier(eurAmount, snapshot.business.margin_tiers);
-  profitCoefficient = determineProfitCoefficient(input.profit, marginTier, issues);
+  profitCoefficient = determineProfitCoefficient(
+    input.profit,
+    marginTier,
+    issues,
+  );
   assertNoIssues(issues);
 
-  if (input.profit.mode === "custom") {
-    warnings.push("Использован пользовательский коэффициент прибыли");
+  if (input.profit.mode === 'custom') {
+    warnings.push('Использован пользовательский коэффициент прибыли');
   }
 
   amountAfterMargin = outputAmount * profitCoefficient;
   addStep({
-    label: "Применение прибыли",
+    label: 'Применение прибыли',
     amount: amountAfterMargin,
     currency: input.outputCurrency,
-    rate: buildRateDescriptor("Коэффициент прибыли", profitCoefficient),
-    note: profitCoefficient !== marginTier?.coefficient ? "Изменённое значение" : undefined,
+    rate: buildRateDescriptor('Коэффициент прибыли', profitCoefficient),
+    note:
+      profitCoefficient !== marginTier?.coefficient
+        ? 'Изменённое значение'
+        : undefined,
   });
 
   /** Шаг 7: Вычитаем расходы курьера (только для региональных встреч) */
   let expensesInfo: ExpensesInfo | undefined;
   let finalAmount = amountAfterMargin;
 
-  if (input.meetingPlace === "regions" && input.expensesRub > 0) {
-    if (input.outputCurrency === "RUB") {
+  if (input.meetingPlace === 'regions' && input.expensesRub > 0) {
+    if (input.outputCurrency === 'RUB') {
       finalAmount = Math.max(amountAfterMargin - input.expensesRub, 0);
       expensesInfo = {
         rub: input.expensesRub,
         converted: input.expensesRub,
-        currency: "RUB",
+        currency: 'RUB',
       };
     } else {
       const fintechRate =
-        input.outputCurrency === "EUR"
-          ? getFintechRate(snapshot, "eur", "sell")
-          : input.outputCurrency === "USD_WHITE"
-            ? getFintechRate(snapshot, "usd_white", "sell")
-            : input.outputCurrency === "USD_BLUE"
-              ? getFintechRate(snapshot, "usd_blue", "sell")
+        input.outputCurrency === 'EUR'
+          ? getFintechRate(snapshot, 'eur', 'sell')
+          : input.outputCurrency === 'USD_WHITE'
+            ? getFintechRate(snapshot, 'usd_white', 'sell')
+            : input.outputCurrency === 'USD_BLUE'
+              ? getFintechRate(snapshot, 'usd_blue', 'sell')
               : null;
       const rubPerTargetCurrency = fintechRate
         ? resolveRate(fintechRate, `Курс RUB/${input.outputCurrency}`, issues)
         : null;
       if (rubPerTargetCurrency) {
-        const expenseInTargetCurrency = input.expensesRub / rubPerTargetCurrency;
+        const expenseInTargetCurrency =
+          input.expensesRub / rubPerTargetCurrency;
         finalAmount = Math.max(amountAfterMargin - expenseInTargetCurrency, 0);
         expensesInfo = {
           rub: input.expensesRub,
@@ -1383,7 +1508,7 @@ function performPurchase({
     }
 
     addStep({
-      label: "Расходы курьера (билеты/отель)",
+      label: 'Расходы курьера (билеты/отель)',
       amount: finalAmount,
       currency: input.outputCurrency,
       note: `Вычтено ${input.expensesRub.toFixed(2)} RUB расходов`,
@@ -1393,7 +1518,7 @@ function performPurchase({
   outputAmount = finalAmount;
   assertNoIssues(issues);
 
-  if (input.inputCurrency === "EUR" && input.outputCurrency === "RUB") {
+  if (input.inputCurrency === 'EUR' && input.outputCurrency === 'RUB') {
     rubPerEurCalc = finalAmount / amount;
   }
 
@@ -1451,18 +1576,27 @@ function performPurchase({
 function solveReverseSale(
   input: SaleInput,
   snapshot: RatesSnapshot,
-  targetAmount: number
+  targetAmount: number,
 ): SaleComputationResult {
   let guess = Math.max(targetAmount, 1);
   for (let i = 0; i < 20; i++) {
-    const sim = performSale({ input, snapshot, amount: guess, collectSteps: false });
+    const sim = performSale({
+      input,
+      snapshot,
+      amount: guess,
+      collectSteps: false,
+    });
     if (sim.outputAmount <= 0) {
-      throw new CalculatorError(["Не удалось выполнить обратный расчёт продажи"]);
+      throw new CalculatorError([
+        'Не удалось выполнить обратный расчёт продажи',
+      ]);
     }
     const ratio = targetAmount / sim.outputAmount;
     const nextGuess = guess * ratio;
     if (!Number.isFinite(nextGuess) || nextGuess <= 0) {
-      throw new CalculatorError(["Не удалось выполнить обратный расчёт продажи"]);
+      throw new CalculatorError([
+        'Не удалось выполнить обратный расчёт продажи',
+      ]);
     }
     if (Math.abs(nextGuess - guess) / guess < 1e-6) {
       guess = nextGuess;
@@ -1489,18 +1623,27 @@ function solveReverseSale(
 function solveReversePurchase(
   input: PurchaseInput,
   snapshot: RatesSnapshot,
-  targetAmount: number
+  targetAmount: number,
 ): PurchaseComputationResult {
   let guess = Math.max(targetAmount, 1);
   for (let i = 0; i < 20; i++) {
-    const sim = performPurchase({ input, snapshot, amount: guess, collectSteps: false });
+    const sim = performPurchase({
+      input,
+      snapshot,
+      amount: guess,
+      collectSteps: false,
+    });
     if (sim.outputAmount <= 0) {
-      throw new CalculatorError(["Не удалось выполнить обратный расчёт покупки"]);
+      throw new CalculatorError([
+        'Не удалось выполнить обратный расчёт покупки',
+      ]);
     }
     const ratio = targetAmount / sim.outputAmount;
     const nextGuess = guess * ratio;
     if (!Number.isFinite(nextGuess) || nextGuess <= 0) {
-      throw new CalculatorError(["Не удалось выполнить обратный расчёт покупки"]);
+      throw new CalculatorError([
+        'Не удалось выполнить обратный расчёт покупки',
+      ]);
     }
     if (Math.abs(nextGuess - guess) / guess < 1e-6) {
       guess = nextGuess;
@@ -1508,7 +1651,12 @@ function solveReversePurchase(
     }
     guess = nextGuess;
   }
-  return performPurchase({ input, snapshot, amount: guess, collectSteps: true });
+  return performPurchase({
+    input,
+    snapshot,
+    amount: guess,
+    collectSteps: true,
+  });
 }
 
 /**
@@ -1544,46 +1692,58 @@ function solveReversePurchase(
  * console.log(result.outputAmount); // 847.46 EUR
  * ```
  */
-export function calculate(input: CalculatorInput, snapshot: RatesSnapshot): CalculationResult {
+export function calculate(
+  input: CalculatorInput,
+  snapshot: RatesSnapshot,
+): CalculationResult {
   const fintechTimestamp = snapshot.fintech.timestamp ?? null;
   const cbrRubPerEur = snapshot.cbr.rub_per_eur.value ?? null;
 
-  if (input.scenario === "sale") {
+  if (input.scenario === 'sale') {
     const baseInput = input;
     const computation = baseInput.reverseMode
       ? (() => {
           if (baseInput.targetAmount == null || baseInput.targetAmount <= 0) {
-            throw new CalculatorError(["Для обратного расчёта необходимо указать сумму к выдаче"]);
+            throw new CalculatorError([
+              'Для обратного расчёта необходимо указать сумму к выдаче',
+            ]);
           }
           return solveReverseSale(baseInput, snapshot, baseInput.targetAmount);
         })()
-      : performSale({ input: baseInput, snapshot, amount: baseInput.amount, collectSteps: true });
+      : performSale({
+          input: baseInput,
+          snapshot,
+          amount: baseInput.amount,
+          collectSteps: true,
+        });
 
-    if (!(baseInput.inputCurrency === "EUR" && baseInput.outputCurrency === "EUR")) {
+    if (
+      !(baseInput.inputCurrency === 'EUR' && baseInput.outputCurrency === 'EUR')
+    ) {
       switch (baseInput.inputCurrency) {
-        case "RUB": {
+        case 'RUB': {
           const cbrRubPerEur = snapshot.cbr.rub_per_eur.value;
           if (cbrRubPerEur == null) {
-            throw new CalculatorError(["Не удалось получить курс RUB/EUR"]);
+            throw new CalculatorError(['Не удалось получить курс RUB/EUR']);
           }
           break;
         }
-        case "USD_WHITE":
-        case "USD_BLUE": {
+        case 'USD_WHITE':
+        case 'USD_BLUE': {
           const xeUsdToEur = snapshot.usd_variants.usd.value;
           if (xeUsdToEur == null) {
-            throw new CalculatorError(["Не удалось получить курс USD/EUR"]);
+            throw new CalculatorError(['Не удалось получить курс USD/EUR']);
           }
           break;
         }
-        case "EUR":
+        case 'EUR':
         default:
           break;
       }
     }
 
     return {
-      scenario: "sale",
+      scenario: 'sale',
       country: baseInput.country,
       meetingPlace: baseInput.meetingPlace,
       inputCurrency: baseInput.inputCurrency,
@@ -1592,7 +1752,7 @@ export function calculate(input: CalculatorInput, snapshot: RatesSnapshot): Calc
       outputAmount: computation.outputAmount,
       targetAmount: baseInput.reverseMode ? baseInput.targetAmount : undefined,
       steps: computation.steps,
-      commission: { channel: "office", tier: null, usd: null, eur: null },
+      commission: { channel: 'office', tier: null, usd: null, eur: null },
       expenses: computation.expenses,
       employeeCommission: computation.employeeCommission,
       profitCoefficient: computation.profitCoefficient,
@@ -1600,9 +1760,9 @@ export function calculate(input: CalculatorInput, snapshot: RatesSnapshot): Calc
       marginTier: computation.marginTier,
       margin: {
         baseAmount: computation.eurBeforeMargin,
-        baseCurrency: "EUR",
+        baseCurrency: 'EUR',
         afterAmount: computation.amountAfterMargin,
-        afterCurrency: "EUR",
+        afterCurrency: 'EUR',
       },
       warnings: computation.warnings,
       fintechTimestamp,
@@ -1615,14 +1775,25 @@ export function calculate(input: CalculatorInput, snapshot: RatesSnapshot): Calc
   const computation = baseInput.reverseMode
     ? (() => {
         if (baseInput.targetAmount == null || baseInput.targetAmount <= 0) {
-          throw new CalculatorError(["Для обратного расчёта необходимо указать сумму к выдаче"]);
+          throw new CalculatorError([
+            'Для обратного расчёта необходимо указать сумму к выдаче',
+          ]);
         }
-        return solveReversePurchase(baseInput, snapshot, baseInput.targetAmount);
+        return solveReversePurchase(
+          baseInput,
+          snapshot,
+          baseInput.targetAmount,
+        );
       })()
-    : performPurchase({ input: baseInput, snapshot, amount: baseInput.amount, collectSteps: true });
+    : performPurchase({
+        input: baseInput,
+        snapshot,
+        amount: baseInput.amount,
+        collectSteps: true,
+      });
 
   return {
-    scenario: "purchase",
+    scenario: 'purchase',
     country: baseInput.country,
     meetingPlace: baseInput.meetingPlace,
     inputCurrency: baseInput.inputCurrency,
@@ -1631,7 +1802,7 @@ export function calculate(input: CalculatorInput, snapshot: RatesSnapshot): Calc
     outputAmount: computation.outputAmount,
     targetAmount: baseInput.reverseMode ? baseInput.targetAmount : undefined,
     steps: computation.steps,
-    commission: { channel: "office", tier: null, usd: null, eur: null },
+    commission: { channel: 'office', tier: null, usd: null, eur: null },
     expenses: computation.expenses,
     employeeCommission: computation.employeeCommission,
     profitCoefficient: computation.profitCoefficient,
@@ -1639,9 +1810,9 @@ export function calculate(input: CalculatorInput, snapshot: RatesSnapshot): Calc
     marginTier: computation.marginTier,
     margin: {
       baseAmount: computation.rubBeforeMargin,
-      baseCurrency: "RUB",
+      baseCurrency: 'RUB',
       afterAmount: computation.rubAfterMargin,
-      afterCurrency: "RUB",
+      afterCurrency: 'RUB',
     },
     warnings: computation.warnings,
     fintechTimestamp,

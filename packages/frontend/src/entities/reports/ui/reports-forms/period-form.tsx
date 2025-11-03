@@ -1,16 +1,22 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import z from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
 
-import { ReportsPeriodSchema } from "@/entities/reports";
-import { usePeriodReport } from "@/entities/reports";
-import { usePopapStore } from "@/entities/reports";
-import { Button } from "@/shared";
-import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/shared";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared";
-import { SheetDescription, SheetHeader, SheetTitle } from "@/shared";
+import { ReportsPeriodSchema } from '@/entities/reports';
+import { usePeriodReport } from '@/entities/reports';
+import { usePopapStore } from '@/entities/reports';
+import { Button } from '@/shared';
+import { Form, FormField, FormItem, FormLabel, FormMessage } from '@/shared';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared';
+import { SheetDescription, SheetHeader, SheetTitle } from '@/shared';
 
 export function ReportsPeriodForm() {
   const { mutate: periodReport, isPending } = usePeriodReport();
@@ -18,7 +24,7 @@ export function ReportsPeriodForm() {
   const form = useForm<z.input<typeof ReportsPeriodSchema>>({
     resolver: zodResolver(ReportsPeriodSchema),
     defaultValues: {
-      walletType: "inskech",
+      walletType: 'inskech',
     },
   });
   const onSubmit = (values: z.input<typeof ReportsPeriodSchema>) => {
@@ -29,7 +35,8 @@ export function ReportsPeriodForm() {
     <SheetHeader>
       <SheetTitle>Формирование отчета</SheetTitle>
       <SheetDescription>
-        Заполните поля для общего формирования отчёта по остаткам на конец периода
+        Заполните поля для общего формирования отчёта по остаткам на конец
+        периода
       </SheetDescription>
       <Form {...form}>
         <form
@@ -43,7 +50,10 @@ export function ReportsPeriodForm() {
               <FormItem className="w-full ">
                 <FormLabel>Тип кошелька</FormLabel>
 
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Выберите тип" />
                   </SelectTrigger>
@@ -58,7 +68,10 @@ export function ReportsPeriodForm() {
             )}
           />
 
-          <Button type="submit"> {isPending ? "Загрузка..." : "Получить отчет"}</Button>
+          <Button type="submit">
+            {' '}
+            {isPending ? 'Загрузка...' : 'Получить отчет'}
+          </Button>
         </form>
       </Form>
     </SheetHeader>

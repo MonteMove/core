@@ -1,28 +1,45 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { useTheme } from "next-themes";
+import { useTheme } from 'next-themes';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 import {
   useDeactivateMySession,
   useDeactivateSessions,
   useSessions,
-} from "@/entities/session/model/use-session";
-import { applyThemeVars, formatDateSafe, getCurrentSessionId } from "@/shared/lib/utils";
-import { ColorField } from "@/shared/ui/components/color-field";
-import { Button } from "@/shared/ui/shadcn/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/shadcn/card";
-import { Form } from "@/shared/ui/shadcn/form";
-import { DEFAULT_THEME, THEME_GROUPS, THEME_LABELS } from "@/shared/utils/constants/settings-theme";
-import { SettingsFormValues, settingsSchema } from "@/shared/utils/schemas/setting-schemas";
+} from '@/entities/session/model/use-session';
+import {
+  applyThemeVars,
+  formatDateSafe,
+  getCurrentSessionId,
+} from '@/shared/lib/utils';
+import { ColorField } from '@/shared/ui/components/color-field';
+import { Button } from '@/shared/ui/shadcn/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared/ui/shadcn/card';
+import { Form } from '@/shared/ui/shadcn/form';
+import {
+  DEFAULT_THEME,
+  THEME_GROUPS,
+  THEME_LABELS,
+} from '@/shared/utils/constants/settings-theme';
+import {
+  SettingsFormValues,
+  settingsSchema,
+} from '@/shared/utils/schemas/setting-schemas';
 
 export function Settings() {
   const { resolvedTheme } = useTheme();
-  const currentTheme = resolvedTheme === "dark" ? "dark" : "light";
+  const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light';
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: DEFAULT_THEME[currentTheme],
@@ -32,8 +49,9 @@ export function Settings() {
     const saved = Object.fromEntries(
       Object.keys(DEFAULT_THEME[currentTheme]).map((key) => [
         key,
-        localStorage.getItem(`${currentTheme}-${key}-color`) ?? DEFAULT_THEME[currentTheme][key],
-      ])
+        localStorage.getItem(`${currentTheme}-${key}-color`) ??
+          DEFAULT_THEME[currentTheme][key],
+      ]),
     );
 
     applyThemeVars(saved);
@@ -50,7 +68,7 @@ export function Settings() {
     const currentSessionId = getCurrentSessionId(sessionsData.sessions);
 
     if (!currentSessionId) {
-      console.error("Не удалось определить текущую сессию");
+      console.error('Не удалось определить текущую сессию');
       return;
     }
 
@@ -92,7 +110,7 @@ export function Settings() {
               applyThemeVars(theme);
               form.reset(theme);
               Object.keys(theme).forEach((key) =>
-                localStorage.removeItem(`${currentTheme}-${key}-color`)
+                localStorage.removeItem(`${currentTheme}-${key}-color`),
               );
             }}
           >
@@ -103,7 +121,9 @@ export function Settings() {
         <Card className="mt-6 mb-4">
           <CardHeader>
             <CardTitle className="text-xl">Сессии</CardTitle>
-            <CardDescription>Здесь отображаются активные входы в систему</CardDescription>
+            <CardDescription>
+              Здесь отображаются активные входы в систему
+            </CardDescription>
           </CardHeader>
         </Card>
         <div>
@@ -111,12 +131,12 @@ export function Settings() {
 
           {sessionsData?.sessions && sessionsData.sessions.length > 0 ? (
             <div>
-              {" "}
+              {' '}
               {sessionsData.sessions.map((session) => (
                 <Card key={session.id} className="mt-2">
                   <CardContent className="lg:grid lg:grid-cols-2 gap-1">
                     <p className="col-span-2">
-                      <span className="font-medium">Статус:</span>{" "}
+                      <span className="font-medium">Статус:</span>{' '}
                       {session.revoked ? (
                         <span className="text-red-600">Завершена</span>
                       ) : (
@@ -124,25 +144,35 @@ export function Settings() {
                       )}
                     </p>
                     <p className="col-span-2">
-                      <span className="font-medium block lg:inline">Дата создания:</span>{" "}
+                      <span className="font-medium block lg:inline">
+                        Дата создания:
+                      </span>{' '}
                       {formatDateSafe(session.createdAt)}
                     </p>
                     <p className="col-span-2">
-                      <span className="font-medium block lg:inline"> Устройство: </span>
-                      {session.userAgent ?? "Неизвестно"}
+                      <span className="font-medium block lg:inline">
+                        {' '}
+                        Устройство:{' '}
+                      </span>
+                      {session.userAgent ?? 'Неизвестно'}
                     </p>
                     <p className="content-center">
-                      <span className="font-medium">IP: </span> {session.ip ?? "—"}
+                      <span className="font-medium">IP: </span>{' '}
+                      {session.ip ?? '—'}
                     </p>
                     <div className="lg:flex gap-2 lg:justify-end">
                       <Button
                         className="lg:w-[200] w-full lg:mt-0 mt-2"
                         type="button"
                         size="sm"
-                        onClick={() => deactivate.mutate({ excludeSessionId: session.id })}
+                        onClick={() =>
+                          deactivate.mutate({ excludeSessionId: session.id })
+                        }
                         disabled={deactivate.isPending}
                       >
-                        {deactivate.isPending ? "Обработка..." : "Завершить другие"}
+                        {deactivate.isPending
+                          ? 'Обработка...'
+                          : 'Завершить другие'}
                       </Button>
                       <Button
                         className="lg:w-[200] w-full lg:mt-0 mt-2"
@@ -151,7 +181,7 @@ export function Settings() {
                         onClick={() => deactivateMy.mutate(session.id)}
                         disabled={deactivateMy.isPending}
                       >
-                        {deactivateMy.isPending ? "Обработка..." : "Завершить"}
+                        {deactivateMy.isPending ? 'Обработка...' : 'Завершить'}
                       </Button>
                     </div>
                   </CardContent>
@@ -172,7 +202,7 @@ export function Settings() {
                 onClick={handleDeactivateAll}
                 disabled={deactivate.isPending}
               >
-                {deactivate.isPending ? "Обработка..." : "Завершить все"}
+                {deactivate.isPending ? 'Обработка...' : 'Завершить все'}
               </Button>
             </div>
           )}

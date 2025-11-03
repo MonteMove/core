@@ -1,25 +1,27 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { UserAuthSchema, UserRole } from "../../../entities/users/model/user-schemas";
+import {
+  UserAuthSchema,
+  UserRole,
+} from '../../../entities/users/model/user-schemas';
 
 export const LoginRequestSchema = z.object({
   username: z
     .string()
-    .min(3, "Имя пользователя должно содержать минимум 3 символа")
-    .max(50, "Имя пользователя не должно превышать 50 символов"),
-  password: z
-    .string()
-    .min(1, "Пароль не может быть пустым")
-    .max(100, "Пароль не должен превышать 100 символов"),
+    .min(3, 'Имя пользователя должно содержать минимум 3 символа')
+    .max(50, 'Имя пользователя не должно превышать 50 символов'),
+  password: z.string().min(1, 'Пароль не может быть пустым'),
 });
 
 export const RegisterRequestSchema = z.object({
   username: z
     .string()
-    .min(3, "Имя пользователя должно содержать минимум 3 символа")
-    .max(50, "Имя пользователя не должно превышать 50 символов"),
-  password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
-  roles: z.array(z.nativeEnum(UserRole)).min(1, "Должна быть выбрана хотя бы одна роль"),
+    .min(3, 'Имя пользователя должно содержать минимум 3 символа')
+    .max(50, 'Имя пользователя не должно превышать 50 символов'),
+  password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
+  roles: z
+    .array(z.nativeEnum(UserRole))
+    .min(1, 'Должна быть выбрана хотя бы одна роль'),
 });
 
 export const RegisterResponseSchema = z.object({

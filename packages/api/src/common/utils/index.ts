@@ -1,1 +1,5 @@
-export { calculatePagination, createAllDataPaginationResponse, createPaginationResponse } from './pagination.helper';
+export {
+  calculatePagination,
+  createAllDataPaginationResponse,
+  createPaginationResponse,
+} from './pagination.helper';

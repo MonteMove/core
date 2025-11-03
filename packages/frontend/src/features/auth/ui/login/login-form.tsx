@@ -1,12 +1,15 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
-import { type LoginRequest, LoginRequestSchema } from "@/entities/auth/model/auth-schemas";
-import { useLogin } from "@/features/auth/hooks/use-login";
-import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/shadcn/button";
+import {
+  type LoginRequest,
+  LoginRequestSchema,
+} from '@/entities/auth/model/auth-schemas';
+import { useLogin } from '@/features/auth/hooks/use-login';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
@@ -14,18 +17,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared/ui/shadcn/form";
-import { Input } from "@/shared/ui/shadcn/input";
+} from '@/shared/ui/shadcn/form';
+import { Input } from '@/shared/ui/shadcn/input';
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<'form'>) {
   const loginMutation = useLogin();
 
   const form = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
     },
   });
 
@@ -38,7 +44,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         autoComplete="on"
-        className={cn("flex flex-col gap-6", className)}
+        className={cn('flex flex-col gap-6', className)}
         {...props}
       >
         <div className="flex flex-col items-center gap-2 text-center">
@@ -53,13 +59,17 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Имя пользователя</FormLabel>
+                <FormLabel>
+                  Имя пользователя <span className="text-destructive">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="username"
                     placeholder="Введите имя пользователя"
                     autoComplete="username"
-                    className={loginMutation.isError ? "border-destructive" : ""}
+                    className={
+                      loginMutation.isError ? 'border-destructive' : ''
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -72,13 +82,17 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Пароль</FormLabel>
+                <FormLabel>
+                  Пароль <span className="text-destructive">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="password"
                     placeholder="Введите ваш пароль"
                     autoComplete="current-password"
-                    className={loginMutation.isError ? "border-destructive" : ""}
+                    className={
+                      loginMutation.isError ? 'border-destructive' : ''
+                    }
                     {...field}
                   />
                 </FormControl>
@@ -86,8 +100,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-            {loginMutation.isPending ? "Входим..." : "Войти"}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loginMutation.isPending}
+          >
+            {loginMutation.isPending ? 'Входим...' : 'Войти'}
           </Button>
         </div>
       </form>

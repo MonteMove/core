@@ -1,18 +1,21 @@
-﻿"use client";
+﻿'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-import { ReportsSheet } from "@/features/reports";
-import { useIsMobile } from "@/shared";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/shared";
-import { DynamicBreadcrumb } from "@/widgets";
-import { AppSidebar } from "@/widgets";
+import { ReportsSheet } from '@/features/reports';
+import { useIsMobile } from '@/shared';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared';
+import { DynamicBreadcrumb } from '@/widgets';
+import { AppSidebar } from '@/widgets';
 
-const PageTransition = dynamic(() => import("@/shared/ui/components/page-transition"), {
-  ssr: false,
-});
+const PageTransition = dynamic(
+  () => import('@/shared/ui/components/page-transition'),
+  {
+    ssr: false,
+  },
+);
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

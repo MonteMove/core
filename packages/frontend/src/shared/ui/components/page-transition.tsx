@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
-import { usePathname } from "next/navigation";
+import { usePathname } from 'next/navigation';
 
 type PageTransitionProps = {
   children: ReactNode;

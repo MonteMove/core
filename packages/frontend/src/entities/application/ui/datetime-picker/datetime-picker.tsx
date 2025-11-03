@@ -1,17 +1,29 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 
-import { Locale, format, isValid, parse, setHours, setMinutes, setSeconds } from "date-fns";
-import { ru } from "date-fns/locale";
-import { CalendarIcon } from "lucide-react";
+import {
+  Locale,
+  format,
+  isValid,
+  parse,
+  setHours,
+  setMinutes,
+  setSeconds,
+} from 'date-fns';
+import { ru } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
 
-import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/shadcn/button";
-import { Calendar } from "@/shared/ui/shadcn/calendar";
-import { Input } from "@/shared/ui/shadcn/input";
-import { Label } from "@/shared/ui/shadcn/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/shadcn/popover";
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Calendar } from '@/shared/ui/shadcn/calendar';
+import { Input } from '@/shared/ui/shadcn/input';
+import { Label } from '@/shared/ui/shadcn/label';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/ui/shadcn/popover';
 
 interface DateTimePickerProps {
   value?: string;
@@ -22,16 +34,16 @@ interface DateTimePickerProps {
 
 function formatDate(date: Date | undefined, locale: Locale = ru) {
   if (!date) {
-    return "";
+    return '';
   }
-  return format(date, "dd MMMM yyyy", { locale });
+  return format(date, 'dd MMMM yyyy', { locale });
 }
 
 function formatTime(date: Date | undefined) {
   if (!date) {
-    return "00:00:00";
+    return '00:00:00';
   }
-  return format(date, "HH:mm:ss");
+  return format(date, 'HH:mm:ss');
 }
 
 function isValidDate(date: Date | undefined) {
@@ -41,16 +53,23 @@ function isValidDate(date: Date | undefined) {
   return !isNaN(date.getTime());
 }
 
-export function DateTimePicker({ value, onChange, className, label }: DateTimePickerProps) {
+export function DateTimePicker({
+  value,
+  onChange,
+  className,
+  label,
+}: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(value ? new Date(value) : undefined);
+  const [date, setDate] = React.useState<Date | undefined>(
+    value ? new Date(value) : undefined,
+  );
   const [month, setMonth] = React.useState<Date | undefined>(date);
   const [dateValue, setDateValue] = React.useState(formatDate(date));
   const [timeValue, setTimeValue] = React.useState(formatTime(date));
 
   React.useEffect(() => {
     if (date) {
-      const [hours, minutes, seconds] = timeValue.split(":").map(Number);
+      const [hours, minutes, seconds] = timeValue.split(':').map(Number);
       let newDate = setHours(date, hours);
       newDate = setMinutes(newDate, minutes);
       newDate = setSeconds(newDate, seconds || 0);
@@ -62,7 +81,7 @@ export function DateTimePicker({ value, onChange, className, label }: DateTimePi
     const input = e.target.value;
     setDateValue(input);
 
-    const formats = ["dd.MM.yyyy", "dd-MM-yyyy", "dd/MM/yyyy", "dd MMMM yyyy"];
+    const formats = ['dd.MM.yyyy', 'dd-MM-yyyy', 'dd/MM/yyyy', 'dd MMMM yyyy'];
 
     for (const dateFormat of formats) {
       try {
@@ -93,7 +112,7 @@ export function DateTimePicker({ value, onChange, className, label }: DateTimePi
   };
 
   return (
-    <div className={cn("flex flex-col gap-3", className)}>
+    <div className={cn('flex flex-col gap-3', className)}>
       {label && (
         <Label htmlFor="date" className="px-1">
           {label}
@@ -110,7 +129,7 @@ export function DateTimePicker({ value, onChange, className, label }: DateTimePi
               className="bg-background pr-10"
               onChange={handleDateInputChange}
               onKeyDown={(e) => {
-                if (e.key === "ArrowDown") {
+                if (e.key === 'ArrowDown') {
                   e.preventDefault();
                   setOpen(true);
                 }

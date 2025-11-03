@@ -1,23 +1,30 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic';
 
-import { applySavedTheme } from "@/shared";
-import { Providers } from "@/shared/ui/components/providers";
-import { ThemeInitScript } from "@/shared/ui/components/theme-init-script";
-import { Toaster } from "@/shared/ui/shadcn/sonner";
+import { applySavedTheme } from '@/shared';
+import { Providers } from '@/shared/ui/components/providers';
+import { ThemeInitScript } from '@/shared/ui/components/theme-init-script';
+import { Toaster } from '@/shared/ui/shadcn/sonner';
 
-import "./globals.css";
+import './globals.css';
 
-const SWRegister = dynamic(() => import("@/features/auth/ui/register/sw-register.client"), {
+const SWRegister = dynamic(
+  () => import('@/features/auth/ui/register/sw-register.client'),
+  {
+    ssr: false,
+  },
+);
+const TopLoader = dynamic(() => import('@/shared/ui/components/top-loader'), {
   ssr: false,
 });
-const TopLoader = dynamic(() => import("@/shared/ui/components/top-loader"), {
-  ssr: false,
-});
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  if (typeof window !== "undefined") {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  if (typeof window !== 'undefined') {
     applySavedTheme();
   }
   return (

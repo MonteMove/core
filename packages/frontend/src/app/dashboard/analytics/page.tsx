@@ -1,11 +1,11 @@
-import { Metadata } from "next";
+import { Metadata } from 'next';
 
-import { AnalyticsCharts } from "@/features/analytics/ui/analytics-chart/analytics-chart";
-import { AnalyticsFilters } from "@/features/analytics/ui/analytics-filters/analytics-filters";
-import { AnalyticsTable } from "@/features/analytics/ui/analytics-table/analytics-table";
+import { AnalyticsCharts } from '@/features/analytics/ui/analytics-chart/analytics-chart';
+import { AnalyticsFilters } from '@/features/analytics/ui/analytics-filters/analytics-filters';
+import { AnalyticsTable } from '@/features/analytics/ui/analytics-table/analytics-table';
 
 export const metadata: Metadata = {
-  title: "Аналитика",
+  title: 'Аналитика',
 };
 
 export default function AnalyticsPage() {

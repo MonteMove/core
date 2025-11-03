@@ -1,6 +1,6 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 import {
   InfiniteData,
@@ -9,10 +9,10 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
-import { toast } from "sonner";
+} from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { GuideService } from "@/entities/guides/api/guide-service";
+import { GuideService } from '@/entities/guides/api/guide-service';
 import {
   type CreateGuideRequest,
   type GetGuidesParamsRequest,
@@ -20,7 +20,7 @@ import {
   type GetGuidesResponse,
   type GuideResponse,
   type UpdateGuideRequest,
-} from "@/entities/guides/model/guide-schemas";
+} from '@/entities/guides/model/guide-schemas';
 import {
   FILTERED_GUIDES_QUERY_KEY,
   GUIDES_QUERY_KEY,
@@ -28,8 +28,8 @@ import {
   GUIDE_CREATE_QUERY_KEY,
   GUIDE_DELETE_MUTATION_KEY,
   GUIDE_QUERY_KEY,
-} from "@/shared/utils/constants/guide-query-key";
-import { ROUTER_MAP } from "@/shared/utils/constants/router-map";
+} from '@/shared/utils/constants/guide-query-key';
+import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 export const useCreateGuide = () => {
   const router = useRouter();
@@ -38,10 +38,10 @@ export const useCreateGuide = () => {
     mutationFn: (data: CreateGuideRequest) => GuideService.create(data),
     onSuccess: () => {
       router.push(ROUTER_MAP.GUIDES);
-      toast.success("Справочник успешно создан");
+      toast.success('Справочник успешно создан');
     },
     onError: () => {
-      toast.error("Произошла неизвестная ошибка. Попробуйте снова.");
+      toast.error('Произошла неизвестная ошибка. Попробуйте снова.');
     },
   });
 };
@@ -53,9 +53,9 @@ export const useUpdateGuide = () => {
       GuideService.update(id, data),
     onSuccess: () => {
       router.push(ROUTER_MAP.GUIDES);
-      toast.success("Справочник обновлён");
+      toast.success('Справочник обновлён');
     },
-    onError: () => toast.error("Ошибка при обновлении"),
+    onError: () => toast.error('Ошибка при обновлении'),
   });
 };
 
@@ -86,7 +86,10 @@ type GuideFilterWithPagination = GetGuidesParamsRequest & {
   limit?: number;
 };
 
-export const useInfiniteGuides = (filters?: GetGuidesParamsRequest, defaultLimit = 20) => {
+export const useInfiniteGuides = (
+  filters?: GetGuidesParamsRequest,
+  defaultLimit = 20,
+) => {
   return useInfiniteQuery<
     GetGuidesResponse,
     Error,
@@ -96,13 +99,15 @@ export const useInfiniteGuides = (filters?: GetGuidesParamsRequest, defaultLimit
     queryKey: GUIDES_WITH_FILTERS_KEY(filters),
 
     queryFn: async (
-      context: QueryFunctionContext<[string, GetGuidesParamsRequest | undefined]>
+      context: QueryFunctionContext<
+        [string, GetGuidesParamsRequest | undefined]
+      >,
     ) => {
       const rawPageParam = context.pageParam;
       const page =
-        typeof rawPageParam === "number"
+        typeof rawPageParam === 'number'
           ? rawPageParam
-          : typeof rawPageParam === "string" && rawPageParam !== ""
+          : typeof rawPageParam === 'string' && rawPageParam !== ''
             ? Number(rawPageParam)
             : 1;
 
@@ -138,7 +143,7 @@ export const useDeleteGuide = (filters?: GetGuidesParamsRequest) => {
     mutationFn: (id: string) => GuideService.delete(id),
 
     onSuccess: () => {
-      toast.success("Справочник удалён");
+      toast.success('Справочник удалён');
 
       queryClient.invalidateQueries({
         queryKey: GUIDES_WITH_FILTERS_KEY(filters) as readonly unknown[],
@@ -146,7 +151,7 @@ export const useDeleteGuide = (filters?: GetGuidesParamsRequest) => {
     },
 
     onError: () => {
-      toast.error("Ошибка при удалении");
+      toast.error('Ошибка при удалении');
     },
   });
 };
@@ -154,21 +159,21 @@ export const useDeleteGuide = (filters?: GetGuidesParamsRequest) => {
 export function useCopyGuide() {
   const copyGuide = useCallback(async (guide: GuideResponse) => {
     const text = `
-ФИО: ${guide.fullName || "Не указано"}
-Дата рождения: ${guide.birthDate || "Не указано"}
-Телефон: ${guide.phone || "Не указано"}
-Номер карты: ${guide.cardNumber || "Не указано"}
-Адрес: ${guide.address || "Не указано"}
+ФИО: ${guide.fullName || 'Не указано'}
+Дата рождения: ${guide.birthDate || 'Не указано'}
+Телефон: ${guide.phone || 'Не указано'}
+Номер карты: ${guide.cardNumber || 'Не указано'}
+Адрес: ${guide.address || 'Не указано'}
 Создан: ${new Date(guide.createdAt).toLocaleString()}
 `;
 
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Скопировано в буфер обмена");
+      toast.success('Скопировано в буфер обмена');
       return true;
     } catch (err) {
-      console.error("Ошибка при копировании:", err);
-      toast.error("Не удалось скопировать");
+      console.error('Ошибка при копировании:', err);
+      toast.error('Не удалось скопировать');
       return false;
     }
   }, []);

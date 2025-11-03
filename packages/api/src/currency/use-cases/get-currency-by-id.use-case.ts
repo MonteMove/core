@@ -5,35 +5,33 @@ import { GetCurrencyByIdOutput } from '../types';
 
 @Injectable()
 export class GetCurrencyByIdUseCase {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(currencyId: string): Promise<GetCurrencyByIdOutput> {
-        const currency = await this.prisma.currency.findUnique({
-            where: { id: currencyId },
-            include: {
-                created_by: {
-                    select: {
-                        id: true,
-                        username: true,
-                    },
-                },
-                updated_by: {
-                    select: {
-                        id: true,
-                        username: true,
-                    },
-                },
-            },
-        });
+  public async execute(currencyId: string): Promise<GetCurrencyByIdOutput> {
+    const currency = await this.prisma.currency.findUnique({
+      where: { id: currencyId },
+      include: {
+        created_by: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+        updated_by: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
 
-        if (!currency || currency.deleted) {
-            throw new NotFoundException('Валюта не найдена');
-        }
-
-        const { deleted: _, ...currencyResponse } = currency;
-
-        return {
-            currency: currencyResponse,
-        };
+    if (!currency || currency.deleted) {
+      throw new NotFoundException('Валюта не найдена');
     }
+
+    return {
+      currency,
+    };
+  }
 }

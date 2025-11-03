@@ -6,8 +6,8 @@
   "packageManager": "pnpm@10.15.1",
   "scripts": {
     "dev": "pnpm --parallel --stream run dev",
-    "dev:api": "pnpm --filter @montemove/api run start:dev",
-    "dev:frontend": "pnpm --filter @montemove/frontend run dev",
+    "dev:api": "dotenv -e .env -- pnpm --filter @montemove/api run start:dev",
+    "dev:frontend": "dotenv -e .env -- pnpm --filter @montemove/frontend run dev",
     "build": "pnpm --recursive run build",
     "build:api": "pnpm --filter @montemove/api run build",
     "build:frontend": "pnpm --filter @montemove/frontend run build",
@@ -20,13 +20,18 @@
     "test": "pnpm --recursive run test",
     "test:api": "pnpm --filter @montemove/api run test",
     "clean": "pnpm --recursive exec rm -rf node_modules dist .next",
-    "db:generate": "pnpm --filter @montemove/api run prisma:generate",
-    "db:migrate": "pnpm --filter @montemove/api run prisma:dev",
-    "db:deploy": "pnpm --filter @montemove/api run prisma:deploy",
+    "db:generate": "dotenv -e .env -- pnpm --filter @montemove/api run prisma:generate",
+    "db:migrate": "dotenv -e .env -- pnpm --filter @montemove/api run prisma:dev",
+    "db:push": "dotenv -e .env -- pnpm --filter @montemove/api run prisma:push",
+    "db:deploy": "dotenv -e .env -- pnpm --filter @montemove/api run prisma:deploy",
+    "db:studio": "dotenv -e .env -- pnpm --filter @montemove/api run prisma:studio",
+    "db:reset": "dotenv -e .env -- pnpm --filter @montemove/api run prisma:reset",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down"
   },
   "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "dotenv-expand": "^11.0.7",
     "prettier": "^3.4.2"
   },
   "engines": {

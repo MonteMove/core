@@ -9,9 +9,9 @@ import {
   GuideResponseSchema,
   UpdateGuideRequest,
   UpdateGuideSchema,
-} from "@/entities/guides/model/guide-schemas";
-import { axiosInstance } from "@/shared/api/axios-instance";
-import { API_MAP } from "@/shared/utils/constants/api-map";
+} from '@/entities/guides/model/guide-schemas';
+import { axiosInstance } from '@/shared/api/axios-instance';
+import { API_MAP } from '@/shared/utils/constants/api-map';
 
 export class GuideService {
   public static async create(data: CreateGuideRequest): Promise<void> {
@@ -19,7 +19,10 @@ export class GuideService {
     await axiosInstance.post(API_MAP.GUIDES.GUIDES, validated);
   }
 
-  public static async update(id: string, data: UpdateGuideRequest): Promise<void> {
+  public static async update(
+    id: string,
+    data: UpdateGuideRequest,
+  ): Promise<void> {
     const validated = UpdateGuideSchema.parse(data);
     await axiosInstance.put(API_MAP.GUIDES.GUIDE_BY_ID(id), validated);
   }
@@ -29,8 +32,12 @@ export class GuideService {
     return GuideResponseSchema.parse(data);
   }
 
-  public static async getGuides(params?: GetGuidesParamsRequest): Promise<GetGuidesResponse> {
-    const validatedParams = params ? GetGuidesParamsSchema.parse(params) : undefined;
+  public static async getGuides(
+    params?: GetGuidesParamsRequest,
+  ): Promise<GetGuidesResponse> {
+    const validatedParams = params
+      ? GetGuidesParamsSchema.parse(params)
+      : undefined;
     const response = await axiosInstance.get(API_MAP.GUIDES.GUIDES, {
       params: validatedParams,
     });
@@ -39,7 +46,9 @@ export class GuideService {
 
   public static async filter(filter: GetGuidesParamsRequest) {
     const validatedParams = GetGuidesParamsSchema.parse(filter);
-    const { data } = await axiosInstance.get(API_MAP.GUIDES.GUIDES, { params: validatedParams });
+    const { data } = await axiosInstance.get(API_MAP.GUIDES.GUIDES, {
+      params: validatedParams,
+    });
     return GetGuidesResponseSchema.parse(data);
   }
 

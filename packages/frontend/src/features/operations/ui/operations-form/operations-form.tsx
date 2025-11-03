@@ -1,11 +1,12 @@
-﻿"use client";
+'use client';
 
-import React from "react";
+import React from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Trash2 } from "lucide-react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CalendarIcon, Trash2 } from 'lucide-react';
+import { useFieldArray, useForm } from 'react-hook-form';
 
+import { useApplicationsList } from '@/entities/application';
 import {
   CreateOperationDto,
   CreateOperationDtoSchema,
@@ -14,7 +15,7 @@ import {
   useOperationTypes,
   useUpdateOperation,
   useWallets,
-} from "@/entities/operations";
+} from '@/entities/operations';
 import {
   Button,
   Calendar,
@@ -33,24 +34,28 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Skeleton,
   Textarea,
   cn,
   formatDate,
-} from "@/shared";
+} from '@/shared';
 
 export function OperationForm({
   initialData,
   className,
   ...props
-}: { initialData?: OperationResponseDto } & React.ComponentProps<"form">) {
+}: { initialData?: OperationResponseDto } & React.ComponentProps<'form'>) {
   const createMutation = useCreateOperation();
   const updateMutation = useUpdateOperation();
 
   const [open, setOpen] = React.useState(false);
-  const [rawInput, setRawInput] = React.useState("");
+  const [rawInput, setRawInput] = React.useState('');
 
   const { data: wallets } = useWallets();
-  const { data: operationTypes, isLoading: isOperationTypesLoading } = useOperationTypes();
+  const { data: operationTypes, isLoading: isOperationTypesLoading } =
+    useOperationTypes();
+  const { data: applications, isLoading: isApplicationsLoading } =
+    useApplicationsList();
 
   const form = useForm<CreateOperationDto>({
     resolver: zodResolver(CreateOperationDtoSchema),
@@ -58,7 +63,7 @@ export function OperationForm({
       ? {
           typeId: initialData.typeId,
           applicationId: 0,
-          description: initialData.description ?? "",
+          description: initialData.description ?? '',
           entries: initialData.entries.map((e) => ({
             wallet: { id: e.wallet.id, name: e.wallet.name },
             direction: e.direction,
@@ -67,17 +72,17 @@ export function OperationForm({
           creatureDate: initialData.createdAt,
         }
       : {
-          typeId: "",
+          typeId: '',
           applicationId: 0,
-          description: "",
+          description: '',
           entries: [],
-          creatureDate: "",
+          creatureDate: '',
         },
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "entries",
+    name: 'entries',
   });
 
   const onSubmit = (data: CreateOperationDto) => {
@@ -89,7 +94,8 @@ export function OperationForm({
       // режим редактирования
       const mergedEntries = data.entries.map((entry) => {
         const oldEntry = initialData.entries.find(
-          (e) => e.wallet.id === entry.wallet.id && e.direction === entry.direction
+          (e) =>
+            e.wallet.id === entry.wallet.id && e.direction === entry.direction,
         );
 
         return {
@@ -126,10 +132,10 @@ export function OperationForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("flex flex-col gap-6", className)}
+        className={cn('flex flex-col gap-6', className)}
         {...props}
       >
-        <div className="lg:flex justify-between gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Тип операции */}
           <FormField
             control={form.control}
@@ -137,9 +143,12 @@ export function OperationForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Тип операции:</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value || ""}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ''}
+                >
                   <FormControl>
-                    <SelectTrigger className="lg:w-[300px] w-full">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Выберите" />
                     </SelectTrigger>
                   </FormControl>
@@ -167,20 +176,27 @@ export function OperationForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Тип заявки:</FormLabel>
-                <Select
-                  onValueChange={(v) => field.onChange(Number(v))}
-                  value={String(field.value ?? "")}
-                >
-                  <FormControl>
-                    <SelectTrigger className="lg:w-[300px] w-full">
-                      <SelectValue placeholder="Выберите" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="1">Заявка A</SelectItem>
-                    <SelectItem value="2">Заявка B</SelectItem>
-                  </SelectContent>
-                </Select>
+                {isApplicationsLoading ? (
+                  <Skeleton className="h-8" />
+                ) : (
+                  <Select
+                    onValueChange={(v) => field.onChange(Number(v))}
+                    value={String(field.value ?? '')}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Выберите" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {applications?.applications?.map((app) => (
+                        <SelectItem key={app.id} value={String(app.id)}>
+                          #{app.id} - {app.amount} {app.currency.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </FormItem>
             )}
           />
@@ -199,17 +215,18 @@ export function OperationForm({
                       placeholder="ДД.ММ.ГГГГ"
                       className="bg-background pr-10"
                       onChange={(e) => {
-                        let raw = e.target.value.replace(/\D/g, "");
+                        let raw = e.target.value.replace(/\D/g, '');
                         if (raw.length > 8) raw = raw.slice(0, 8);
 
                         let formatted = raw;
                         if (raw.length > 4)
                           formatted = `${raw.slice(0, 2)}.${raw.slice(2, 4)}.${raw.slice(4)}`;
-                        else if (raw.length > 2) formatted = `${raw.slice(0, 2)}.${raw.slice(2)}`;
+                        else if (raw.length > 2)
+                          formatted = `${raw.slice(0, 2)}.${raw.slice(2)}`;
 
                         setRawInput(formatted);
 
-                        const parts = formatted.split(".");
+                        const parts = formatted.split('.');
                         if (parts.length === 3) {
                           const [dd, mm, yyyy] = parts.map(Number);
                           const parsed = new Date(yyyy, mm - 1, dd);
@@ -232,10 +249,15 @@ export function OperationForm({
                         <CalendarIcon className="size-3.5" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto overflow-hidden p-0" align="end">
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="end"
+                    >
                       <Calendar
                         mode="single"
-                        selected={field.value ? new Date(field.value) : undefined}
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
                         onSelect={(date) => {
                           if (date) {
                             field.onChange(date.toISOString());
@@ -252,36 +274,22 @@ export function OperationForm({
           />
         </div>
 
-        {/* Описание */}
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Описание</FormLabel>
-              <FormControl>
-                <Textarea className="w-full h-[250px]" {...field} value={field.value ?? ""} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* Entries */}
         <div className="lg:grid lg:grid-cols-2 gap-4">
-          {["credit", "debit"].map((dir) => (
+          {['credit', 'debit'].map((dir) => (
             <div key={dir} className="flex flex-col gap-3 mt-2">
               <div className="lg:flex justify-between items-center">
                 <p className="font-medium">
-                  {dir === "credit" ? "Вычесть из..." : "Прибавить к..."}
+                  {dir === 'credit' ? 'Вычесть из...' : 'Прибавить к...'}
                 </p>
                 <Button
-                  className="lg:w-[254px] w-full"
+                  variant="outline"
+                  size="sm"
                   type="button"
                   onClick={() =>
                     append({
-                      wallet: { id: "", name: "" },
-                      direction: dir as "credit" | "debit",
+                      wallet: { id: '', name: '' },
+                      direction: dir as 'credit' | 'debit',
                       amount: 0,
                     })
                   }
@@ -300,7 +308,10 @@ export function OperationForm({
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormLabel>Кошелек</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value || ""}>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value || ''}
+                          >
                             <FormControl>
                               <SelectTrigger className="lg:w-[250px] w-full">
                                 <SelectValue placeholder="Выберите" />
@@ -335,7 +346,13 @@ export function OperationForm({
                       )}
                     />
 
-                    <Button type="button" variant="destructive" onClick={() => remove(index)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="text-destructive hover:bg-destructive/10"
+                    >
                       <Trash2 className="size-4" />
                     </Button>
                   </div>
@@ -344,14 +361,36 @@ export function OperationForm({
           ))}
         </div>
 
-        <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+        {/* Описание */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Описание</FormLabel>
+              <FormControl>
+                <Textarea
+                  className="w-full h-[50px]"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          type="submit"
+          disabled={createMutation.isPending || updateMutation.isPending}
+        >
           {isEditing
             ? updateMutation.isPending
-              ? "Сохранение..."
-              : "Сохранить изменения"
+              ? 'Сохранение...'
+              : 'Сохранить изменения'
             : createMutation.isPending
-              ? "Создание..."
-              : "Создать"}
+              ? 'Создание...'
+              : 'Создать'}
         </Button>
       </form>
     </Form>

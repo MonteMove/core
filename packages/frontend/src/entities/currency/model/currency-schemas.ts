@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const CurrencySchema = z.object({
   id: z.string().uuid(),
@@ -6,21 +6,26 @@ export const CurrencySchema = z.object({
   updatedById: z.string().uuid(),
   code: z.string(),
   name: z.string(),
+  deleted: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 
 export const CreateCurrencySchema = z.object({
-  code: z.string().min(1, "Код валюты обязателен"),
-  name: z.string().min(1, "Название валюты обязательно"),
-  symbol: z.string().min(1, "Символ валюты обязателен"),
+  code: z.string().min(1, 'Код валюты обязателен'),
+  name: z.string().min(1, 'Название валюты обязательно'),
+});
+
+export const UpdateCurrencySchema = z.object({
+  code: z.string().min(1, 'Код валюты обязателен').optional(),
+  name: z.string().min(1, 'Название валюты обязательно').optional(),
 });
 
 export const GetCurrenciesParamsSchema = z.object({
   search: z.string().optional(),
   code: z.string().optional(),
-  sortField: z.enum(["code", "name", "createdAt", "updatedAt"]).optional(),
-  sortOrder: z.enum(["asc", "desc"]).optional(),
+  sortField: z.enum(['code', 'name', 'createdAt', 'updatedAt']).optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
   page: z.number().int().positive().optional(),
   limit: z.number().int().positive().max(100).optional(),
 });
@@ -41,7 +46,39 @@ export const CurrencyInfoSchema = z.object({
   code: z.string(),
 });
 
+export const CreateCurrencyResponseSchema = z.object({
+  message: z.string(),
+  currency: CurrencySchema,
+});
+
+export const UpdateCurrencyResponseSchema = z.object({
+  message: z.string(),
+  currency: CurrencySchema,
+});
+
+export const DeleteCurrencyResponseSchema = z.object({
+  message: z.string(),
+});
+
+export const RestoreCurrencyResponseSchema = z.object({
+  message: z.string(),
+});
+
 export type Currency = z.infer<typeof CurrencySchema>;
 export type CreateCurrencyRequest = z.infer<typeof CreateCurrencySchema>;
+export type UpdateCurrencyRequest = z.infer<typeof UpdateCurrencySchema>;
+export type GetCurrenciesResponse = z.infer<typeof GetCurrenciesResponseSchema>;
+export type CreateCurrencyResponse = z.infer<
+  typeof CreateCurrencyResponseSchema
+>;
+export type UpdateCurrencyResponse = z.infer<
+  typeof UpdateCurrencyResponseSchema
+>;
+export type DeleteCurrencyResponse = z.infer<
+  typeof DeleteCurrencyResponseSchema
+>;
+export type RestoreCurrencyResponse = z.infer<
+  typeof RestoreCurrencyResponseSchema
+>;
 export type GetCurrenciesParams = z.infer<typeof GetCurrenciesParamsSchema>;
 export type CurrenciesResponse = z.infer<typeof GetCurrenciesResponseSchema>;

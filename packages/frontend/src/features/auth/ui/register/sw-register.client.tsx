@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { isDevelopment } from "@/shared/lib/env-config";
+import { isDevelopment } from '@/shared/lib/env-config';
 
 export default function ServiceWorkerRegister() {
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!("serviceWorker" in navigator)) return;
+    if (typeof window === 'undefined') return;
+    if (!('serviceWorker' in navigator)) return;
 
     if (isDevelopment) {
       return;
@@ -15,20 +15,20 @@ export default function ServiceWorkerRegister() {
 
     const register = async () => {
       try {
-        await navigator.serviceWorker.register("/sw.js");
+        await navigator.serviceWorker.register('/sw.js');
       } catch (error) {
         console.error(error);
       }
     };
 
-    if (document.readyState === "complete") {
+    if (document.readyState === 'complete') {
       register();
     } else {
-      window.addEventListener("load", register, { once: true });
+      window.addEventListener('load', register, { once: true });
     }
 
     return () => {
-      window.removeEventListener("load", register);
+      window.removeEventListener('load', register);
     };
   }, []);
 

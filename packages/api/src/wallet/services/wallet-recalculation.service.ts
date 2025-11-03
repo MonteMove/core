@@ -1,127 +1,140 @@
 import { Injectable } from '@nestjs/common';
 
-import { BalanceStatus, OperationDirection, Prisma } from '../../../prisma/generated/prisma';
+import {
+  BalanceStatus,
+  OperationDirection,
+  Prisma,
+} from '../../../prisma/generated/prisma';
 import { PrismaService } from '../../common/services/prisma.service';
 
 @Injectable()
 export class WalletRecalculationService {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    public async recalculateForOperation(
-        tx: Prisma.TransactionClient,
-        operationId: string,
-        updatedById?: string,
-    ): Promise<void> {
-        const walletIds = await this.getOperationWalletIds(tx, operationId);
+  public async recalculateForOperation(
+    tx: Prisma.TransactionClient,
+    operationId: string,
+    updatedById?: string,
+  ): Promise<void> {
+    const walletIds = await this.getOperationWalletIds(tx, operationId);
 
-        if (walletIds.length === 0) {
-            return;
-        }
-
-        await this.recalculateWallets(tx, walletIds, updatedById);
+    if (walletIds.length === 0) {
+      return;
     }
 
-    public async recalculateWallet(
-        tx: Prisma.TransactionClient,
-        walletId: string,
-        updatedById?: string,
-    ): Promise<void> {
-        await this.recalculateWallets(tx, [walletId], updatedById);
+    await this.recalculateWallets(tx, walletIds, updatedById);
+  }
+
+  public async recalculateWallet(
+    tx: Prisma.TransactionClient,
+    walletId: string,
+    updatedById?: string,
+  ): Promise<void> {
+    await this.recalculateWallets(tx, [walletId], updatedById);
+  }
+
+  public async recalculateWallets(
+    tx: Prisma.TransactionClient,
+    walletIds: string[],
+    updatedById?: string,
+  ): Promise<void> {
+    const uniqueIds = [...new Set(walletIds)];
+
+    for (const walletId of uniqueIds) {
+      const amount = await this.calculateWalletAmount(tx, walletId);
+      const balanceStatus = this.determineBalanceStatus(amount);
+
+      await tx.wallet.update({
+        where: { id: walletId },
+        data: {
+          amount,
+          balanceStatus,
+          ...(updatedById && { updatedById }),
+        },
+      });
+    }
+  }
+
+  public async recalculateAllWallets(): Promise<void> {
+    await this.prisma.$transaction(async (tx) => {
+      const wallets = await tx.wallet.findMany({
+        where: { deleted: false },
+        select: { id: true },
+      });
+
+      if (wallets.length === 0) {
+        return;
+      }
+
+      await this.recalculateWallets(
+        tx,
+        wallets.map((wallet) => wallet.id),
+      );
+    });
+  }
+
+  public async getCalculatedWalletAmount(
+    tx: Prisma.TransactionClient,
+    walletId: string,
+  ): Promise<number> {
+    return this.calculateWalletAmount(tx, walletId);
+  }
+
+  private async getOperationWalletIds(
+    tx: Prisma.TransactionClient,
+    operationId: string,
+  ): Promise<string[]> {
+    const entries = await tx.operationEntry.findMany({
+      where: {
+        operationId,
+        deleted: false,
+      },
+      select: { walletId: true },
+    });
+
+    return entries.map((entry) => entry.walletId);
+  }
+
+  private async calculateWalletAmount(
+    tx: Prisma.TransactionClient,
+    walletId: string,
+  ): Promise<number> {
+    const groupedAmounts = await tx.operationEntry.groupBy({
+      by: ['direction'],
+      where: {
+        walletId,
+        deleted: false,
+        operation: { deleted: false },
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    let balance = 0;
+
+    for (const result of groupedAmounts) {
+      const sum = result._sum.amount ?? 0;
+
+      if (result.direction === OperationDirection.credit) {
+        balance += sum;
+      } else {
+        balance -= sum;
+      }
     }
 
-    public async recalculateWallets(
-        tx: Prisma.TransactionClient,
-        walletIds: string[],
-        updatedById?: string,
-    ): Promise<void> {
-        const uniqueIds = [...new Set(walletIds)];
+    return balance;
+  }
 
-        for (const walletId of uniqueIds) {
-            const amount = await this.calculateWalletAmount(tx, walletId);
-            const balanceStatus = this.determineBalanceStatus(amount);
-
-            await tx.wallet.update({
-                where: { id: walletId },
-                data: {
-                    amount,
-                    balanceStatus,
-                    ...(updatedById && { updatedById }),
-                },
-            });
-        }
+  private determineBalanceStatus(amount: number): BalanceStatus {
+    if (amount > 0) {
+      return BalanceStatus.positive;
     }
 
-    public async recalculateAllWallets(): Promise<void> {
-        await this.prisma.$transaction(async (tx) => {
-            const wallets = await tx.wallet.findMany({
-                where: { deleted: false },
-                select: { id: true },
-            });
-
-            if (wallets.length === 0) {
-                return;
-            }
-
-            await this.recalculateWallets(
-                tx,
-                wallets.map((wallet) => wallet.id),
-            );
-        });
+    if (amount < 0) {
+      return BalanceStatus.negative;
     }
 
-    public async getCalculatedWalletAmount(tx: Prisma.TransactionClient, walletId: string): Promise<number> {
-        return this.calculateWalletAmount(tx, walletId);
-    }
-
-    private async getOperationWalletIds(tx: Prisma.TransactionClient, operationId: string): Promise<string[]> {
-        const entries = await tx.operationEntry.findMany({
-            where: {
-                operationId,
-                deleted: false,
-            },
-            select: { walletId: true },
-        });
-
-        return entries.map((entry) => entry.walletId);
-    }
-
-    private async calculateWalletAmount(tx: Prisma.TransactionClient, walletId: string): Promise<number> {
-        const groupedAmounts = await tx.operationEntry.groupBy({
-            by: ['direction'],
-            where: {
-                walletId,
-                deleted: false,
-                operation: { deleted: false },
-            },
-            _sum: {
-                amount: true,
-            },
-        });
-
-        let balance = 0;
-
-        for (const result of groupedAmounts) {
-            const sum = result._sum.amount ?? 0;
-
-            if (result.direction === OperationDirection.credit) {
-                balance += sum;
-            } else {
-                balance -= sum;
-            }
-        }
-
-        return balance;
-    }
-
-    private determineBalanceStatus(amount: number): BalanceStatus {
-        if (amount > 0) {
-            return BalanceStatus.positive;
-        }
-
-        if (amount < 0) {
-            return BalanceStatus.negative;
-        }
-
-        return BalanceStatus.neutral;
-    }
+    return BalanceStatus.neutral;
+  }
 }

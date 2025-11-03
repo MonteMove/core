@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-import { verifyJwtToken } from "@/shared/lib/jwt-utils";
-import { ROUTER_MAP } from "@/shared/utils/constants/router-map";
+import { verifyJwtToken } from '@/shared/lib/jwt-utils';
+import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import {
   AUTH_REFRESH_TOKEN_COOKIE_KEY,
   AUTH_TOKEN_KEY,
-} from "@/shared/utils/constants/storage-keys";
+} from '@/shared/utils/constants/storage-keys';
 
-import { isDevelopment } from "./shared/lib/env-config";
+import { isDevelopment } from './shared/lib/env-config';
 
 /**
  * Middleware для проверки аутентификации
@@ -22,14 +22,16 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
   if (isDevelopment) {
     const accessToken = request.cookies.get(AUTH_TOKEN_KEY)?.value;
-    const refreshToken = request.cookies.get(AUTH_REFRESH_TOKEN_COOKIE_KEY)?.value;
+    const refreshToken = request.cookies.get(
+      AUTH_REFRESH_TOKEN_COOKIE_KEY,
+    )?.value;
 
     if (!accessToken && !refreshToken && !isLoginRoute) {
       const loginUrl = new URL(ROUTER_MAP.LOGIN, request.url);
-      const nextPath = pathname + (search || "");
+      const nextPath = pathname + (search || '');
 
       if (nextPath && nextPath !== ROUTER_MAP.LOGIN) {
-        loginUrl.searchParams.set("next", nextPath);
+        loginUrl.searchParams.set('next', nextPath);
       }
 
       return NextResponse.redirect(loginUrl);
@@ -43,15 +45,19 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     return NextResponse.next();
   }
 
-  const refreshToken = request.cookies.get(AUTH_REFRESH_TOKEN_COOKIE_KEY)?.value;
-  const hasValidToken = refreshToken ? (await verifyJwtToken(refreshToken)) !== null : false;
+  const refreshToken = request.cookies.get(
+    AUTH_REFRESH_TOKEN_COOKIE_KEY,
+  )?.value;
+  const hasValidToken = refreshToken
+    ? (await verifyJwtToken(refreshToken)) !== null
+    : false;
 
   if (!hasValidToken && !isLoginRoute) {
     const loginUrl = new URL(ROUTER_MAP.LOGIN, request.url);
-    const nextPath = pathname + (search || "");
+    const nextPath = pathname + (search || '');
 
     if (nextPath && nextPath !== ROUTER_MAP.LOGIN) {
-      loginUrl.searchParams.set("next", nextPath);
+      loginUrl.searchParams.set('next', nextPath);
     }
 
     const response = NextResponse.redirect(loginUrl);
@@ -74,5 +80,5 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
  * @property {string[]} matcher - Защищённые пути и login
  */
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ['/dashboard/:path*', '/login'],
 };

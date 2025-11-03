@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, X } from "lucide-react";
-import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Search, X } from 'lucide-react';
+import { useForm, useWatch } from 'react-hook-form';
+import { z } from 'zod';
 
 import {
   GetApplicationsFilters,
   getApplicationsFiltersSchema,
   useSetApplicationQueryParam,
-} from "@/entities/application";
+} from '@/entities/application';
 import {
   Button,
   Form,
@@ -25,49 +25,52 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared";
-import { cn } from "@/shared/lib/utils";
+} from '@/shared';
+import { cn } from '@/shared/lib/utils';
 
 const sortByOptions = [
-  { value: "createdAt", label: "Дате создания" },
-  { value: "meetingDate", label: "Дате встречи" },
+  { value: 'createdAt', label: 'Дате создания' },
+  { value: 'meetingDate', label: 'Дате встречи' },
 ];
 
 const sortOrderOptions = [
-  { value: "desc", label: "Сначала новые" },
-  { value: "asc", label: "Сначала старые" },
+  { value: 'desc', label: 'Сначала новые' },
+  { value: 'asc', label: 'Сначала старые' },
 ];
 
 const statusApplications = [
-  { value: "all", label: "Все" },
-  { value: "open", label: "В работе" },
-  { value: "done", label: "Завершена" },
+  { value: 'all', label: 'Все' },
+  { value: 'open', label: 'В работе' },
+  { value: 'done', label: 'Завершена' },
 ];
 
-export function ApplicationsFilters({ className, ...props }: React.ComponentProps<"div">) {
+export function ApplicationsFilters({
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
   const { setAllQueryParams } = useSetApplicationQueryParam();
 
   const form = useForm<z.input<typeof getApplicationsFiltersSchema>>({
     resolver: zodResolver(getApplicationsFiltersSchema),
     defaultValues: {
-      search: "",
-      status: "all",
-      sortField: "createdAt",
-      sortOrder: "desc",
+      search: '',
+      status: 'all',
+      sortField: 'createdAt',
+      sortOrder: 'desc',
       page: 1,
       limit: 10,
     },
   });
 
-  const search = useWatch({ control: form.control, name: "search" });
-  const status = useWatch({ control: form.control, name: "status" });
-  const sortField = useWatch({ control: form.control, name: "sortField" });
-  const sortOrder = useWatch({ control: form.control, name: "sortOrder" });
+  const search = useWatch({ control: form.control, name: 'search' });
+  const status = useWatch({ control: form.control, name: 'status' });
+  const sortField = useWatch({ control: form.control, name: 'sortField' });
+  const sortOrder = useWatch({ control: form.control, name: 'sortOrder' });
 
   useEffect(() => {
     const currentValues = {
       search: search || undefined,
-      status: status === "all" ? undefined : status,
+      status: status === 'all' ? undefined : status,
       sortField: sortField || undefined,
       sortOrder: sortOrder || undefined,
       page: 1,
@@ -79,16 +82,16 @@ export function ApplicationsFilters({ className, ...props }: React.ComponentProp
 
   const handleReset = () => {
     form.reset({
-      search: "",
-      status: "all",
-      sortField: "createdAt",
-      sortOrder: "desc",
+      search: '',
+      status: 'all',
+      sortField: 'createdAt',
+      sortOrder: 'desc',
       page: 1,
       limit: 10,
     });
     setAllQueryParams({
       search: undefined,
-      status: "all",
+      status: 'all',
       sortField: undefined,
       sortOrder: undefined,
       page: 1,
@@ -97,7 +100,7 @@ export function ApplicationsFilters({ className, ...props }: React.ComponentProp
   };
 
   return (
-    <div className={cn("flex flex-col gap-2", className)} {...props}>
+    <div className={cn('flex flex-col gap-2', className)} {...props}>
       <Form {...form}>
         <form>
           <div className="lg:flex justify-center max-xl:flex-wrap md:items-end lg:gap-4">
@@ -120,7 +123,7 @@ export function ApplicationsFilters({ className, ...props }: React.ComponentProp
                         <button
                           type="button"
                           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
-                          onClick={() => form.setValue("search", "")}
+                          onClick={() => form.setValue('search', '')}
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -160,7 +163,9 @@ export function ApplicationsFilters({ className, ...props }: React.ComponentProp
               name="sortField"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="lg:mt-0 mt-2">Сортировать по:</FormLabel>
+                  <FormLabel className="lg:mt-0 mt-2">
+                    Сортировать по:
+                  </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="lg:w-[150px] w-full">

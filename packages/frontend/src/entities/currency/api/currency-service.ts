@@ -1,9 +1,9 @@
 import {
   CurrenciesResponse,
   GetCurrenciesResponseSchema,
-} from "@/entities/currency/model/currency-schemas";
-import { axiosInstance } from "@/shared/api/axios-instance";
-import { API_MAP } from "@/shared/utils/constants/api-map";
+} from '@/entities/currency/model/currency-schemas';
+import { axiosInstance } from '@/shared/api/axios-instance';
+import { API_MAP } from '@/shared/utils/constants/api-map';
 
 export class CurrencyService {
   public static async getCurrencies(): Promise<CurrenciesResponse> {

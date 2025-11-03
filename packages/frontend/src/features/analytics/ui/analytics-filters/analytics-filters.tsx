@@ -1,52 +1,59 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { ChevronDownIcon } from "lucide-react";
+import { ChevronDownIcon } from 'lucide-react';
 
-import { useAnalyticsFilters } from "@/features/analytics/hook/use-analytics-filters";
-import { Button } from "@/shared/ui/shadcn/button";
-import { Calendar } from "@/shared/ui/shadcn/calendar";
-import { Input } from "@/shared/ui/shadcn/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/shadcn/popover";
+import { useAnalyticsFilters } from '@/features/analytics/hook/use-analytics-filters';
+import { Button } from '@/shared/ui/shadcn/button';
+import { Calendar } from '@/shared/ui/shadcn/calendar';
+import { Input } from '@/shared/ui/shadcn/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/ui/shadcn/popover';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/shadcn/select";
+} from '@/shared/ui/shadcn/select';
 
 const MONTHS = [
-  { value: "January", label: "Январь" },
-  { value: "February", label: "Февраль" },
-  { value: "March", label: "Март" },
-  { value: "April", label: "Апрель" },
-  { value: "May", label: "Май" },
-  { value: "June", label: "Июнь" },
-  { value: "July", label: "Июль" },
-  { value: "August", label: "Август" },
-  { value: "September", label: "Сентябрь" },
-  { value: "October", label: "Октябрь" },
-  { value: "November", label: "Ноябрь" },
-  { value: "December", label: "Декабрь" },
+  { value: 'January', label: 'Январь' },
+  { value: 'February', label: 'Февраль' },
+  { value: 'March', label: 'Март' },
+  { value: 'April', label: 'Апрель' },
+  { value: 'May', label: 'Май' },
+  { value: 'June', label: 'Июнь' },
+  { value: 'July', label: 'Июль' },
+  { value: 'August', label: 'Август' },
+  { value: 'September', label: 'Сентябрь' },
+  { value: 'October', label: 'Октябрь' },
+  { value: 'November', label: 'Ноябрь' },
+  { value: 'December', label: 'Декабрь' },
 ];
 
 export const AnalyticsFilters = () => {
   const { month, setFilter } = useAnalyticsFilters();
   const [open, setOpen] = useState(false);
-  const [range, setRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+  const [range, setRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
     from: undefined,
     to: undefined,
   });
-  const [wallet, setWallet] = useState("");
-  const [currency, setCurrency] = useState("");
+  const [wallet, setWallet] = useState('');
+  const [currency, setCurrency] = useState('');
 
   const handleResetFilters = () => {
-    setWallet("");
-    setCurrency("");
+    setWallet('');
+    setCurrency('');
     setRange({ from: undefined, to: undefined });
-    setFilter("month", "all");
+    setFilter('month', 'all');
   };
 
   return (
@@ -73,13 +80,13 @@ export const AnalyticsFilters = () => {
             variant="outline"
             id="date-range"
             className={
-              "w-64 justify-between font-normal" +
-              (!(range.from && range.to) ? " text-muted-foreground" : "")
+              'w-64 justify-between font-normal' +
+              (!(range.from && range.to) ? ' text-muted-foreground' : '')
             }
           >
             {range.from && range.to
               ? `${range.from.toLocaleDateString()} — ${range.to.toLocaleDateString()}`
-              : "Выберите период"}
+              : 'Выберите период'}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
@@ -89,13 +96,18 @@ export const AnalyticsFilters = () => {
             selected={range}
             captionLayout="dropdown"
             onSelect={(selected) => {
-              setRange(selected as { from: Date | undefined; to: Date | undefined });
+              setRange(
+                selected as { from: Date | undefined; to: Date | undefined },
+              );
               if (selected && selected.from && selected.to) setOpen(false);
             }}
           />
         </PopoverContent>
       </Popover>
-      <Select value={month} onValueChange={(value) => setFilter("month", value)}>
+      <Select
+        value={month}
+        onValueChange={(value) => setFilter('month', value)}
+      >
         <SelectTrigger className="w-48">
           <SelectValue placeholder="Все месяцы" />
         </SelectTrigger>

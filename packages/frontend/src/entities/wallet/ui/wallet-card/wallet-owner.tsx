@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import type { PinnedWallet } from "@/entities/wallet";
-import { Badge } from "@/shared/ui/shadcn/badge";
+import type { PinnedWallet } from '@/entities/wallet';
+import { Badge } from '@/shared/ui/shadcn/badge';
 
 interface WalletOwnerProps {
-  user: PinnedWallet["user"];
+  user: PinnedWallet['user'];
 }
 
 export function WalletOwner({ user }: WalletOwnerProps) {
-  const username = user.username?.trim() || "Неизвестный";
+  const username = user?.username?.trim() || 'Неизвестный';
 
   return (
     <Badge variant="outline" className="gap-1">

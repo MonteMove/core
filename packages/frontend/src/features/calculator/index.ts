@@ -1,3 +1,3 @@
-import CalculatorPage from "@/app/dashboard/calculator/page";
+import CalculatorPage from '@/app/dashboard/calculator/page';
 
 export default CalculatorPage;

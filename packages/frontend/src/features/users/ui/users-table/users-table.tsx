@@ -1,16 +1,20 @@
-"use client";
+'use client';
 
-import React, { Fragment, useMemo, useState } from "react";
+import React, { Fragment, useMemo, useState } from 'react';
 
-import { useBlockUser } from "@/features/users/hooks/use-block-user";
-import { useDeleteUser } from "@/features/users/hooks/use-delete-user";
-import { useInfiniteUsers } from "@/features/users/hooks/use-infinite-users";
-import { useUpdateUserRole } from "@/features/users/hooks/use-update-user-role";
-import { useUsersQueryParams } from "@/features/users/hooks/use-users-query-param";
-import { useLastItemObserver } from "@/shared/lib/hooks/use-last-Item-observer";
-import { Button } from "@/shared/ui/shadcn/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/shadcn/popover";
-import { Skeleton } from "@/shared/ui/shadcn/skeleton";
+import { useBlockUser } from '@/features/users/hooks/use-block-user';
+import { useDeleteUser } from '@/features/users/hooks/use-delete-user';
+import { useInfiniteUsers } from '@/features/users/hooks/use-infinite-users';
+import { useUpdateUserRole } from '@/features/users/hooks/use-update-user-role';
+import { useUsersQueryParams } from '@/features/users/hooks/use-users-query-param';
+import { useLastItemObserver } from '@/shared/lib/hooks/use-last-Item-observer';
+import { Button } from '@/shared/ui/shadcn/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared/ui/shadcn/popover';
+import { Skeleton } from '@/shared/ui/shadcn/skeleton';
 import {
   Table,
   TableBody,
@@ -18,18 +22,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/ui/shadcn/table";
+} from '@/shared/ui/shadcn/table';
 
 export const UsersTable = () => {
   const blockUserMutation = useBlockUser();
   const deleteUserMutation = useDeleteUser();
   const [openUserId, setOpenUserId] = useState<string | null>(null);
-  const [rolePopoverUser, setRolePopoverUser] = useState<null | { id: string; current: string }>(
-    null
-  );
+  const [rolePopoverUser, setRolePopoverUser] = useState<null | {
+    id: string;
+    current: string;
+  }>(null);
   const updateUserRoleMutation = useUpdateUserRole();
   const params = useUsersQueryParams();
-  const safeParams = { ...params, page: params.page ?? 1, limit: params.limit ?? 100 };
+  const safeParams = {
+    ...params,
+    page: params.page ?? 1,
+    limit: params.limit ?? 100,
+  };
   const {
     data: infiniteData,
     isLoading,
@@ -39,17 +48,17 @@ export const UsersTable = () => {
 
   const users = useMemo(
     () => infiniteData?.pages.flatMap((page) => page.users) || [],
-    [infiniteData]
+    [infiniteData],
   );
 
-  const tableRow = ["Имя", "Роль", "Создан", "Статус", "Последний вход"];
+  const tableRow = ['Имя', 'Роль', 'Создан', 'Статус', 'Последний вход'];
 
   const lastUserRef = useLastItemObserver<HTMLTableRowElement>(
     () => {
       fetchNextPage();
     },
     isLoading,
-    hasNextPage
+    hasNextPage,
   );
 
   return (
@@ -59,7 +68,9 @@ export const UsersTable = () => {
           <TableHeader>
             <TableRow>
               {tableRow.map((h) => (
-                <TableHead key={h}>{isLoading ? <Skeleton className="h-6 w-24" /> : h}</TableHead>
+                <TableHead key={h}>
+                  {isLoading ? <Skeleton className="h-6 w-24" /> : h}
+                </TableHead>
               ))}
             </TableRow>
           </TableHeader>
@@ -87,28 +98,38 @@ export const UsersTable = () => {
                   <Popover
                     key={user.id}
                     open={openUserId === user.id}
-                    onOpenChange={(open) => setOpenUserId(open ? user.id : null)}
+                    onOpenChange={(open) =>
+                      setOpenUserId(open ? user.id : null)
+                    }
                   >
                     <PopoverTrigger asChild>
                       <TableRow
                         ref={isLast ? lastUserRef : null}
                         className="cursor-pointer hover:bg-muted/50 transition"
-                        onClick={() => setOpenUserId(openUserId === user.id ? null : user.id)}
+                        onClick={() =>
+                          setOpenUserId(openUserId === user.id ? null : user.id)
+                        }
                       >
                         <TableCell>{user.username}</TableCell>
                         <TableCell>
-                          {user.roles && Array.isArray(user.roles) && user.roles.length > 0
-                            ? user.roles.map((r) => r.name).join(", ")
-                            : "-"}
+                          {user.roles &&
+                          Array.isArray(user.roles) &&
+                          user.roles.length > 0
+                            ? user.roles.map((r) => r.name).join(', ')
+                            : '-'}
                         </TableCell>
                         <TableCell>
-                          {user.createdAt ? new Date(user.createdAt).toLocaleString() : "-"}
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleString()
+                            : '-'}
                         </TableCell>
-                        <TableCell>{user.blocked ? "Заблокирован" : "Активен"}</TableCell>
+                        <TableCell>
+                          {user.blocked ? 'Заблокирован' : 'Активен'}
+                        </TableCell>
                         <TableCell>
                           {user.lastLogin
                             ? new Date(user.lastLogin).toLocaleString()
-                            : "Не был в сети"}
+                            : 'Не был в сети'}
                         </TableCell>
                       </TableRow>
                     </PopoverTrigger>
@@ -120,14 +141,19 @@ export const UsersTable = () => {
                           disabled={blockUserMutation.isPending}
                           onClick={(e) => {
                             e.stopPropagation();
-                            blockUserMutation.mutate({ id: user.id, blocked: !user.blocked });
+                            blockUserMutation.mutate({
+                              id: user.id,
+                              blocked: !user.blocked,
+                            });
                             setOpenUserId(null);
                           }}
                         >
-                          {user.blocked ? "Разблокировать" : "Заблокировать"}
+                          {user.blocked ? 'Разблокировать' : 'Заблокировать'}
                         </Button>
                         <Popover
-                          open={!!rolePopoverUser && rolePopoverUser.id === user.id}
+                          open={
+                            !!rolePopoverUser && rolePopoverUser.id === user.id
+                          }
                           onOpenChange={(open) => {
                             if (!open) setRolePopoverUser(null);
                           }}
@@ -140,22 +166,25 @@ export const UsersTable = () => {
                                 e.stopPropagation();
                                 setRolePopoverUser({
                                   id: user.id,
-                                  current: user.roles?.[0]?.code || "user",
+                                  current: user.roles?.[0]?.code || 'user',
                                 });
                               }}
                             >
                               Обновить роль
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent align="start" className="w-56 p-4 z-50">
+                          <PopoverContent
+                            align="start"
+                            className="w-56 p-4 z-50"
+                          >
                             <div className="flex flex-col gap-3">
-                              <div className="font-medium mb-1">Выберите роль:</div>
+                              <div className="font-medium mb-1">
+                                Выберите роль:
+                              </div>
                               {[
-                                { value: "admin", label: "Админ" },
-                                { value: "moderator", label: "Модератор" },
-                                { value: "holder", label: "Холдер" },
-                                { value: "courier", label: "Курьер" },
-                                { value: "user", label: "Пользователь" },
+                                { value: 'admin', label: 'Админ' },
+                                { value: 'moderator', label: 'Модератор' },
+                                { value: 'user', label: 'Пользователь' },
                               ].map((role) => (
                                 <label
                                   key={role.value}
@@ -165,10 +194,16 @@ export const UsersTable = () => {
                                     type="radio"
                                     name={`user-role-${user.id}`}
                                     value={role.value}
-                                    checked={rolePopoverUser?.current === role.value}
+                                    checked={
+                                      rolePopoverUser?.current === role.value
+                                    }
                                     onChange={() =>
                                       setRolePopoverUser(
-                                        (prev) => prev && { ...prev, current: role.value }
+                                        (prev) =>
+                                          prev && {
+                                            ...prev,
+                                            current: role.value,
+                                          },
                                       )
                                     }
                                   />
@@ -197,7 +232,9 @@ export const UsersTable = () => {
                                     setOpenUserId(null);
                                   }}
                                 >
-                                  {updateUserRoleMutation.isPending ? "Сохраняем..." : "Сохранить"}
+                                  {updateUserRoleMutation.isPending
+                                    ? 'Сохраняем...'
+                                    : 'Сохранить'}
                                 </Button>
                               </div>
                             </div>

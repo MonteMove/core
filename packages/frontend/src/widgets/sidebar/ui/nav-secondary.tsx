@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from 'react';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { FileText, type LucideIcon } from "lucide-react";
+import { FileText, type LucideIcon } from 'lucide-react';
 
-import { usePopapStore } from "@/entities/reports";
+import { usePopapStore } from '@/entities/reports';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -13,8 +13,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/shared";
-import { useSidebar } from "@/shared";
+} from '@/shared';
+import { useSidebar } from '@/shared';
 
 export function NavSecondary({
   items,
@@ -47,7 +47,11 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               {item.isAction ? (
-                <SidebarMenuButton size="sm" onClick={toggleActive} className="gap-2">
+                <SidebarMenuButton
+                  size="sm"
+                  onClick={toggleActive}
+                  className="gap-2"
+                >
                   <FileText className="h-4 w-4" />
                   <span>Отчёты</span>
                 </SidebarMenuButton>

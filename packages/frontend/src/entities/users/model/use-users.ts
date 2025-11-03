@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { UserService } from "@/entities/users/api/users-service";
+import { UserService } from '@/entities/users/api/users-service';
 
-export const USERS_QUERY_KEY = "users";
+export const USERS_QUERY_KEY = 'users';
 
 export const useUsers = () => {
   const queryResult = useQuery({
@@ -17,7 +17,7 @@ export const useUsers = () => {
 
   useEffect(() => {
     if (queryResult.isError && queryResult.error) {
-      toast.error("Не удалось загрузить пользователей");
+      toast.error('Не удалось загрузить пользователей');
     }
   }, [queryResult.isError, queryResult.error]);
 

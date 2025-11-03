@@ -1,6 +1,6 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 import {
   InfiniteData,
@@ -9,20 +9,20 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
-import { toast } from "sonner";
+} from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-import { GetWalletsResponseDtoSchema } from "@/entities/wallet";
-import { ROUTER_MAP } from "@/shared";
+import { GetWalletsResponseDtoSchema } from '@/entities/wallet';
+import { ROUTER_MAP } from '@/shared';
 import {
   FILTERED_OPERATIONS_QUERY_KEY,
   OPERATIONS_CREATE_QUERY_KEY,
   OPERATIONS_QUERY_KEY,
   OPERATIONS_WITH_FILTERS_KEY,
   OPERATION_DELETE_MUTATION_KEY,
-} from "@/shared/utils/constants/operation-query-key";
+} from '@/shared/utils/constants/operation-query-key';
 
-import { OperationsService } from "../api/operations-service";
+import { OperationsService } from '../api/operations-service';
 import {
   CreateOperationDto,
   GetOperationsParams,
@@ -30,7 +30,7 @@ import {
   GetOperationsResponseDto,
   OperationResponseDto,
   UpdateOperationDto,
-} from "./opeartions-schemas";
+} from './opeartions-schemas';
 
 export const useCreateOperation = () => {
   const router = useRouter();
@@ -39,19 +39,19 @@ export const useCreateOperation = () => {
     mutationFn: (data: CreateOperationDto) => OperationsService.create(data),
     onSuccess: () => {
       router.push(ROUTER_MAP.OPERATIONS);
-      toast.success("Справочник успешно создан");
+      toast.success('Справочник успешно создан');
     },
     onError: () => {
-      toast.error("Произошла неизвестная ошибка. Попробуйте снова.");
+      toast.error('Произошла неизвестная ошибка. Попробуйте снова.');
     },
   });
 };
 
 export const useWallets = () => {
   return useQuery({
-    queryKey: ["wallets"],
+    queryKey: ['wallets'],
     queryFn: async () => {
-      const res = await fetch("/api/wallets");
+      const res = await fetch('/api/wallets');
       const json = await res.json();
       return GetWalletsResponseDtoSchema.parse(json);
     },
@@ -65,12 +65,23 @@ export const useOperations = () => {
   });
 };
 
+export const useOperation = (id: string) => {
+  return useQuery({
+    queryKey: [...OPERATIONS_QUERY_KEY, id],
+    queryFn: () => OperationsService.getById(id),
+    enabled: !!id,
+  });
+};
+
 type OperationFilterWithPagination = GetOperationsParams & {
   page?: number;
   limit?: number;
 };
 
-export const useInfiniteOperations = (filters?: GetOperationsParams, defaultLimit = 20) => {
+export const useInfiniteOperations = (
+  filters?: GetOperationsParams,
+  defaultLimit = 20,
+) => {
   return useInfiniteQuery<
     GetOperationsResponseDto,
     Error,
@@ -79,12 +90,14 @@ export const useInfiniteOperations = (filters?: GetOperationsParams, defaultLimi
   >({
     queryKey: OPERATIONS_WITH_FILTERS_KEY(filters),
 
-    queryFn: async (context: QueryFunctionContext<[string, GetOperationsParams | undefined]>) => {
+    queryFn: async (
+      context: QueryFunctionContext<[string, GetOperationsParams | undefined]>,
+    ) => {
       const rawPageParam = context.pageParam;
       const page =
-        typeof rawPageParam === "number"
+        typeof rawPageParam === 'number'
           ? rawPageParam
-          : typeof rawPageParam === "string" && rawPageParam !== ""
+          : typeof rawPageParam === 'string' && rawPageParam !== ''
             ? Number(rawPageParam)
             : 1;
 
@@ -121,14 +134,17 @@ export const useFilterOperations = (filter: GetOperationsParams) => {
 
 export const useUpdateOperation = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
+  
   return useMutation({
     mutationFn: ({ id, ...data }: { id: string } & UpdateOperationDto) =>
       OperationsService.update(id, data),
     onSuccess: () => {
-      router.push(ROUTER_MAP.GUIDES);
-      toast.success("Справочник обновлён");
+      queryClient.invalidateQueries({ queryKey: OPERATIONS_QUERY_KEY });
+      router.push(ROUTER_MAP.OPERATIONS);
+      toast.success('Операция обновлена');
     },
-    onError: () => toast.error("Ошибка при обновлении"),
+    onError: () => toast.error('Ошибка при обновлении'),
   });
 };
 
@@ -140,7 +156,7 @@ export const useDeleteOperation = (filters?: GetOperationsParams) => {
     mutationFn: (id: string) => OperationsService.delete(id),
 
     onSuccess: () => {
-      toast.success("Справочник удалён");
+      toast.success('Справочник удалён');
 
       queryClient.invalidateQueries({
         queryKey: OPERATIONS_WITH_FILTERS_KEY(filters) as readonly unknown[],
@@ -148,7 +164,7 @@ export const useDeleteOperation = (filters?: GetOperationsParams) => {
     },
 
     onError: () => {
-      toast.error("Ошибка при удалении");
+      toast.error('Ошибка при удалении');
     },
   });
 };
@@ -156,16 +172,16 @@ export const useDeleteOperation = (filters?: GetOperationsParams) => {
 export function useCopyOperation() {
   const copyOperation = useCallback(async (operation: OperationResponseDto) => {
     const text = `
-    Описание: ${operation.description || "Не указано"}
+    Описание: ${operation.description || 'Не указано'}
 `;
 
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Скопировано в буфер обмена");
+      toast.success('Скопировано в буфер обмена');
       return true;
     } catch (err) {
-      console.error("Ошибка при копировании:", err);
-      toast.error("Не удалось скопировать");
+      console.error('Ошибка при копировании:', err);
+      toast.error('Не удалось скопировать');
       return false;
     }
   }, []);

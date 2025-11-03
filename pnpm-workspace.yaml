@@ -1,6 +1,11 @@
 packages:
-  - 'packages/*'
+  - packages/*
 
 ignoredBuiltDependencies:
-  - '@nestjs/core'
-  - bcrypt
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - '@swc/core'
+  - prisma
+  - sharp
+  - unrs-resolver

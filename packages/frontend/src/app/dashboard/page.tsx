@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
-import { DashboardPinnedWallets } from "@/features/dashboard/ui/dashboard-pinned-wallets/dashboard-pinned-wallets";
+import { DashboardPinnedWallets } from '@/features/dashboard/ui/dashboard-pinned-wallets/dashboard-pinned-wallets';
 
 export const metadata: Metadata = {
-  title: "Панель управления",
+  title: 'Панель управления',
 };
 
 export default function Page() {

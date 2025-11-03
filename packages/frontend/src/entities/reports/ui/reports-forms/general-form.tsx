@@ -1,32 +1,46 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import z from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import z from 'zod';
 
-import { useOperationTypes } from "@/entities/operations";
-import { ReportsGeneralSchema } from "@/entities/reports";
-import { useGeneralReport } from "@/entities/reports";
-import { usePopapStore } from "@/entities/reports";
-import { cn } from "@/shared";
-import { Button } from "@/shared";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/shared";
-import { Input } from "@/shared";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared";
-import { SheetDescription, SheetHeader, SheetTitle } from "@/shared";
-import { Skeleton } from "@/shared";
+import { useOperationTypes } from '@/entities/operations';
+import { ReportsGeneralSchema } from '@/entities/reports';
+import { useGeneralReport } from '@/entities/reports';
+import { usePopapStore } from '@/entities/reports';
+import { cn } from '@/shared';
+import { Button } from '@/shared';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/shared';
+import { Input } from '@/shared';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared';
+import { SheetDescription, SheetHeader, SheetTitle } from '@/shared';
+import { Skeleton } from '@/shared';
 
 export function ReportGeneralForm() {
-  const { data: operationTypes, isLoading: operationTypesLoading } = useOperationTypes();
+  const { data: operationTypes, isLoading: operationTypesLoading } =
+    useOperationTypes();
   const { mutate: generalReport, isPending } = useGeneralReport();
   const setActive = usePopapStore((state) => state.setActive);
   const form = useForm<z.input<typeof ReportsGeneralSchema>>({
     resolver: zodResolver(ReportsGeneralSchema),
     defaultValues: {
-      dateStart: "",
-      dateEnd: "",
-      operationTypeId: "",
-      typeUnloading: "all",
+      dateStart: '',
+      dateEnd: '',
+      operationTypeId: '',
+      typeUnloading: 'all',
     },
   });
   const onSubmit = (values: z.input<typeof ReportsGeneralSchema>) => {
@@ -53,10 +67,12 @@ export function ReportGeneralForm() {
                 <FormControl>
                   <Input
                     type="date"
-                    value={field.value ? String(field.value).slice(0, 10) : ""}
+                    value={field.value ? String(field.value).slice(0, 10) : ''}
                     onChange={(e) => {
                       const v = e.target.value;
-                      field.onChange(v ? new Date(`${v}T00:00:00`).toISOString() : "");
+                      field.onChange(
+                        v ? new Date(`${v}T00:00:00`).toISOString() : '',
+                      );
                     }}
                   />
                 </FormControl>
@@ -73,10 +89,12 @@ export function ReportGeneralForm() {
                 <FormControl>
                   <Input
                     type="date"
-                    value={field.value ? String(field.value).slice(0, 10) : ""}
+                    value={field.value ? String(field.value).slice(0, 10) : ''}
                     onChange={(e) => {
                       const v = e.target.value;
-                      field.onChange(v ? new Date(`${v}T00:00:00`).toISOString() : "");
+                      field.onChange(
+                        v ? new Date(`${v}T00:00:00`).toISOString() : '',
+                      );
                     }}
                   />
                 </FormControl>
@@ -94,13 +112,24 @@ export function ReportGeneralForm() {
                 {operationTypesLoading ? (
                   <Skeleton className="h-8" />
                 ) : (
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger className={cn("w-full", fieldState.error && "border-red-500")}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        'w-full',
+                        fieldState.error && 'border-red-500',
+                      )}
+                    >
                       <SelectValue placeholder="Выберите тип" />
                     </SelectTrigger>
                     <SelectContent>
                       {operationTypes?.map((operationType) => (
-                        <SelectItem key={operationType.id} value={operationType.id}>
+                        <SelectItem
+                          key={operationType.id}
+                          value={operationType.id}
+                        >
                           {operationType.name}
                         </SelectItem>
                       ))}
@@ -118,7 +147,10 @@ export function ReportGeneralForm() {
               <FormItem className="w-full">
                 <FormLabel>Тип кошелька</FormLabel>
 
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Выберите тип" />
                   </SelectTrigger>
@@ -126,14 +158,19 @@ export function ReportGeneralForm() {
                     <SelectItem value="all">all</SelectItem>
                     <SelectItem value="wnzh">wnzh</SelectItem>
                     <SelectItem value="inskesh">inskesh</SelectItem>
-                    <SelectItem value="not_wnzh_inskesh">not_wnzh_inskesh</SelectItem>
+                    <SelectItem value="not_wnzh_inskesh">
+                      not_wnzh_inskesh
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit"> {isPending ? "Загрузка..." : "Получить отчет"}</Button>
+          <Button type="submit">
+            {' '}
+            {isPending ? 'Загрузка...' : 'Получить отчет'}
+          </Button>
         </form>
       </Form>
     </SheetHeader>

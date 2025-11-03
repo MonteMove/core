@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from 'next-themes';
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { useAuthStore } from "@/features/users/ui/user-stores/user-store";
+import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
 
 const queryClient = new QueryClient();
 
@@ -18,7 +18,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }, [initializeAuth]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </ThemeProvider>
   );

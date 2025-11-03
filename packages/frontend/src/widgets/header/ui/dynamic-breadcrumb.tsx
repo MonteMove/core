@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import {
   Breadcrumb,
@@ -12,22 +12,41 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/shared/ui/shadcn/breadcrumb";
-import { ROUTER_MAP, ROUTER_TITLES } from "@/shared/utils/constants/router-map";
+} from '@/shared/ui/shadcn/breadcrumb';
+import { ROUTER_MAP, ROUTER_TITLES } from '@/shared/utils/constants/router-map';
 
 export function DynamicBreadcrumb() {
   const pathname = usePathname();
 
-  const segments = pathname.split("/").filter(Boolean);
-  const isDashboard = segments[0] === "dashboard";
+  const segments = pathname.split('/').filter(Boolean);
+  const isDashboard = segments[0] === 'dashboard';
   const subSegments = isDashboard ? segments.slice(1) : segments;
   const dashboardHref = ROUTER_MAP.DASHBOARD;
-  const dashboardTitle = ROUTER_TITLES[dashboardHref] ?? "Панель управления";
+  const dashboardTitle = ROUTER_TITLES[dashboardHref] ?? 'Панель управления';
+
+  const isUUID = (str: string) => {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
+  };
 
   const items = subSegments.map((segment, index) => {
-    const href = [ROUTER_MAP.DASHBOARD, ...subSegments.slice(0, index + 1)].join("/");
-    const title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
+    const href = [
+      ROUTER_MAP.DASHBOARD,
+      ...subSegments.slice(0, index + 1),
+    ].join('/');
+    let title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
+
     const isLast = index === subSegments.length - 1;
+    if (isLast && isUUID(segment) && index > 0) {
+      const parentHref = [
+        ROUTER_MAP.DASHBOARD,
+        ...subSegments.slice(0, index),
+      ].join('/');
+      const editHref = parentHref + '/edit';
+      title = ROUTER_TITLES[editHref] ?? ROUTER_TITLES[parentHref] ?? title;
+    }
+
     return { href, title, isLast };
   });
 
@@ -57,7 +76,9 @@ export function DynamicBreadcrumb() {
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
-                {idx < items.length - 1 && <BreadcrumbSeparator key={`${item.href}-sep`} />}
+                {idx < items.length - 1 && (
+                  <BreadcrumbSeparator key={`${item.href}-sep`} />
+                )}
               </Fragment>
             ))}
           </Fragment>

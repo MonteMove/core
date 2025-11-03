@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export function useAnalyticsFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const month = searchParams.get("month") || "";
+  const month = searchParams.get('month') || '';
 
   const setFilter = useCallback(
     (key: string, value: string) => {
@@ -20,7 +20,7 @@ export function useAnalyticsFilters() {
       }
       router.push(`${window.location.pathname}?${params.toString()}`);
     },
-    [searchParams, router]
+    [searchParams, router],
   );
 
   return {

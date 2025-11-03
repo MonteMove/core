@@ -1,16 +1,19 @@
-"use client";
+'use client';
 
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import dynamic from "next/dynamic";
-import Head from "next/head";
-import Image from "next/image";
+import dynamic from 'next/dynamic';
+import Head from 'next/head';
+import Image from 'next/image';
 
-import { LoginForm } from "@/features/auth";
+import { LoginForm } from '@/features/auth';
 
-const PageTransition = dynamic(() => import("@/shared/ui/components/page-transition"), {
-  ssr: false,
-});
+const PageTransition = dynamic(
+  () => import('@/shared/ui/components/page-transition'),
+  {
+    ssr: false,
+  },
+);
 
 export default function LoginPage() {
   return (
@@ -24,7 +27,12 @@ export default function LoginPage() {
             <div className="flex justify-center gap-2 md:justify-start">
               <a href="#" className="flex items-center gap-2 font-medium">
                 <div className=" text-primary-foreground flex size-6 items-center justify-center rounded-md">
-                  <Image src="/logo-circle.png" alt="Logo" height={25} width={25} />
+                  <Image
+                    src="/logo-circle.png"
+                    alt="Logo"
+                    height={25}
+                    width={25}
+                  />
                 </div>
                 MonteMove
               </a>

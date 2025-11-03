@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const rateValueSchema = z.object({
   value: z.number().nullable(),

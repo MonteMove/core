@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Upload, X } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FileText, Upload, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
-import { CreateHelp, CreateHelpSchema } from "@/entities/help";
-import { useCreateHelp } from "@/features/help";
+import { CreateHelp, CreateHelpSchema } from '@/entities/help';
+import { useCreateHelp } from '@/features/help';
 import {
   Form,
   FormControl,
@@ -16,11 +16,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared";
-import { Button } from "@/shared";
-import { Input } from "@/shared";
-import { Textarea } from "@/shared";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared";
+} from '@/shared';
+import { Button } from '@/shared';
+import { Input } from '@/shared';
+import { Textarea } from '@/shared';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/shared';
 
 export function HelpForm() {
   const [files, setFiles] = useState<File[]>([]);
@@ -29,8 +35,8 @@ export function HelpForm() {
   const form = useForm<CreateHelp>({
     resolver: zodResolver(CreateHelpSchema),
     defaultValues: {
-      title: "",
-      description: "",
+      title: '',
+      description: '',
       files: [],
     },
   });
@@ -41,20 +47,20 @@ export function HelpForm() {
 
     const newFiles = Array.from(selectedFiles);
     if (files.length + newFiles.length > 5) {
-      alert("Можно загрузить не более 5 файлов");
+      alert('Можно загрузить не более 5 файлов');
       return;
     }
 
     const updatedFiles = [...files, ...newFiles];
     setFiles(updatedFiles);
-    form.setValue("files", updatedFiles);
-    event.target.value = "";
+    form.setValue('files', updatedFiles);
+    event.target.value = '';
   };
 
   const removeFile = (index: number) => {
     const updatedFiles = files.filter((_, i) => i !== index);
     setFiles(updatedFiles);
-    form.setValue("files", updatedFiles);
+    form.setValue('files', updatedFiles);
   };
 
   const onSubmit = (data: CreateHelp) => {
@@ -79,9 +85,14 @@ export function HelpForm() {
                 <FormItem>
                   <FormLabel>Заголовок *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Введите заголовок обращения" {...field} />
+                    <Input
+                      placeholder="Введите заголовок обращения"
+                      {...field}
+                    />
                   </FormControl>
-                  <FormDescription>Кратко опишите суть вашего обращения</FormDescription>
+                  <FormDescription>
+                    Кратко опишите суть вашего обращения
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -120,7 +131,9 @@ export function HelpForm() {
                     >
                       <div className="flex items-center space-x-2">
                         <FileText className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm truncate max-w-xs text-gray-500">{file.name}</span>
+                        <span className="text-sm truncate max-w-xs text-gray-500">
+                          {file.name}
+                        </span>
                         <span className="text-xs text-gray-500">
                           ({(file.size / 1024).toFixed(1)} KB)
                         </span>
@@ -159,14 +172,15 @@ export function HelpForm() {
                     </div>
                   </label>
                   <FormDescription>
-                    Можно загрузить до {5 - files.length} файлов. Максимум 5 файлов всего.
+                    Можно загрузить до {5 - files.length} файлов. Максимум 5
+                    файлов всего.
                   </FormDescription>
                 </div>
               )}
             </div>
 
             <Button type="submit" disabled={isPending} className="w-full">
-              {isPending ? "Отправка..." : "Отправить обращение"}
+              {isPending ? 'Отправка...' : 'Отправить обращение'}
             </Button>
           </form>
         </Form>

@@ -1,6 +1,6 @@
-import { CreateHelp, CreateHelpSchema } from "@/entities/help";
-import { axiosInstance } from "@/shared";
-import { API_MAP } from "@/shared/utils/constants/api-map";
+import { CreateHelp, CreateHelpSchema } from '@/entities/help';
+import { axiosInstance } from '@/shared';
+import { API_MAP } from '@/shared/utils/constants/api-map';
 
 export class HelpService {
   /**

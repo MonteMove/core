@@ -1,17 +1,16 @@
-"use client";
+'use client';
 
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from 'react-hook-form';
 
-import { useCurrency } from "@/entities/currency";
-import { useUsers } from "@/entities/users";
+import { useCurrency } from '@/entities/currency';
+import { useUsers } from '@/entities/users';
 import {
   BalanceStatus,
   GetWalletsFilter,
   SortOrder,
   WalletKind,
-  WalletSortField,
-} from "@/entities/wallet";
-import { Button } from "@/shared/ui/shadcn/button";
+} from '@/entities/wallet';
+import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
@@ -19,18 +18,35 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/shared/ui/shadcn/form";
-import { Input } from "@/shared/ui/shadcn/input";
+} from '@/shared/ui/shadcn/form';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/shadcn/select";
-import { Switch } from "@/shared/ui/shadcn/switch";
+} from '@/shared/ui/shadcn/select';
+import { Switch } from '@/shared/ui/shadcn/switch';
 
-export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter> }) {
+const walletKindLabels: Record<WalletKind, string> = {
+  [WalletKind.crypto]: 'Криптовалютный',
+  [WalletKind.bank]: 'Банковский',
+  [WalletKind.simple]: 'Касса',
+};
+
+const balanceStatusLabels: Record<BalanceStatus, string> = {
+  [BalanceStatus.unknown]: 'Неизвестный',
+  [BalanceStatus.positive]: 'Положительный',
+  [BalanceStatus.negative]: 'Отрицательный',
+  [BalanceStatus.neutral]: 'Нейтральный',
+};
+
+export function WalletsFilters({
+  form,
+}: {
+  form: UseFormReturn<GetWalletsFilter>;
+}) {
   const { data: currencies } = useCurrency();
   const { data: users } = useUsers();
 
@@ -58,16 +74,22 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Статус баланса</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(value === 'all' ? undefined : value)
+                  }
+                  value={field.value ?? 'all'}
+                >
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Выбрать" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
+                    <SelectItem value="all">Все</SelectItem>
                     {Object.values(BalanceStatus).map((s) => (
                       <SelectItem key={s} value={s}>
-                        {s}
+                        {balanceStatusLabels[s]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -83,16 +105,22 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Вид кошелька</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(value === 'all' ? undefined : value)
+                  }
+                  value={field.value ?? 'all'}
+                >
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Выбрать" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
+                    <SelectItem value="all">Все</SelectItem>
                     {Object.values(WalletKind).map((kind) => (
                       <SelectItem key={kind} value={kind}>
-                        {kind}
+                        {walletKindLabels[kind]}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -112,7 +140,13 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
                 <FormItem>
                   <FormLabel>Мин. сумма</FormLabel>
                   <FormControl>
-                    <Input type="number" min={0} {...field} value={field.value ?? ""} />
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="0"
+                      {...field}
+                      value={field.value ?? ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -126,7 +160,13 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
                 <FormItem>
                   <FormLabel>Макс. сумма</FormLabel>
                   <FormControl>
-                    <Input type="number" min={0} {...field} value={field.value ?? ""} />
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="∞"
+                      {...field}
+                      value={field.value ?? ''}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -140,13 +180,19 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Валюта</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(value === 'all' ? undefined : value)
+                  }
+                  value={field.value ?? 'all'}
+                >
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Выбрать" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
+                    <SelectItem value="all">Все</SelectItem>
                     {currencies?.currencies?.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.code} — {c.name}
@@ -165,13 +211,19 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Пользователь</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(value) =>
+                    field.onChange(value === 'all' ? undefined : value)
+                  }
+                  value={field.value ?? 'all'}
+                >
                   <FormControl>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Выбрать" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
+                    <SelectItem value="all">Все</SelectItem>
                     {users?.users?.map((u) => (
                       <SelectItem key={u.id} value={u.id}>
                         {u.username}
@@ -185,32 +237,7 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-          <FormField
-            control={form.control}
-            name="sortField"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Поле сортировки</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Выбрать" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {Object.values(WalletSortField).map((f) => (
-                      <SelectItem key={f} value={f}>
-                        {f}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <FormField
             control={form.control}
             name="sortOrder"
@@ -224,7 +251,9 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value={SortOrder.ASC}>По возрастанию</SelectItem>
+                    <SelectItem value={SortOrder.ASC}>
+                      По возрастанию
+                    </SelectItem>
                     <SelectItem value={SortOrder.DESC}>По убыванию</SelectItem>
                   </SelectContent>
                 </Select>
@@ -240,9 +269,14 @@ export function WalletsFilters({ form }: { form: UseFormReturn<GetWalletsFilter>
               render={({ field }) => (
                 <FormItem className="flex items-center gap-2 border rounded-md p-3 w-full">
                   <FormControl>
-                    <Switch checked={!!field.value} onCheckedChange={field.onChange} />
+                    <Switch
+                      checked={!!field.value}
+                      onCheckedChange={field.onChange}
+                    />
                   </FormControl>
-                  <FormLabel className="text-sm font-medium">Активные</FormLabel>
+                  <FormLabel className="text-sm font-medium">
+                    Активные
+                  </FormLabel>
                 </FormItem>
               )}
             />

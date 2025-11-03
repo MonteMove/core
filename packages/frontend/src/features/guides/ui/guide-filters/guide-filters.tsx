@@ -1,62 +1,68 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Search, X } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Search, X } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 import {
   GetGuidesParamsRequest,
   GetGuidesParamsSchema,
-} from "@/entities/guides/model/guide-schemas";
-import { cn } from "@/shared/lib/utils";
-import { Button } from "@/shared/ui/shadcn/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/shared/ui/shadcn/form";
-import { Input } from "@/shared/ui/shadcn/input";
+} from '@/entities/guides/model/guide-schemas';
+import { cn } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/shadcn/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/shared/ui/shadcn/form';
+import { Input } from '@/shared/ui/shadcn/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/shared/ui/shadcn/select";
+} from '@/shared/ui/shadcn/select';
 
 const sortByOptions = [
-  { value: "createdAt", label: "Дате создания" },
-  { value: "updatedAt", label: "Дате обновления" },
-  { value: "fullName", label: "Имени" },
-  { value: "phone", label: "Телефону" },
-  { value: "address", label: "Адресу" },
+  { value: 'createdAt', label: 'Дате создания' },
+  { value: 'updatedAt', label: 'Дате обновления' },
+  { value: 'fullName', label: 'Имени' },
+  { value: 'phone', label: 'Телефону' },
+  { value: 'address', label: 'Адресу' },
 ];
 
 const sortOrderOptions = [
-  { value: "desc", label: "По убыванию" },
-  { value: "asc", label: "По возрастанию" },
+  { value: 'desc', label: 'По убыванию' },
+  { value: 'asc', label: 'По возрастанию' },
 ];
 
 export function GuidesFilters({
   className,
   onFiltersChange,
   ...props
-}: React.ComponentProps<"div"> & {
+}: React.ComponentProps<'div'> & {
   onFiltersChange?: (filters: Partial<GetGuidesParamsRequest>) => void;
 }) {
   const form = useForm<z.input<typeof GetGuidesParamsSchema>>({
     resolver: zodResolver(GetGuidesParamsSchema),
     defaultValues: {
-      search: "",
-      sortField: "createdAt",
-      sortOrder: "desc",
+      search: '',
+      sortField: 'createdAt',
+      sortOrder: 'desc',
       page: 1,
       limit: 10,
     },
   });
 
-  const search = form.watch("search");
-  const sortField = form.watch("sortField");
-  const sortOrder = form.watch("sortOrder");
+  const search = form.watch('search');
+  const sortField = form.watch('sortField');
+  const sortOrder = form.watch('sortOrder');
   const prevValues = useRef({ search, sortField, sortOrder });
 
   useEffect(() => {
@@ -70,15 +76,15 @@ export function GuidesFilters({
   const handleReset = () => {
     form.reset({
       search: search,
-      sortField: "createdAt",
-      sortOrder: "desc",
+      sortField: 'createdAt',
+      sortOrder: 'desc',
       page: 1,
       limit: 10,
     });
   };
 
   return (
-    <div className={cn("flex flex-col gap-2", className)} {...props}>
+    <div className={cn('flex flex-col gap-2', className)} {...props}>
       <Form {...form}>
         <form>
           <div className="lg:flex max-xl:flex-wrap md:items-end lg:gap-4">
@@ -101,7 +107,7 @@ export function GuidesFilters({
                         <button
                           type="button"
                           className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
-                          onClick={() => form.setValue("search", "")}
+                          onClick={() => form.setValue('search', '')}
                         >
                           <X className="h-4 w-4" />
                         </button>
@@ -117,7 +123,9 @@ export function GuidesFilters({
               name="sortField"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="lg:mt-0 mt-2">Сортировать по:</FormLabel>
+                  <FormLabel className="lg:mt-0 mt-2">
+                    Сортировать по:
+                  </FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="lg:w-[200px] w-full">
