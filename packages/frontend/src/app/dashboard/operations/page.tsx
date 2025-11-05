@@ -1,14 +1,14 @@
 'use client';
 
 import { Fragment, useState } from 'react';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { CalendarIcon, Copy, Pencil, Search, Trash, X } from 'lucide-react';
+import { CalendarIcon, Copy, Pencil, Search, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { useApplicationsList } from '@/entities/application';
@@ -26,7 +26,6 @@ import {
   Calendar,
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
   DropdownMenu,

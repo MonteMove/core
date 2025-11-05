@@ -18,16 +18,6 @@ interface DashboardCurrencyProps {
   currencyGroups: WalletCurrencyGroup[];
 }
 
-const getWalletsLabel = (count: number) => {
-  const mod100 = count % 100;
-  const mod10 = count % 10;
-
-  if (mod100 >= 11 && mod100 <= 14) return 'кошельков';
-  if (mod10 === 1) return 'кошелек';
-  if (mod10 >= 2 && mod10 <= 4) return 'кошелька';
-  return 'кошельков';
-};
-
 export function DashboardCurrency({
   isLoading,
   hasError,

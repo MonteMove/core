@@ -4,14 +4,13 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { WalletOwner } from '@/entities/wallet';
-import type { PinnedWallet } from '@/entities/wallet';
+import type { Wallet } from '@/entities/wallet';
 import { WalletService } from '@/entities/wallet/api/wallet-service';
 import { ChangeOwnerDialog } from '@/features/wallets/ui/change-owner-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { cn, formatDate } from '@/shared/lib/utils';
-import { Badge } from '@/shared/ui/shadcn/badge';
 import {
   Card,
   CardContent,
@@ -26,7 +25,7 @@ import {
 } from '@/shared/ui/shadcn/dropdown-menu';
 
 interface SimpleWalletCardProps {
-  wallet: PinnedWallet;
+  wallet: Wallet;
 }
 
 export const SimpleWalletCard = ({ wallet }: SimpleWalletCardProps) => {

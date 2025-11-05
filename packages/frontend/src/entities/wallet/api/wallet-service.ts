@@ -7,8 +7,8 @@ import {
   GetWalletsFilterSchema,
   GetWalletsResponse,
   GetWalletsResponseSchema,
-  PinnedWallet,
-  PinnedWalletSchema,
+  Wallet,
+  WalletSchema,
 } from '@/entities/wallet/model/wallet-schemas';
 import { axiosInstance } from '@/shared/api/axios-instance';
 import { API_MAP } from '@/shared/utils/constants/api-map';
@@ -37,82 +37,82 @@ export class WalletService {
 
   public static async createWallet(
     payload: CreateWalletRequest,
-  ): Promise<PinnedWallet> {
+  ): Promise<Wallet> {
     const validated = CreateWalletSchema.parse(payload);
     const { data } = await axiosInstance.post(
       API_MAP.WALLETS.WALLETS,
       validated,
     );
     const wallet = data?.wallet ?? data;
-    return PinnedWalletSchema.parse(wallet);
+    return WalletSchema.parse(wallet);
   }
 
   public static async changeWalletOwner(
     walletId: string,
     newOwnerId: string,
-  ): Promise<PinnedWallet> {
+  ): Promise<Wallet> {
     const { data } = await axiosInstance.put(
       `${API_MAP.WALLETS.WALLETS}/${walletId}/owner`,
       { newOwnerId },
     );
     const wallet = data?.wallet ?? data;
-    return PinnedWalletSchema.parse(wallet);
+    return WalletSchema.parse(wallet);
   }
 
   public static async toggleWalletPin(
     walletId: string,
     pinned: boolean,
     pinOnMain: boolean,
-  ): Promise<PinnedWallet> {
+  ): Promise<Wallet> {
     const { data } = await axiosInstance.put(
       `${API_MAP.WALLETS.WALLETS}/${walletId}/pin`,
       { pinned, pinOnMain },
     );
     const wallet = data?.wallet ?? data;
-    return PinnedWalletSchema.parse(wallet);
+    return WalletSchema.parse(wallet);
   }
 
   public static async updateWallet(
     walletId: string,
     payload: CreateWalletRequest,
-  ): Promise<PinnedWallet> {
+  ): Promise<Wallet> {
     const validated = CreateWalletSchema.parse(payload);
     const { data } = await axiosInstance.put(
       `${API_MAP.WALLETS.WALLETS}/${walletId}`,
       validated,
     );
     const wallet = data?.wallet ?? data;
-    return PinnedWalletSchema.parse(wallet);
+    return WalletSchema.parse(wallet);
   }
 
-  public static async getWalletById(walletId: string): Promise<PinnedWallet> {
+  public static async getWalletById(walletId: string): Promise<Wallet> {
     const { data } = await axiosInstance.get(
       `${API_MAP.WALLETS.WALLETS}/${walletId}`,
     );
-    return PinnedWalletSchema.parse(data);
+    return WalletSchema.parse(data);
   }
 
   public static async updateBalanceStatus(
     walletId: string,
     balanceStatus: string,
-  ): Promise<PinnedWallet> {
+  ): Promise<Wallet> {
     const { data } = await axiosInstance.patch(
       `${API_MAP.WALLETS.WALLETS}/${walletId}`,
       { balanceStatus },
     );
     const wallet = data?.wallet ?? data;
-    return PinnedWalletSchema.parse(wallet);
+    return WalletSchema.parse(wallet);
   }
 
   public static async toggleActive(
     walletId: string,
     active: boolean,
-  ): Promise<PinnedWallet> {
+  ): Promise<Wallet> {
     const { data } = await axiosInstance.patch(
       `${API_MAP.WALLETS.WALLETS}/${walletId}`,
       { active },
     );
     const wallet = data?.wallet ?? data;
-    return PinnedWalletSchema.parse(wallet);
+    return WalletSchema.parse(wallet);
   }
 }

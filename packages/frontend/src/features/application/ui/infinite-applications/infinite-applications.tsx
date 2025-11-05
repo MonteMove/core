@@ -12,16 +12,9 @@ import {
   useCopyApplication,
   useDeleteApplication,
   useInfiniteApplications,
-  useUpdateApplication,
   useUpdateStatusApplication,
-} from /* useUpdateStatusApplication, */ '@/entities/application';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-} from '@/shared';
+} from '@/entities/application';
+import { Card } from '@/shared';
 import {
   DropdownMenu,
   DropdownMenuContent,

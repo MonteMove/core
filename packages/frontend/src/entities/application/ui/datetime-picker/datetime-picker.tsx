@@ -5,7 +5,6 @@ import * as React from 'react';
 import {
   Locale,
   format,
-  isValid,
   parse,
   setHours,
   setMinutes,

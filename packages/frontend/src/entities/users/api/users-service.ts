@@ -22,7 +22,7 @@ export class UserService {
   ): Promise<UsersResponseType> {
     const queryParams = Object.fromEntries(
       Object.entries(GetUsersParamsSchema.parse(params || {})).filter(
-        ([_, value]) => value !== undefined,
+        ([, value]) => value !== undefined,
       ),
     );
 

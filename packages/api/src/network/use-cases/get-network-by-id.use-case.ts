@@ -5,33 +5,33 @@ import { GetNetworkByIdResponse } from '../types';
 
 @Injectable()
 export class GetNetworkByIdUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-  public async execute(networkId: string): Promise<GetNetworkByIdResponse> {
-    const network = await this.prisma.network.findUnique({
-      where: { id: networkId },
-      include: {
-        created_by: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-        updated_by: {
-          select: {
-            id: true,
-            username: true,
-          },
-        },
-      },
-    });
+    public async execute(networkId: string): Promise<GetNetworkByIdResponse> {
+        const network = await this.prisma.network.findUnique({
+            where: { id: networkId },
+            include: {
+                created_by: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                updated_by: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+            },
+        });
 
-    if (!network || network.deleted) {
-      throw new NotFoundException('Сеть не найдена');
+        if (!network || network.deleted) {
+            throw new NotFoundException('Сеть не найдена');
+        }
+
+        return {
+            network,
+        };
     }
-
-    return {
-      network,
-    };
-  }
 }

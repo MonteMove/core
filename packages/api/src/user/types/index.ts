@@ -1,7 +1,7 @@
 export {
-  DeleteUserOutput,
-  GetUserByIdOutput,
-  GetUsersOutput,
-  UpdateUserOutput,
-  UpdateUserRolesOutput,
+    DeleteUserOutput,
+    GetUserByIdOutput,
+    GetUsersOutput,
+    UpdateUserOutput,
+    UpdateUserRolesOutput,
 } from './use-cases';

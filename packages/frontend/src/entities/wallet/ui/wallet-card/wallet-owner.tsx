@@ -1,10 +1,10 @@
 'use client';
 
-import type { PinnedWallet } from '@/entities/wallet';
+import type { Wallet } from '@/entities/wallet';
 import { Badge } from '@/shared/ui/shadcn/badge';
 
 interface WalletOwnerProps {
-  user: PinnedWallet['user'];
+  user: Wallet['user'];
 }
 
 export function WalletOwner({ user }: WalletOwnerProps) {

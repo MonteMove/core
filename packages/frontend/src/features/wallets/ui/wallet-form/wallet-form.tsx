@@ -12,6 +12,7 @@ import {
   CreateWalletFormValues,
   CreateWalletRequest,
   CreateWalletSchema,
+  Wallet,
   WalletKind,
 } from '@/entities/wallet';
 import { useWalletTypes } from '@/entities/wallet-type';
@@ -52,14 +53,14 @@ const WALLET_KIND_LABELS: Record<WalletKind, string> = {
 };
 
 interface WalletFormProps {
-  initialData?: any;
+  initialData?: Wallet;
   walletId?: string;
 }
 
 export function WalletForm({ initialData, walletId }: WalletFormProps) {
   const isEditMode = !!walletId && !!initialData;
   const createWalletMutation = useCreateWallet();
-  const updateWalletMutation = walletId ? useUpdateWallet(walletId) : null;
+  const updateWalletMutation = useUpdateWallet(walletId ?? '');
   const { data: currenciesData, isLoading: isCurrenciesLoading } =
     useCurrency();
   const { data: networksData, isLoading: isNetworksLoading } = useNetworks();
@@ -71,7 +72,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
     defaultValues: initialData
       ? {
           name: initialData.name || '',
-          description: initialData.description || '',
+          description: initialData.description ?? '',
           amount: initialData.amount || 0,
           walletKind: initialData.walletKind || WalletKind.simple,
           walletTypeId: initialData.walletTypeId || undefined,
@@ -81,14 +82,14 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           pinned: initialData.pinned ?? false,
           visible: initialData.visible ?? true,
           details: {
-            phone: initialData.details?.phone || '',
-            card: initialData.details?.card || '',
-            ownerFullName: initialData.details?.ownerFullName || '',
-            address: initialData.details?.address || '',
-            accountId: initialData.details?.accountId || '',
-            exchangeUid: initialData.details?.exchangeUid || '',
-            networkId: initialData.details?.networkId || '',
-            networkTypeId: initialData.details?.networkTypeId || '',
+            phone: initialData.details?.phone ?? '',
+            card: initialData.details?.card ?? '',
+            ownerFullName: initialData.details?.ownerFullName ?? '',
+            address: initialData.details?.address ?? '',
+            accountId: initialData.details?.accountId ?? '',
+            exchangeUid: initialData.details?.exchangeUid ?? '',
+            networkId: initialData.details?.network?.id || '',
+            networkTypeId: initialData.details?.networkType?.id || '',
           },
         }
       : {

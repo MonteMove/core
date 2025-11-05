@@ -5,33 +5,31 @@ import { GetOperationTypeByIdResponse } from '../types';
 
 @Injectable()
 export class GetOperationTypeByIdUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-  public async execute(
-    operationTypeId: string,
-  ): Promise<GetOperationTypeByIdResponse> {
-    const operationType = await this.prisma.operationType.findUnique({
-      where: { id: operationTypeId },
-      select: {
-        id: true,
-        userId: true,
-        updatedById: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        updatedAt: true,
-        deleted: true,
-      },
-    });
+    public async execute(operationTypeId: string): Promise<GetOperationTypeByIdResponse> {
+        const operationType = await this.prisma.operationType.findUnique({
+            where: { id: operationTypeId },
+            select: {
+                id: true,
+                userId: true,
+                updatedById: true,
+                name: true,
+                description: true,
+                createdAt: true,
+                updatedAt: true,
+                deleted: true,
+            },
+        });
 
-    if (!operationType || operationType.deleted) {
-      throw new NotFoundException('Тип операции не найден');
+        if (!operationType || operationType.deleted) {
+            throw new NotFoundException('Тип операции не найден');
+        }
+
+        const { deleted: _, ...operationTypeResponse } = operationType;
+
+        return {
+            operationType: operationTypeResponse,
+        };
     }
-
-    const { deleted: _, ...operationTypeResponse } = operationType;
-
-    return {
-      operationType: operationTypeResponse,
-    };
-  }
 }

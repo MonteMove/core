@@ -5,30 +5,27 @@ import { DeleteNetworkTypeResponse } from '../types';
 
 @Injectable()
 export class DeleteNetworkTypeUseCase {
-  constructor(private readonly prisma: PrismaService) {}
+    constructor(private readonly prisma: PrismaService) {}
 
-  public async execute(
-    networkTypeId: string,
-    deletedById: string,
-  ): Promise<DeleteNetworkTypeResponse> {
-    const existingNetworkType = await this.prisma.networkType.findUnique({
-      where: { id: networkTypeId },
-    });
+    public async execute(networkTypeId: string, deletedById: string): Promise<DeleteNetworkTypeResponse> {
+        const existingNetworkType = await this.prisma.networkType.findUnique({
+            where: { id: networkTypeId },
+        });
 
-    if (!existingNetworkType || existingNetworkType.deleted) {
-      throw new NotFoundException('Тип сети не найден');
+        if (!existingNetworkType || existingNetworkType.deleted) {
+            throw new NotFoundException('Тип сети не найден');
+        }
+
+        await this.prisma.networkType.update({
+            where: { id: networkTypeId },
+            data: {
+                deleted: true,
+                updatedById: deletedById,
+            },
+        });
+
+        return {
+            message: 'Тип сети успешно удалён',
+        };
     }
-
-    await this.prisma.networkType.update({
-      where: { id: networkTypeId },
-      data: {
-        deleted: true,
-        updatedById: deletedById,
-      },
-    });
-
-    return {
-      message: 'Тип сети успешно удалён',
-    };
-  }
 }

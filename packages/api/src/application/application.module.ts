@@ -5,31 +5,31 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { PrismaService } from '../common/services/prisma.service';
 import { ApplicationController } from './application.controller';
 import {
-  CreateApplicationUseCase,
-  DeleteApplicationUseCase,
-  GetApplicationByIdUseCase,
-  GetApplicationsUseCase,
-  UpdateApplicationUseCase,
+    CreateApplicationUseCase,
+    DeleteApplicationUseCase,
+    GetApplicationByIdUseCase,
+    GetApplicationsUseCase,
+    UpdateApplicationUseCase,
 } from './use-cases';
 
 @Module({
-  controllers: [ApplicationController],
-  providers: [
-    PrismaService,
-    JwtAuthGuard,
-    RolesGuard,
-    CreateApplicationUseCase,
-    GetApplicationsUseCase,
-    GetApplicationByIdUseCase,
-    UpdateApplicationUseCase,
-    DeleteApplicationUseCase,
-  ],
-  exports: [
-    CreateApplicationUseCase,
-    GetApplicationsUseCase,
-    GetApplicationByIdUseCase,
-    UpdateApplicationUseCase,
-    DeleteApplicationUseCase,
-  ],
+    controllers: [ApplicationController],
+    providers: [
+        PrismaService,
+        JwtAuthGuard,
+        RolesGuard,
+        CreateApplicationUseCase,
+        GetApplicationsUseCase,
+        GetApplicationByIdUseCase,
+        UpdateApplicationUseCase,
+        DeleteApplicationUseCase,
+    ],
+    exports: [
+        CreateApplicationUseCase,
+        GetApplicationsUseCase,
+        GetApplicationByIdUseCase,
+        UpdateApplicationUseCase,
+        DeleteApplicationUseCase,
+    ],
 })
 export class ApplicationModule {}

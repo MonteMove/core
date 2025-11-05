@@ -8,7 +8,6 @@ import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
 import {
-  GetApplicationsFilters,
   getApplicationsFiltersSchema,
   useSetApplicationQueryParam,
 } from '@/entities/application';

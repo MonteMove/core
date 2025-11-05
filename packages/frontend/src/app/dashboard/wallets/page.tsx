@@ -13,7 +13,7 @@ import {
   CryptoWalletCard,
   GetWalletsFilter,
   GetWalletsFilterSchema,
-  PinnedWallet,
+  Wallet,
   SimpleWalletCard,
   SortOrder,
   WalletSortField,
@@ -82,7 +82,8 @@ export default function WalletsPage() {
       ) {
         params[key] = value === 'true';
       } else if (value) {
-        params[key as keyof GetWalletsFilter] = value as any;
+        const k = key as keyof GetWalletsFilter;
+        (params as Record<keyof GetWalletsFilter, unknown>)[k] = value;
       }
     });
 
@@ -150,7 +151,8 @@ export default function WalletsPage() {
         return;
       }
 
-      filtered[key as keyof GetWalletsFilter] = value as any;
+      const k = key as keyof GetWalletsFilter;
+      (filtered as Record<keyof GetWalletsFilter, unknown>)[k] = value;
     });
 
     return {
@@ -164,7 +166,7 @@ export default function WalletsPage() {
 
   const { data, isLoading } = useWallets(filteredValues);
 
-  const renderWalletCard = (wallet: PinnedWallet) => {
+  const renderWalletCard = (wallet: Wallet) => {
     switch (wallet.walletKind) {
       case 'crypto':
         return <CryptoWalletCard key={wallet.id} wallet={wallet} />;

@@ -2,6 +2,19 @@ import { z } from 'zod';
 
 import { PaginationSchema } from '@/shared/utils/schemas/common-schemas';
 
+export enum BalanceStatus {
+  unknown = 'unknown',
+  positive = 'positive',
+  negative = 'negative',
+  neutral = 'neutral',
+}
+
+export enum WalletKind {
+  crypto = 'crypto',
+  bank = 'bank',
+  simple = 'simple',
+}
+
 const WalletUserSchema = z.object({
   id: z.string().uuid(),
   username: z.string(),
@@ -62,7 +75,7 @@ export const WalletTypeSchema = z.object({
   tabOrder: z.number(),
 });
 
-export const PinnedWalletSchema = z.object({
+export const WalletSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid().optional(),
   user: WalletUserSchema.optional(),
@@ -73,7 +86,7 @@ export const PinnedWalletSchema = z.object({
   description: z.string().nullable(),
   amount: z.number(),
   balanceStatus: z.string(),
-  walletKind: z.string(),
+  walletKind: z.nativeEnum(WalletKind),
   walletType: z.union([WalletTypeSchema, z.string(), z.null()]).optional(),
   active: z.boolean(),
   pinOnMain: z.boolean(),
@@ -90,7 +103,7 @@ export const PinnedWalletSchema = z.object({
 
 export const WalletCurrencyGroupSchema = z.object({
   currency: z.string(),
-  wallets: z.array(PinnedWalletSchema),
+  wallets: z.array(WalletSchema),
 });
 
 export const GetPinnedWalletsResponseSchema = z.object({
@@ -102,24 +115,11 @@ export const GetPinnedWalletsResponseSchema = z.object({
 export const WalletPaginationSchema = PaginationSchema;
 
 export const GetWalletsResponseSchema = z.object({
-  wallets: z.array(PinnedWalletSchema),
+  wallets: z.array(WalletSchema),
   pagination: WalletPaginationSchema,
 });
 
 export const GetWalletsResponseDtoSchema = GetWalletsResponseSchema;
-
-export enum BalanceStatus {
-  unknown = 'unknown',
-  positive = 'positive',
-  negative = 'negative',
-  neutral = 'neutral',
-}
-
-export enum WalletKind {
-  crypto = 'crypto',
-  bank = 'bank',
-  simple = 'simple',
-}
 
 export interface WalletType {
   id: string;
@@ -344,7 +344,7 @@ export type WalletPagination = z.infer<typeof WalletPaginationSchema>;
 export type GetWalletsResponse = z.infer<typeof GetWalletsResponseSchema>;
 export type WalletDetails = z.infer<typeof WalletDetailsSchema>;
 export type WalletCurrency = z.infer<typeof WalletCurrencySchema>;
-export type PinnedWallet = z.infer<typeof PinnedWalletSchema>;
+export type Wallet = z.infer<typeof WalletSchema>;
 export type WalletCurrencyGroup = z.infer<typeof WalletCurrencyGroupSchema>;
 export type GetPinnedWalletsResponse = z.infer<
   typeof GetPinnedWalletsResponseSchema

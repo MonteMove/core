@@ -11,42 +11,35 @@ import { JwtAuthGuard } from './guards/jwt-auth';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtTokenService } from './jwt.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import {
-  LoginUserUseCase,
-  LogoutUserUseCase,
-  RefreshTokensUseCase,
-  RegisterUserUseCase,
-} from './use-cases';
+import { LoginUserUseCase, LogoutUserUseCase, RefreshTokensUseCase, RegisterUserUseCase } from './use-cases';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: parseInt(
-            configService.getOrThrow<string>('JWT_ACCESS_TOKEN_EXPIRES_IN'),
-          ),
-        },
-      }),
-    }),
-  ],
-  controllers: [AuthController],
-  providers: [
-    RegisterUserUseCase,
-    LoginUserUseCase,
-    LogoutUserUseCase,
-    RefreshTokensUseCase,
-    PrismaService,
-    BcryptHasher,
-    JwtTokenService,
-    CookieConfigService,
-    JwtStrategy,
-    JwtAuthGuard,
-    RolesGuard,
-  ],
-  exports: [PrismaService, BcryptHasher, JwtAuthGuard, RolesGuard],
+    imports: [
+        PassportModule,
+        JwtModule.registerAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                secret: configService.getOrThrow<string>('JWT_SECRET'),
+                signOptions: {
+                    expiresIn: parseInt(configService.getOrThrow<string>('JWT_ACCESS_TOKEN_EXPIRES_IN')),
+                },
+            }),
+        }),
+    ],
+    controllers: [AuthController],
+    providers: [
+        RegisterUserUseCase,
+        LoginUserUseCase,
+        LogoutUserUseCase,
+        RefreshTokensUseCase,
+        PrismaService,
+        BcryptHasher,
+        JwtTokenService,
+        CookieConfigService,
+        JwtStrategy,
+        JwtAuthGuard,
+        RolesGuard,
+    ],
+    exports: [PrismaService, BcryptHasher, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

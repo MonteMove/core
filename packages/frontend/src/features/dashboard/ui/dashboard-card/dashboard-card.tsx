@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import type { PinnedWallet, WalletCurrencyGroup } from '@/entities/wallet';
+import type { Wallet, WalletCurrencyGroup } from '@/entities/wallet';
 import { BankWalletCard } from '@/entities/wallet';
 import { CryptoWalletCard } from '@/entities/wallet';
 import { SimpleWalletCard } from '@/entities/wallet';
@@ -20,17 +20,7 @@ export const CardDashboard = ({
   hasError,
   currencyGroups,
 }: CardDashboardProps) => {
-  const getWalletsLabel = (count: number) => {
-    const mod100 = count % 100;
-    const mod10 = count % 10;
-
-    if (mod100 >= 11 && mod100 <= 14) return 'кошельков';
-    if (mod10 === 1) return 'кошелек';
-    if (mod10 >= 2 && mod10 <= 4) return 'кошелька';
-    return 'кошельков';
-  };
-
-  const renderWalletCard = (wallet: PinnedWallet) => {
+  const renderWalletCard = (wallet: Wallet) => {
     switch (wallet.walletKind) {
       case 'crypto':
         return <CryptoWalletCard key={wallet.id} wallet={wallet} />;
@@ -92,10 +82,6 @@ export const CardDashboard = ({
         const currencyCode =
           firstWallet?.currency.code ?? group.currency.toUpperCase();
         const currencyName = firstWallet?.currency.name ?? currencyCode;
-        const totalAmount = group.wallets.reduce(
-          (sum, wallet) => sum + wallet.amount,
-          0,
-        );
 
         return (
           <section key={group.currency} className="space-y-2">
