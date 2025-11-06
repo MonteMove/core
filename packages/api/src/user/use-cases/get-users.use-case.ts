@@ -19,6 +19,7 @@ export class GetUsersUseCase {
             telegramId,
             isHolder,
             isCourier,
+            deleted,
             sortField = 'createdAt',
             sortOrder = 'desc',
             page,
@@ -28,7 +29,7 @@ export class GetUsersUseCase {
         const pagination = calculatePagination({ page, limit });
 
         const where: Prisma.UserWhereInput = {
-            deleted: false,
+            deleted: deleted === true ? true : false,
         };
 
         if (search) {

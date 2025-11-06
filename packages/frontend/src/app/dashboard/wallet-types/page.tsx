@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { FolderOpen, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
 
 import { useWalletTypes } from '@/entities/wallet-type';
 import { useDeleteWalletType } from '@/features/wallet-types/hooks/use-delete-wallet-type';
+import { useRestoreWalletType } from '@/features/wallet-types/hooks/use-restore-wallet-type';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,31 +19,48 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/ui/shadcn/alert-dialog';
-import { Button } from '@/shared/ui/shadcn/button';
-import {
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
-import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  ROUTER_MAP,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/shadcn/table';
-import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared';
 
 export default function WalletTypesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [typeToDelete, setTypeToDelete] = useState<string | null>(null);
 
-  const { data, isLoading } = useWalletTypes();
+  const tab = searchParams.get('tab') || 'all';
+  const showDeleted = tab === 'deleted';
+
+  const { data, isLoading } = useWalletTypes(showDeleted ? true : undefined);
   const deleteMutation = useDeleteWalletType();
+  const restoreMutation = useRestoreWalletType();
+
+  const handleTabChange = useCallback(
+    (value: string) => {
+      router.push(`${ROUTER_MAP.WALLET_TYPES}?tab=${value}`);
+    },
+    [router],
+  );
 
   const handleDeleteClick = (id: string) => {
     setTypeToDelete(id);
@@ -57,10 +75,14 @@ export default function WalletTypesPage() {
     }
   };
 
+  const handleRestore = async (id: string) => {
+    await restoreMutation.mutateAsync(id);
+  };
+
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-2xl">Типы кошельков</CardTitle>
           <Button asChild>
             <Link href={ROUTER_MAP.WALLET_TYPES_CREATE}>
@@ -69,18 +91,32 @@ export default function WalletTypesPage() {
             </Link>
           </Button>
         </CardHeader>
-
-        <CardContent>
+        <CardContent className="space-y-4">
+          <Tabs value={tab} onValueChange={handleTabChange}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="all">Все</TabsTrigger>
+              <TabsTrigger value="deleted">Удалённые</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
               Загрузка...
             </div>
           ) : (data?.walletTypes?.length ?? 0) === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                Типы кошельков ещё не созданы
-              </p>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <FolderOpen />
+                </EmptyMedia>
+                <EmptyContent>
+                  <EmptyTitle>Типы кошельков ещё не созданы</EmptyTitle>
+                  <EmptyDescription>
+                    Создайте первый тип кошелька для категоризации ваших
+                    кошельков.
+                  </EmptyDescription>
+                </EmptyContent>
+              </EmptyHeader>
+            </Empty>
           ) : (
             <Table>
               <TableHeader>
@@ -94,31 +130,56 @@ export default function WalletTypesPage() {
               </TableHeader>
               <TableBody>
                 {data?.walletTypes.map((type) => (
-                  <TableRow key={type.id}>
+                  <TableRow
+                    key={type.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() =>
+                      router.push(`${ROUTER_MAP.WALLET_TYPES_EDIT}/${type.id}`)
+                    }
+                  >
                     <TableCell className="font-medium">{type.code}</TableCell>
                     <TableCell>{type.name}</TableCell>
                     <TableCell>{type.showInTabs ? 'Да' : 'Нет'}</TableCell>
                     <TableCell>{type.tabOrder}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() =>
-                            router.push(
-                              `${ROUTER_MAP.WALLET_TYPES_EDIT}/${type.id}`,
-                            )
-                          }
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(type.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        {showDeleted ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRestore(type.id);
+                            }}
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `${ROUTER_MAP.WALLET_TYPES_EDIT}/${type.id}`,
+                                );
+                              }}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(type.id);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -134,7 +195,8 @@ export default function WalletTypesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить тип кошелька?</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие нельзя отменить. Тип будет удалён из системы.
+              Тип кошелька будет перемещен в удаленные. Вы сможете восстановить
+              его позже из вкладки "Удалённые".
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

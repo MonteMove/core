@@ -12,11 +12,7 @@ import {
   useDeactivateSessions,
   useSessions,
 } from '@/entities/session/model/use-session';
-import {
-  applyThemeVars,
-  formatDateSafe,
-  getCurrentSessionId,
-} from '@/shared/lib/utils';
+import { applyThemeVars, formatDateSafe } from '@/shared/lib/utils';
 import { ColorField } from '@/shared/ui/components/color-field';
 import { Button } from '@/shared/ui/shadcn/button';
 import {
@@ -65,14 +61,14 @@ export function Settings() {
   if (!sessionsData) return null;
 
   const handleDeactivateAll = () => {
-    const currentSessionId = getCurrentSessionId(sessionsData.sessions);
+    const currentSession = sessionsData.sessions.find((s) => s.isCurrent);
 
-    if (!currentSessionId) {
+    if (!currentSession) {
       console.error('Не удалось определить текущую сессию');
       return;
     }
 
-    deactivate.mutate({ excludeSessionId: currentSessionId });
+    deactivate.mutate({ excludeSessionId: currentSession.id });
   };
 
   return (
@@ -133,53 +129,91 @@ export function Settings() {
             <div>
               {' '}
               {sessionsData.sessions.map((session) => (
-                <Card key={session.id} className="mt-2">
-                  <CardContent className="lg:grid lg:grid-cols-2 gap-1">
-                    <p className="col-span-2">
-                      <span className="font-medium">Статус:</span>{' '}
-                      {session.revoked ? (
-                        <span className="text-red-600">Завершена</span>
-                      ) : (
-                        <span className="text-green-600">Активна</span>
-                      )}
-                    </p>
-                    <p className="col-span-2">
-                      <span className="font-medium block lg:inline">
-                        Дата создания:
-                      </span>{' '}
-                      {formatDateSafe(session.createdAt)}
-                    </p>
-                    <p className="col-span-2">
-                      <span className="font-medium block lg:inline">
-                        {' '}
-                        Устройство:{' '}
-                      </span>
-                      {session.userAgent ?? 'Неизвестно'}
-                    </p>
-                    <p className="content-center">
-                      <span className="font-medium">IP: </span>{' '}
-                      {session.ip ?? '—'}
-                    </p>
-                    <div className="lg:flex gap-2 lg:justify-end">
+                <Card
+                  key={session.id}
+                  className={`mt-2 ${
+                    session.isCurrent ? 'border-primary border-2' : ''
+                  }`}
+                >
+                  <CardHeader>
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <CardTitle className="text-base">
+                          {session.browser || 'Браузер'} •{' '}
+                          {session.device || 'Устройство'}
+                        </CardTitle>
+                        {session.isCurrent && (
+                          <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full font-medium">
+                            Текущая
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        {session.revoked ? (
+                          <span className="text-xs text-destructive/60 font-medium">
+                            Завершена
+                          </span>
+                        ) : (
+                          <span className="text-xs text-green-600 dark:text-green-500 font-medium">
+                            Активна
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {session.os && (
+                      <CardDescription className="text-sm">
+                        {session.os}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">IP адрес:</span>
+                        <p className="font-medium break-all">
+                          {session.ip?.replace('::ffff:', '') || '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">
+                          Последняя активность:
+                        </span>
+                        <p className="font-medium">
+                          {formatDateSafe(session.lastActivityAt)}
+                        </p>
+                      </div>
+                      <div className="lg:col-span-2">
+                        <span className="text-muted-foreground">
+                          Дата создания:
+                        </span>
+                        <p className="font-medium">
+                          {formatDateSafe(session.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row gap-2 pt-3 border-t mt-1">
                       <Button
-                        className="lg:w-[200] w-full lg:mt-0 mt-2"
+                        className="flex-1"
                         type="button"
                         size="sm"
+                        variant="outline"
                         onClick={() =>
                           deactivate.mutate({ excludeSessionId: session.id })
                         }
-                        disabled={deactivate.isPending}
+                        disabled={deactivate.isPending || session.isCurrent}
                       >
                         {deactivate.isPending
                           ? 'Обработка...'
                           : 'Завершить другие'}
                       </Button>
                       <Button
-                        className="lg:w-[200] w-full lg:mt-0 mt-2"
+                        className="flex-1"
                         type="button"
                         size="sm"
+                        variant="destructive"
                         onClick={() => deactivateMy.mutate(session.id)}
-                        disabled={deactivateMy.isPending}
+                        disabled={deactivateMy.isPending || session.isCurrent}
                       >
                         {deactivateMy.isPending ? 'Обработка...' : 'Завершить'}
                       </Button>

@@ -6,9 +6,7 @@ import { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
-import { CalendarIcon, Copy, Pencil, Search, Trash } from 'lucide-react';
+import { CalendarIcon, Copy, FileText, Pencil, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { useApplicationsList } from '@/entities/application';
@@ -23,7 +21,6 @@ import {
 import { useUsers } from '@/entities/users';
 import {
   Button,
-  Calendar,
   Card,
   CardContent,
   CardHeader,
@@ -32,28 +29,25 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
   Input,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   ROUTER_MAP,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Skeleton,
   Tabs,
   TabsList,
   TabsTrigger,
-  cn,
 } from '@/shared';
+import { OperationsFiltersSheet } from '@/features/operations/ui/operations-filters/operations-filters-sheet';
 
 export default function OperationsPage() {
   const form = useForm<GetOperationsParams>({
@@ -92,21 +86,11 @@ export default function OperationsPage() {
   const { mutate: deleteOperation } = useDeleteOperation();
   const lastOperationRef = useRef<HTMLDivElement | null>(null);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState('all');
 
-  const [open, setOpen] = useState(false);
+  const tabTypes = operationTypes?.filter((type) => type.isSeparateTab) || [];
 
-  // const searchValue = form.watch("search");
-
-  // useEffect(() => {
-  //   const delayDebounce = setTimeout(() => {
-  //     form.setValue("page", 1);
-  //     form.handleSubmit((values) => {
-  //     })();
-  //   }, 400);
-
-  //   return () => clearTimeout(delayDebounce);
-  // }, [form.watch("search")]);
+  const currentTypeId = form.watch('typeId');
+  const activeTab = currentTypeId || 'all';
 
   return (
     <Form {...form}>
@@ -114,258 +98,49 @@ export default function OperationsPage() {
         <Card>
           <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <CardTitle className="text-2xl">Операции</CardTitle>
-            <Button
-              type="button"
-              onClick={() => router.push(ROUTER_MAP.OPERATIONS_CREATE)}
-              className="md:w-auto"
-            >
-              Создать операцию
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
-              <FormField
-                control={form.control}
-                name="search"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Поиск</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type="search"
-                          placeholder="Введите данные"
-                          {...field}
-                          className="pl-8 [appearance:textfield] [&::-webkit-search-cancel-button]:appearance-none"
-                        />
-                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                      </div>
-                    </FormControl>
-                  </FormItem>
-                )}
+            <div className="flex gap-2 items-center flex-wrap">
+              <Input
+                placeholder="Поиск..."
+                value={form.watch('search') ?? ''}
+                onChange={(e) => form.setValue('search', e.target.value || '')}
+                className="w-full md:w-64"
               />
-
-              <FormField
-                control={form.control}
-                name="dateFrom"
-                render={() => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Период</FormLabel>
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              'w-full justify-start text-left font-normal',
-                              !form.watch('dateFrom') &&
-                                'text-muted-foreground',
-                            )}
-                          >
-                            <CalendarIcon className="h-4 w-4" />
-                            {form.watch('dateFrom') ? (
-                              form.watch('dateTo') ? (
-                                <>
-                                  {form.watch('dateFrom') &&
-                                    format(
-                                      new Date(form.watch('dateFrom')!),
-                                      'dd.MM.yyyy',
-                                      {
-                                        locale: ru,
-                                      },
-                                    )}{' '}
-                                  –{' '}
-                                  {form.watch('dateTo') &&
-                                    format(
-                                      new Date(form.watch('dateTo')!),
-                                      'dd.MM.yyyy',
-                                      {
-                                        locale: ru,
-                                      },
-                                    )}
-                                </>
-                              ) : (
-                                form.watch('dateFrom') &&
-                                format(
-                                  new Date(form.watch('dateFrom')!),
-                                  'dd.MM.yyyy',
-                                  {
-                                    locale: ru,
-                                  },
-                                )
-                              )
-                            ) : (
-                              <span>Выбрать даты</span>
-                            )}
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-
-                      <PopoverContent
-                        align="start"
-                        sideOffset={4}
-                        className="p-0 w-auto bg-white border rounded-xl shadow-lg z-50 overflow-hidden"
-                      >
-                        <div className="bg-white">
-                          <Calendar
-                            mode="range"
-                            numberOfMonths={2}
-                            selected={{
-                              from: form.watch('dateFrom')
-                                ? new Date(form.watch('dateFrom')!)
-                                : undefined,
-                              to: form.watch('dateTo')
-                                ? new Date(form.watch('dateTo')!)
-                                : undefined,
-                            }}
-                            onSelect={(range) => {
-                              if (!range) return;
-
-                              if (range.from && !range.to) {
-                                form.setValue(
-                                  'dateFrom',
-                                  range.from.toISOString(),
-                                );
-                                form.setValue('dateTo', undefined);
-                                return;
-                              }
-
-                              if (range.from && range.to) {
-                                form.setValue(
-                                  'dateFrom',
-                                  range.from.toISOString(),
-                                );
-                                form.setValue('dateTo', range.to.toISOString());
-                                setOpen(false);
-                              }
-                            }}
-                            locale={ru}
-                          />
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="typeId"
-                render={({ field, fieldState }) => (
-                  <FormItem>
-                    <FormLabel>Тип операции</FormLabel>
-                    {operationTypesLoading ? (
-                      <Skeleton className="h-8" />
-                    ) : (
-                      <Select
-                        onValueChange={(value) => field.onChange(value || null)}
-                        value={field.value ?? ''}
-                      >
-                        <SelectTrigger
-                          className={cn(
-                            'w-full',
-                            fieldState.error && 'border-red-500',
-                          )}
-                        >
-                          <SelectValue placeholder="Выбрать" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {operationTypes?.map((operationType) => (
-                            <SelectItem
-                              key={operationType.id}
-                              value={String(operationType.id)}
-                            >
-                              {operationType.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="applicationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Заявка</FormLabel>
-                    {applicationsLoading ? (
-                      <Skeleton className="h-8" />
-                    ) : (
-                      <Select
-                        onValueChange={(value) => field.onChange(value || null)}
-                        value={field.value ?? ''}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Выбрать" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {applications?.applications?.map((app) => (
-                            <SelectItem key={app.id} value={String(app.id)}>
-                              #{app.id} - {app.amount} {app.currency.code}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="userId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Пользователь</FormLabel>
-                    <Select
-                      onValueChange={(value) => field.onChange(value || null)}
-                      value={field.value ?? ''}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Выбрать" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {users?.users?.map((u) => (
-                          <SelectItem key={u.id} value={u.id}>
-                            {u.username}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex items-end">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  type="button"
-                  onClick={handleReset}
-                >
-                  Сбросить
-                </Button>
-              </div>
+              <OperationsFiltersSheet form={form} onReset={handleReset} />
+              <Button
+                type="button"
+                onClick={() => router.push(ROUTER_MAP.OPERATIONS_CREATE)}
+                className="md:w-auto"
+              >
+                Создать операцию
+              </Button>
             </div>
-          </CardContent>
+          </CardHeader>
         </Card>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full">
-            <TabsTrigger value="all">Все операции</TabsTrigger>
-            <TabsTrigger value="deposit">Пополнение</TabsTrigger>
+        <Tabs
+          value={activeTab}
+          onValueChange={(val) => {
+            if (val === 'all') {
+              form.setValue('typeId', null);
+            } else {
+              form.setValue('typeId', val);
+            }
+          }}
+        >
+          <TabsList
+            className="grid w-full"
+            style={{
+              gridTemplateColumns: `repeat(${1 + tabTypes.length}, minmax(0, 1fr))`,
+            }}
+          >
+            <TabsTrigger value="all" className="w-full">
+              Все операции
+            </TabsTrigger>
+            {tabTypes.map((type) => (
+              <TabsTrigger key={type.id} value={type.id} className="w-full">
+                {type.name}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
 
@@ -386,11 +161,21 @@ export default function OperationsPage() {
                 </Card>
               </div>
             ) : !data?.pages[0]?.operations.length ? (
-              <div className="justify-items-center">
-                <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
-                  <strong>Операции не найдены.</strong>
-                </Card>
-              </div>
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <FileText />
+                  </EmptyMedia>
+                  <EmptyContent>
+                    <EmptyTitle>Операции не найдены</EmptyTitle>
+                    <EmptyDescription>
+                      Нет операций, соответствующих выбранным фильтрам.
+                      Попробуйте изменить параметры поиска или создайте новую
+                      операцию.
+                    </EmptyDescription>
+                  </EmptyContent>
+                </EmptyHeader>
+              </Empty>
             ) : (
               <div>
                 {data?.pages.map((page, pageIndex) => (
@@ -464,7 +249,7 @@ export default function OperationsPage() {
                                                     <span className="text-muted-foreground">
                                                       {entry.before} +{' '}
                                                     </span>
-                                                    <span className="text-emerald-600 font-semibold">
+                                                    <span className="text-success/60 font-semibold">
                                                       {entry.amount}
                                                     </span>
                                                     <span className="text-muted-foreground">
@@ -477,7 +262,7 @@ export default function OperationsPage() {
                                                     <span className="text-muted-foreground">
                                                       {entry.before} -{' '}
                                                     </span>
-                                                    <span className="text-red-600 font-semibold">
+                                                    <span className="text-destructive/60 font-semibold">
                                                       {entry.amount}
                                                     </span>
                                                     <span className="text-muted-foreground">

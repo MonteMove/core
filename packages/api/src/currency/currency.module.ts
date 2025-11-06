@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { PrismaService } from '../common/services/prisma.service';
 import { CurrencyController } from './currency.controller';
+import { CurrencyInitService } from './currency-init.service';
 import {
     CreateCurrencyUseCase,
     DeleteCurrencyUseCase,
@@ -25,6 +26,7 @@ import {
         PrismaService,
         JwtAuthGuard,
         RolesGuard,
+        CurrencyInitService,
     ],
     exports: [PrismaService],
 })

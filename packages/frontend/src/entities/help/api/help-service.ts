@@ -9,6 +9,6 @@ export class HelpService {
    */
   public static async create(data: CreateHelp): Promise<void> {
     const validatedData = CreateHelpSchema.parse(data);
-    await axiosInstance.post(API_MAP.HELP.HELP, validatedData);
+    await axiosInstance.post(API_MAP.FEEDBACK.FEEDBACK, validatedData);
   }
 }

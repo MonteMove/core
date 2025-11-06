@@ -4,7 +4,7 @@ import React, { Fragment, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Copy, Pencil, Trash } from 'lucide-react';
+import { BookOpen, Copy, Pencil, Trash } from 'lucide-react';
 
 import { GetGuidesParamsRequest } from '@/entities/guides/model/guide-schemas';
 import {
@@ -12,20 +12,26 @@ import {
   useDeleteGuide,
 } from '@/features/guides/hooks/use-guide';
 import { useInfiniteGuides } from '@/features/guides/hooks/use-guide';
+import { copyHandler, formatDate, formatDateTime } from '@/shared/lib/utils';
 import {
+  Button,
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from '@/shared/ui/shadcn/card';
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/ui/shadcn/dropdown-menu';
-import { Skeleton } from '@/shared/ui/shadcn/skeleton';
-import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  ROUTER_MAP,
+  Skeleton,
+} from '@/shared';
 
 export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
   const { data, error, fetchNextPage, hasNextPage, isFetching, isLoading } =
@@ -73,11 +79,20 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
             </Card>
           </div>
         ) : !data?.pages[0]?.guides.length ? (
-          <div className="justify-items-center">
-            <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
-              <strong>Справочники не найдены.</strong>
-            </Card>
-          </div>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <BookOpen />
+              </EmptyMedia>
+              <EmptyContent>
+                <EmptyTitle>Справочники не найдены</EmptyTitle>
+                <EmptyDescription>
+                  Нет справочников, соответствующих выбранным критериям.
+                  Создайте новый справочник.
+                </EmptyDescription>
+              </EmptyContent>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div>
             {data?.pages.map((page, pageIndex) => (
@@ -123,31 +138,46 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
                               <span>
                                 <strong>Создан: </strong>
                                 <span className="block lg:inline">
-                                  {new Date(guide.createdAt).toLocaleString()}
+                                  {formatDateTime(guide.createdAt)}
                                 </span>
                               </span>
                             </p>
                           </CardHeader>
 
-                          <CardContent className="md:grid lg:grid-cols-2 flex flex-col">
+                          <CardContent className="flex flex-col">
+                            <p>
+                              <strong className="mr-1">Телефон:</strong>
+                              <span
+                                className="block lg:inline text-primary cursor-pointer"
+                                onPointerDown={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (guide.phone) copyHandler(guide.phone);
+                                }}
+                              >
+                                {guide.phone || 'Не указано'}
+                              </span>
+                            </p>
                             <p>
                               <strong className="mr-1">Дата рождения:</strong>
                               <span className="block lg:inline">
                                 {guide.birthDate
-                                  ? new Date(
-                                      guide.birthDate,
-                                    ).toLocaleDateString('ru-RU', {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      year: 'numeric',
-                                    })
+                                  ? formatDate(new Date(guide.birthDate))
                                   : 'Не указано'}
                               </span>
                             </p>
-                            <p className="lg:flex justify-end">
-                              <strong className="mr-1">Телефон:</strong>
-                              <span className="block lg:inline">
-                                {guide.phone || 'Не указано'}
+                            <p>
+                              <strong className="mr-1">Номер карты:</strong>
+                              <span
+                                className="block lg:inline text-primary cursor-pointer"
+                                onPointerDown={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (guide.cardNumber)
+                                    copyHandler(guide.cardNumber);
+                                }}
+                              >
+                                {guide.cardNumber || 'Не указано'}
                               </span>
                             </p>
                             <p>
@@ -156,21 +186,31 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
                                 {guide.address || 'Не указано'}
                               </span>
                             </p>
-                            <p className="lg:flex justify-end">
-                              <strong className="mr-1">Номер карты:</strong>
-                              <span className="block lg:inline">
-                                {guide.cardNumber || 'Не указано'}
-                              </span>
-                            </p>
                           </CardContent>
 
-                          <CardFooter>
-                            <p className="col-span-4">
+                          <CardFooter className="flex justify-between items-start gap-2">
+                            <p className="flex-1">
                               <strong className="mr-1">Описание:</strong>
                               <span className="block lg:inline">
                                 {guide.description || 'Не указано'}
                               </span>
                             </p>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="shrink-0"
+                              onPointerDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                copyGuide(guide);
+                              }}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
                           </CardFooter>
                         </Card>
                       </DropdownMenuTrigger>
@@ -187,13 +227,6 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
                         >
                           <Pencil className="mr-2 h-4 w-4 text-primary" />{' '}
                           Редактировать
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="hover:bg-primary/60 dark:hover:bg-primary/60"
-                          onClick={() => copyGuide(guide)}
-                        >
-                          <Copy className="mr-2 h-4 w-4 text-primary" />{' '}
-                          Копировать
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive/60 hover:text-destructive! hover:bg-destructive dark:hover:bg-destructive"

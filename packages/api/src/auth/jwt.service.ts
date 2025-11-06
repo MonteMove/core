@@ -6,6 +6,7 @@ import { randomUUID } from 'crypto';
 import { isJwtPayload, isRefreshTokenPayload } from '../auth/type-guards';
 import { SessionInfo, TokenPair, UserPayload } from '../auth/types';
 import { PrismaService } from '../common/services/prisma.service';
+import { parseUserAgent } from '../common/utils';
 
 @Injectable()
 export class JwtTokenService {
@@ -71,13 +72,16 @@ export class JwtTokenService {
                     revoked: false,
                     expiresAt: { gt: new Date() },
                 },
-                orderBy: { createdAt: 'asc' },
+                orderBy: { lastActivityAt: 'asc' },
                 take: activeSessions - this.maxSessions + 1,
             });
 
-            await this.prisma.session.deleteMany({
+            await this.prisma.session.updateMany({
                 where: {
                     id: { in: oldestSessions.map((s) => s.id) },
+                },
+                data: {
+                    revoked: true,
                 },
             });
         }
@@ -93,6 +97,8 @@ export class JwtTokenService {
         const expirationTime = Date.now() + refreshTokenExpiresInMs;
         const expirationDate = new Date(expirationTime);
 
+        const { device, browser, os } = parseUserAgent(sessionInfo.userAgent);
+
         await this.prisma.session.create({
             data: {
                 userId,
@@ -100,7 +106,11 @@ export class JwtTokenService {
                 refreshTokenHash: refreshJti,
                 ip: sessionInfo.ip,
                 userAgent: sessionInfo.userAgent,
+                device,
+                browser,
+                os,
                 expiresAt: expirationDate,
+                lastActivityAt: new Date(),
             },
         });
     }
@@ -143,6 +153,13 @@ export class JwtTokenService {
         });
     }
 
+    public async updateSessionActivity(jti: string): Promise<void> {
+        await this.prisma.session.updateMany({
+            where: { jti, revoked: false },
+            data: { lastActivityAt: new Date() },
+        });
+    }
+
     public getJtiFromToken(accessToken: string): string | null {
         try {
             const decodedAccess: unknown = this.jwtService.decode(accessToken);
@@ -169,7 +186,7 @@ export class JwtTokenService {
                 where: { jti: payload.jti },
             });
 
-            if (!session || session.revoked) {
+            if (!session || session.revoked || session.expiresAt < new Date()) {
                 return null;
             }
 
@@ -177,6 +194,7 @@ export class JwtTokenService {
                 id: payload.id,
                 username: payload.username,
                 roles: payload.roles,
+                jti: payload.jti,
             };
         } catch {
             return null;

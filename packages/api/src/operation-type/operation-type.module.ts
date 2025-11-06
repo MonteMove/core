@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { PrismaService } from '../common/services/prisma.service';
 import { OperationTypeController } from './operation-type.controller';
+import { OperationTypeInitService } from './operation-type-init.service';
 import {
     CreateOperationTypeUseCase,
     DeleteOperationTypeUseCase,
@@ -23,6 +24,7 @@ import {
         PrismaService,
         JwtAuthGuard,
         RolesGuard,
+        OperationTypeInitService,
     ],
     exports: [
         CreateOperationTypeUseCase,

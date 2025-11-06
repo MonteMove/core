@@ -14,7 +14,14 @@ import { useCurrency } from '@/entities/currency';
 import { useOperationTypes } from '@/entities/operations';
 import { useCouriers } from '@/entities/users';
 import { useCreateApplication } from '@/features/application';
-import { cn, findPhoneRule, formatByRule, normalizeDigits } from '@/shared';
+import {
+  cn,
+  findPhoneRule,
+  formatByRule,
+  formatNumber,
+  normalizeDigits,
+  RequiredLabel,
+} from '@/shared';
 import { Button } from '@/shared';
 import {
   Form,
@@ -35,7 +42,6 @@ import {
 import { Separator } from '@/shared';
 import { Skeleton } from '@/shared';
 import { Textarea } from '@/shared';
-import { Switch } from '@/shared';
 
 const formatTelegramUsername = (value: string): string => {
   return value
@@ -65,7 +71,6 @@ export function CreateApplicationForm({
       telegramUsername: '',
       phone: '',
       meetingDate: undefined,
-      advance: false,
     },
   });
 
@@ -90,7 +95,7 @@ export function CreateApplicationForm({
               name="assigneeUserId"
               render={({ field }) => (
                 <FormItem className="">
-                  <FormLabel>Исполнитель</FormLabel>
+                  <RequiredLabel required>Исполнитель</RequiredLabel>
 
                   {couriersLoading ? (
                     <Skeleton className="h-8" />
@@ -123,7 +128,7 @@ export function CreateApplicationForm({
               name="meetingDate"
               render={({ field, fieldState }) => (
                 <FormItem className="flex flex-col  w-full">
-                  <FormLabel>Дата и время встречи</FormLabel>
+                  <RequiredLabel required>Дата и время встречи</RequiredLabel>
                   <DateTimePicker
                     value={field.value}
                     onChange={field.onChange}
@@ -145,7 +150,7 @@ export function CreateApplicationForm({
                 name="operationTypeId"
                 render={({ field, fieldState }) => (
                   <FormItem className="w-full min-[450px]:col-span-2 lg:col-span-1">
-                    <FormLabel>Тип операции</FormLabel>
+                    <RequiredLabel required>Тип операции</RequiredLabel>
                     {operationTypesLoading ? (
                       <Skeleton className="h-8" />
                     ) : (
@@ -182,14 +187,19 @@ export function CreateApplicationForm({
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Сумма</FormLabel>
+                    <RequiredLabel required>Сумма</RequiredLabel>
                     <FormControl className="w-full">
                       <Input
-                        type="number"
-                        placeholder="1000"
-                        {...field}
-                        value={field.value === undefined ? '' : field.value}
-                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                        type="text"
+                        placeholder="1 000 000"
+                        value={field.value ? formatNumber(field.value) : ''}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, '');
+                          const numValue =
+                            digits === '' ? 0 : parseInt(digits, 10);
+                          field.onChange(numValue);
+                        }}
+                        inputMode="numeric"
                       />
                     </FormControl>
                     <FormMessage />
@@ -201,7 +211,7 @@ export function CreateApplicationForm({
                 name="currencyId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Валюта</FormLabel>
+                    <RequiredLabel required>Валюта</RequiredLabel>
                     {currencyLoading ? (
                       <Skeleton className="h-8" />
                     ) : (
@@ -228,21 +238,6 @@ export function CreateApplicationForm({
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name="advance"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-2">
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                  <FormLabel>Аванс</FormLabel>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
           <Separator className="my-6" />

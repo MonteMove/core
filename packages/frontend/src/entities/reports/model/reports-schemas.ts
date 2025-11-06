@@ -4,7 +4,7 @@ export const ReportsGeneralSchema = z.object({
   dateStart: z.string().datetime(),
   dateEnd: z.string().datetime(),
   operationTypeId: z.string().uuid(),
-  typeUnloading: z.enum(['all', 'wnzh', 'inskesh', 'not_wnzh_inskesh']),
+  typeUnloading: z.array(z.string()).min(1, 'Выберите хотя бы один тип'),
 });
 
 export const ReportsConversionSchema = z.object({
@@ -14,7 +14,7 @@ export const ReportsConversionSchema = z.object({
 });
 
 export const ReportsPeriodSchema = z.object({
-  walletType: z.enum(['inskech', 'bet11', 'vnj']),
+  walletTypes: z.array(z.string()).min(1, 'Выберите хотя бы один тип'),
 });
 
 export type ReportsGeneral = z.infer<typeof ReportsGeneralSchema>;

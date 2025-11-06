@@ -11,14 +11,12 @@ export class CookieConfigService {
     }
 
     public get refreshTokenCookieOptions(): CookieOptions {
-        const isProd = this.configService.getOrThrow<string>('NODE_ENV') === 'production';
-
         return {
             httpOnly: true,
-            secure: isProd,
+            secure: this.configService.getOrThrow<string>('REFRESH_TOKEN_COOKIE_SECURE') === 'true',
             domain: this.configService.getOrThrow<string>('REFRESH_TOKEN_COOKIE_DOMAIN'),
             path: this.configService.getOrThrow<string>('REFRESH_TOKEN_COOKIE_PATH'),
-            sameSite: isProd ? 'lax' : 'none',
+            sameSite: this.configService.getOrThrow<string>('REFRESH_TOKEN_COOKIE_SAME_SITE') as 'strict' | 'lax' | 'none',
             maxAge: Number(this.configService.getOrThrow<string>('JWT_REFRESH_TOKEN_EXPIRES_IN_MS')),
         };
     }

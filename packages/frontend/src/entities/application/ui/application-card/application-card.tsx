@@ -4,7 +4,8 @@ import React from 'react';
 
 import { Copy } from 'lucide-react';
 
-import { copyHandler } from '@/shared/lib/utils';
+import { copyHandler, formatDateTime } from '@/shared/lib/utils';
+import { formatNumber } from '@/shared/lib/utils/format-number';
 import { Badge } from '@/shared/ui/shadcn/badge';
 import { Button } from '@/shared/ui/shadcn/button';
 import {
@@ -23,113 +24,97 @@ interface CardApplicationProps {
 
 export const CardApplication = ({ application }: CardApplicationProps) => {
   return (
-    <Card className="w-full max-w-5xl mx-auto p-6 my-4 gap-2">
-      <CardHeader className="grid grid-cols-2 min-[470px]:grid-cols-[auto_auto_auto_1fr]  items-stretch p-0 m-0">
-        <p className="min-[500px]:text-nowrap  flex items-center justify-end ">
-          <span className="hidden sm:block mr-0.5">Статус:</span>
-          <span
-            className={
-              application.status === 'open'
-                ? 'text-green-600/60 font-semibold'
-                : 'text-red-600/60 font-semibold'
-            }
+    <Card className="w-full my-4">
+      <CardHeader className="flex flex-col lg:flex-row lg:justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge
+            variant={application.status === 'open' ? 'success' : 'destructive'}
+            className="font-semibold"
+          >
+            {formatNumber(application.amount)} | {application.currency.code}
+          </Badge>
+          <Badge
+            variant={application.status === 'open' ? 'success' : 'destructive'}
           >
             {application.status === 'open' ? 'В РАБОТЕ' : 'ЗАВЕРШЕНА'}
+          </Badge>
+          <Badge variant="outline">{application.operation_type.name}</Badge>
+        </div>
+        <div className="flex justify-end">
+          <span>
+            <strong>Создан:</strong>{' '}
+            <span className="block lg:inline">
+              {formatDateTime(application.createdAt)}
+            </span>
+          </span>
+        </div>
+      </CardHeader>
+
+      <CardContent className="flex flex-col">
+        <p>
+          <strong className="mr-1">Исполнитель:</strong>
+          <span className="block lg:inline">
+            {application.assignee_user.username}
           </span>
         </p>
-        <Badge variant="outline" className="h-6 ">
-          {application.operation_type.name}
-        </Badge>
-        <Badge
-          variant={application.status === 'open' ? 'success' : 'destructive'}
-          className="h-6 max-[500px]:order-first"
-        >
-          {application.amount} | {application.currency.code}
-        </Badge>
-        <CardDescription className="p-0 m-0 flex justify-end items-center">
-          <Badge variant="secondary">
-            {new Date(application.createdAt).toLocaleString()}
-          </Badge>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className=" flex p-0 m-0">
-        <div className="grid grid-cols-2 md:grid-cols-4 md:gap-6 w-full">
-          <p className="flex flex-col">
-            <span>Исполнитель:</span>{' '}
-            <span>{application.assignee_user.username}</span>{' '}
-          </p>
-          <p className="flex flex-col md:text-nowrap max-[500px]:text-right">
-            <span>Дата встречи: </span>{' '}
-            <span>
-              {new Date(application.meetingDate).toLocaleString()}
-            </span>{' '}
-          </p>
-          <p className="flex flex-col">
-            {' '}
-            <span>Telegram :</span>{' '}
-            <span
-              className="cursor-pointer select-none"
-              role="button"
-              onPointerDown={(e) => {
-                e.stopPropagation();
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+        <p>
+          <strong className="mr-1">Дата встречи:</strong>
+          <span className="block lg:inline">
+            {formatDateTime(application.meetingDate)}
+          </span>
+        </p>
+        <p>
+          <strong className="mr-1">Telegram:</strong>
+          <span
+            className="block lg:inline text-primary cursor-pointer"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (application.telegramUsername)
                 copyHandler(application.telegramUsername);
-              }}
-            >
-              {application.telegramUsername || '—'}
-            </span>{' '}
-          </p>
-          <div className="flex flex-col max-[500px]:text-right">
-            <p>Телефон:</p>
-            <p
-              role="button"
-              onPointerDown={(e) => {
-                e.stopPropagation();
-              }}
-              onClick={(e) => {
-                e.preventDefault();
-                copyHandler(application.phone);
-              }}
-            >
-              {application.phone || '—'}
-            </p>
-          </div>
-        </div>
+            }}
+          >
+            {application.telegramUsername || 'Не указано'}
+          </span>
+        </p>
+        <p>
+          <strong className="mr-1">Телефон:</strong>
+          <span
+            className="block lg:inline text-primary cursor-pointer"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (application.phone) copyHandler(application.phone);
+            }}
+          >
+            {application.phone || 'Не указано'}
+          </span>
+        </p>
       </CardContent>
-      <CardFooter className="flex flex-col gap-3 min-[500px]:flex-row justify-between  p-0 m-0">
-        <p className="self-stretch">{application.description}</p>
-        <div className="flex justify-between gap-2.5 self-stretch">
-          <Button
-            className="cursor-pointer select-none"
-            size="icon"
-            role="button"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              copyHandler(application.description);
-            }}
-          >
-            <Copy />
-          </Button>
-          <Button
-            className="cursor-pointer select-none"
-            role="button"
-            onPointerDown={(e) => {
-              e.stopPropagation();
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              copyHandler(application.id.toString());
-            }}
-          >
-            {application.id}
-          </Button>
-        </div>
+
+      <CardFooter className="flex justify-between items-start gap-2">
+        <p className="flex-1">
+          <strong className="mr-1">Описание:</strong>
+          <span className="block lg:inline">
+            {application.description || 'Не указано'}
+          </span>
+        </p>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="shrink-0"
+          onPointerDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (application.description) copyHandler(application.description);
+          }}
+        >
+          <Copy className="h-4 w-4" />
+        </Button>
       </CardFooter>
     </Card>
   );

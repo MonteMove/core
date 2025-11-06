@@ -2,8 +2,13 @@
 
 import { Fragment, useState } from 'react';
 
+import Link from 'next/link';
+
+import { Plus } from 'lucide-react';
+
 import { GetGuidesParamsRequest } from '@/entities/guides';
 import { GuidesFilters } from '@/features/guides/ui/guide-filters/guide-filters';
+import { Button, ROUTER_MAP } from '@/shared';
 import {
   Card,
   CardContent,
@@ -27,12 +32,18 @@ export const GuidesPageContent = () => {
   return (
     <Fragment>
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-2xl">Список справочников</CardTitle>
+          <div className="flex gap-2 items-center">
+            <GuidesFilters onFiltersChange={handleFiltersChange} />
+            <Button asChild>
+              <Link href={ROUTER_MAP.GUIDES_CREATE}>
+                <Plus className="w-4 h-4 mr-2" />
+                Создать справочник
+              </Link>
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <GuidesFilters onFiltersChange={handleFiltersChange} />
-        </CardContent>
       </Card>
       <GuidesList filters={filters} />
     </Fragment>

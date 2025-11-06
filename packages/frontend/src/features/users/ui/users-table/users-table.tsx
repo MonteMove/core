@@ -2,31 +2,44 @@
 
 import React, { Fragment, useMemo, useState } from 'react';
 
+import { CheckCircle2, Users, XCircle } from 'lucide-react';
+
 import { useBlockUser } from '@/features/users/hooks/use-block-user';
 import { useDeleteUser } from '@/features/users/hooks/use-delete-user';
 import { useInfiniteUsers } from '@/features/users/hooks/use-infinite-users';
+import { useUpdateUserFlags } from '@/features/users/hooks/use-update-user-flags';
 import { useUpdateUserRole } from '@/features/users/hooks/use-update-user-role';
 import { useUsersQueryParams } from '@/features/users/hooks/use-users-query-param';
 import { useLastItemObserver } from '@/shared/lib/hooks/use-last-Item-observer';
-import { Button } from '@/shared/ui/shadcn/button';
+import { cn, formatDateTime } from '@/shared/lib/utils';
 import {
+  Button,
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/shared/ui/shadcn/popover';
-import { Skeleton } from '@/shared/ui/shadcn/skeleton';
-import {
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/shadcn/table';
+} from '@/shared';
 
-export const UsersTable = () => {
+interface UsersTableProps {
+  showDeleted?: boolean;
+}
+
+export const UsersTable = ({ showDeleted = false }: UsersTableProps) => {
   const blockUserMutation = useBlockUser();
   const deleteUserMutation = useDeleteUser();
+  const updateUserFlagsMutation = useUpdateUserFlags();
   const [openUserId, setOpenUserId] = useState<string | null>(null);
   const [rolePopoverUser, setRolePopoverUser] = useState<null | {
     id: string;
@@ -38,6 +51,7 @@ export const UsersTable = () => {
     ...params,
     page: params.page ?? 1,
     limit: params.limit ?? 100,
+    deleted: showDeleted ? true : undefined,
   };
   const {
     data: infiniteData,
@@ -51,7 +65,15 @@ export const UsersTable = () => {
     [infiniteData],
   );
 
-  const tableRow = ['Имя', 'Роль', 'Создан', 'Статус', 'Последний вход'];
+  const tableRow = [
+    'Имя',
+    'Роль',
+    'Курьер',
+    'Держатель',
+    'Создан',
+    'Статус',
+    'Последний вход',
+  ];
 
   const lastUserRef = useLastItemObserver<HTMLTableRowElement>(
     () => {
@@ -63,8 +85,8 @@ export const UsersTable = () => {
 
   return (
     <Fragment>
-      <div className="overflow-x-auto border rounded-lg shadow-sm">
-        <Table className="min-w-full">
+      <div className="overflow-x-auto">
+        <Table>
           <TableHeader>
             <TableRow>
               {tableRow.map((h) => (
@@ -78,7 +100,7 @@ export const UsersTable = () => {
             {isLoading ? (
               [...Array(5)].map((_, i) => (
                 <TableRow key={i}>
-                  {[...Array(5)].map((_, j) => (
+                  {[...Array(7)].map((_, j) => (
                     <TableCell key={j}>
                       <Skeleton className="h-4 w-full" />
                     </TableCell>
@@ -87,8 +109,21 @@ export const UsersTable = () => {
               ))
             ) : users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8">
-                  Пользователей не найдено
+                <TableCell colSpan={7} className="p-0">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <Users />
+                      </EmptyMedia>
+                      <EmptyContent>
+                        <EmptyTitle>Пользователей не найдено</EmptyTitle>
+                        <EmptyDescription>
+                          Попробуйте изменить параметры поиска или создайте
+                          нового пользователя.
+                        </EmptyDescription>
+                      </EmptyContent>
+                    </EmptyHeader>
+                  </Empty>
                 </TableCell>
               </TableRow>
             ) : (
@@ -119,21 +154,69 @@ export const UsersTable = () => {
                             : '-'}
                         </TableCell>
                         <TableCell>
+                          <div className="flex items-center gap-2">
+                            {user.isCourier ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                <span className="text-green-600">Да</span>
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Нет
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {user.isHolder ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                <span className="text-green-600">Да</span>
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Нет
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           {user.createdAt
-                            ? new Date(user.createdAt).toLocaleString()
+                            ? formatDateTime(user.createdAt)
                             : '-'}
                         </TableCell>
                         <TableCell>
-                          {user.blocked ? 'Заблокирован' : 'Активен'}
+                          <div className="flex items-center gap-2">
+                            {user.blocked ? (
+                              <>
+                                <XCircle className="h-4 w-4 text-destructive" />
+                                <span className="text-destructive">
+                                  Заблокирован
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                <span className="text-green-600">Активен</span>
+                              </>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           {user.lastLogin
-                            ? new Date(user.lastLogin).toLocaleString()
+                            ? formatDateTime(user.lastLogin)
                             : 'Не был в сети'}
                         </TableCell>
                       </TableRow>
                     </PopoverTrigger>
-                    <PopoverContent align="start" className="w-48 p-0 z-50">
+                    <PopoverContent align="end" className="w-48 p-0 z-50">
                       <div className="flex flex-col divide-y">
                         <Button
                           variant="ghost"
@@ -240,6 +323,58 @@ export const UsersTable = () => {
                             </div>
                           </PopoverContent>
                         </Popover>
+                        <Button
+                          variant="ghost"
+                          className="justify-start"
+                          disabled={updateUserFlagsMutation.isPending}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateUserFlagsMutation.mutate({
+                              id: user.id,
+                              isHolder: !user.isHolder,
+                            });
+                            setOpenUserId(null);
+                          }}
+                        >
+                          {user.isHolder
+                            ? 'Убрать держателя'
+                            : 'Сделать держателем'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="justify-start"
+                          disabled={updateUserFlagsMutation.isPending}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateUserFlagsMutation.mutate({
+                              id: user.id,
+                              isCourier: !user.isCourier,
+                            });
+                            setOpenUserId(null);
+                          }}
+                        >
+                          {user.isCourier
+                            ? 'Убрать курьера'
+                            : 'Сделать курьером'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="justify-start"
+                          disabled={updateUserFlagsMutation.isPending}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateUserFlagsMutation.mutate({
+                              id: user.id,
+                              telegramNotifications:
+                                !user.telegramNotifications,
+                            });
+                            setOpenUserId(null);
+                          }}
+                        >
+                          {user.telegramNotifications
+                            ? 'Выключить уведомления'
+                            : 'Включить уведомления'}
+                        </Button>
                         <Button
                           variant="ghost"
                           className="justify-start text-destructive"

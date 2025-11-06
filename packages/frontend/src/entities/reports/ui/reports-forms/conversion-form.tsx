@@ -1,6 +1,9 @@
 'use client';
 
+import React from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CalendarIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
@@ -8,8 +11,15 @@ import { useOperationTypes } from '@/entities/operations';
 import { ReportsConversionSchema } from '@/entities/reports';
 import { useConversionReport } from '@/entities/reports';
 import { usePopapStore } from '@/entities/reports';
-import { cn } from '@/shared';
-import { Button } from '@/shared';
+import {
+  Button,
+  Calendar,
+  cn,
+  formatDate,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/shared';
 import {
   Form,
   FormControl,
@@ -26,7 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared';
-import { SheetDescription, SheetHeader, SheetTitle } from '@/shared';
 import { Skeleton } from '@/shared';
 
 export function ReportsConversionForm() {
@@ -34,6 +43,12 @@ export function ReportsConversionForm() {
     useOperationTypes();
   const { mutate: conversionReport, isPending } = useConversionReport();
   const setActive = usePopapStore((state) => state.setActive);
+
+  const [openStart, setOpenStart] = React.useState(false);
+  const [openEnd, setOpenEnd] = React.useState(false);
+  const [rawInputStart, setRawInputStart] = React.useState('');
+  const [rawInputEnd, setRawInputEnd] = React.useState('');
+
   const form = useForm<z.input<typeof ReportsConversionSchema>>({
     resolver: zodResolver(ReportsConversionSchema),
     defaultValues: {
@@ -47,11 +62,7 @@ export function ReportsConversionForm() {
     setActive(false);
   };
   return (
-    <SheetHeader>
-      <SheetTitle>Формирование отчета</SheetTitle>
-      <SheetDescription>
-        Заполните поля для общего формирования отчёта по конвертациям
-      </SheetDescription>
+    <div>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -63,18 +74,67 @@ export function ReportsConversionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Начало периода</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={field.value ? String(field.value).slice(0, 10) : ''}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      field.onChange(
-                        v ? new Date(`${v}T00:00:00`).toISOString() : '',
-                      );
-                    }}
-                  />
-                </FormControl>
+                <div className="relative flex gap-2">
+                  <FormControl>
+                    <Input
+                      value={rawInputStart}
+                      placeholder="дд.мм.гггг"
+                      className="bg-background pr-10"
+                      onChange={(e) => {
+                        let raw = e.target.value.replace(/\D/g, '');
+                        if (raw.length > 8) raw = raw.slice(0, 8);
+
+                        let formatted = raw;
+                        if (raw.length > 4)
+                          formatted = `${raw.slice(0, 2)}.${raw.slice(2, 4)}.${raw.slice(4)}`;
+                        else if (raw.length > 2)
+                          formatted = `${raw.slice(0, 2)}.${raw.slice(2)}`;
+
+                        setRawInputStart(formatted);
+
+                        const parts = formatted.split('.');
+                        if (parts.length === 3) {
+                          const [dd, mm, yyyy] = parts.map(Number);
+                          const parsed = new Date(yyyy, mm - 1, dd);
+                          if (!isNaN(parsed.getTime())) {
+                            field.onChange(parsed.toISOString());
+                            return;
+                          }
+                        }
+
+                        field.onChange(formatted);
+                      }}
+                    />
+                  </FormControl>
+                  <Popover open={openStart} onOpenChange={setOpenStart}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+                      >
+                        <CalendarIcon className="size-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="end"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) => {
+                          if (date) {
+                            field.onChange(date.toISOString());
+                            setRawInputStart(formatDate(date));
+                          }
+                          setOpenStart(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -85,18 +145,67 @@ export function ReportsConversionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Конец периода</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={field.value ? String(field.value).slice(0, 10) : ''}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      field.onChange(
-                        v ? new Date(`${v}T00:00:00`).toISOString() : '',
-                      );
-                    }}
-                  />
-                </FormControl>
+                <div className="relative flex gap-2">
+                  <FormControl>
+                    <Input
+                      value={rawInputEnd}
+                      placeholder="дд.мм.гггг"
+                      className="bg-background pr-10"
+                      onChange={(e) => {
+                        let raw = e.target.value.replace(/\D/g, '');
+                        if (raw.length > 8) raw = raw.slice(0, 8);
+
+                        let formatted = raw;
+                        if (raw.length > 4)
+                          formatted = `${raw.slice(0, 2)}.${raw.slice(2, 4)}.${raw.slice(4)}`;
+                        else if (raw.length > 2)
+                          formatted = `${raw.slice(0, 2)}.${raw.slice(2)}`;
+
+                        setRawInputEnd(formatted);
+
+                        const parts = formatted.split('.');
+                        if (parts.length === 3) {
+                          const [dd, mm, yyyy] = parts.map(Number);
+                          const parsed = new Date(yyyy, mm - 1, dd);
+                          if (!isNaN(parsed.getTime())) {
+                            field.onChange(parsed.toISOString());
+                            return;
+                          }
+                        }
+
+                        field.onChange(formatted);
+                      }}
+                    />
+                  </FormControl>
+                  <Popover open={openEnd} onOpenChange={setOpenEnd}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+                      >
+                        <CalendarIcon className="size-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-auto overflow-hidden p-0"
+                      align="end"
+                    >
+                      <Calendar
+                        mode="single"
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) => {
+                          if (date) {
+                            field.onChange(date.toISOString());
+                            setRawInputEnd(formatDate(date));
+                          }
+                          setOpenEnd(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -146,6 +255,6 @@ export function ReportsConversionForm() {
           </Button>
         </form>
       </Form>
-    </SheetHeader>
+    </div>
   );
 }

@@ -50,6 +50,7 @@ export function OperationForm({
 
   const [open, setOpen] = React.useState(false);
   const [rawInput, setRawInput] = React.useState('');
+  const [walletSearch, setWalletSearch] = React.useState('');
 
   const { data: wallets } = useWallets();
   const { data: operationTypes, isLoading: isOperationTypesLoading } =
@@ -91,7 +92,6 @@ export function OperationForm({
     }
 
     if (initialData) {
-      // режим редактирования
       const mergedEntries = data.entries.map((entry) => {
         const oldEntry = initialData.entries.find(
           (e) =>
@@ -121,7 +121,6 @@ export function OperationForm({
         entries: mergedEntries,
       });
     } else {
-      // создание
       createMutation.mutate(data);
     }
   };
@@ -169,13 +168,13 @@ export function OperationForm({
             )}
           />
 
-          {/* Тип заявки */}
+          {/* Заявка */}
           <FormField
             control={form.control}
             name="applicationId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Тип заявки:</FormLabel>
+                <FormLabel>Заявка:</FormLabel>
                 {isApplicationsLoading ? (
                   <Skeleton className="h-8" />
                 ) : (
@@ -185,7 +184,7 @@ export function OperationForm({
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Выберите" />
+                        <SelectValue placeholder="Выберите заявку" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -212,7 +211,7 @@ export function OperationForm({
                   <FormControl>
                     <Input
                       value={rawInput}
-                      placeholder="ДД.ММ.ГГГГ"
+                      placeholder="дд.мм.гггг"
                       className="bg-background pr-10"
                       onChange={(e) => {
                         let raw = e.target.value.replace(/\D/g, '');
@@ -314,15 +313,32 @@ export function OperationForm({
                           >
                             <FormControl>
                               <SelectTrigger className="lg:w-[250px] w-full">
-                                <SelectValue placeholder="Выберите" />
+                                <SelectValue placeholder="Выберите кошелек" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {wallets?.wallets?.map((wallet) => (
-                                <SelectItem key={wallet.id} value={wallet.id}>
-                                  {wallet.name} — {wallet.amount}
-                                </SelectItem>
-                              ))}
+                              <div className="px-2 pb-2">
+                                <Input
+                                  placeholder="Поиск кошелька..."
+                                  value={walletSearch}
+                                  onChange={(e) =>
+                                    setWalletSearch(e.target.value)
+                                  }
+                                  className="h-8"
+                                />
+                              </div>
+                              {wallets?.wallets
+                                ?.filter((wallet) =>
+                                  wallet.name
+                                    .toLowerCase()
+                                    .includes(walletSearch.toLowerCase()),
+                                )
+                                .map((wallet) => (
+                                  <SelectItem key={wallet.id} value={wallet.id}>
+                                    {wallet.name} — {wallet.amount}{' '}
+                                    {wallet.currency.code}
+                                  </SelectItem>
+                                ))}
                             </SelectContent>
                           </Select>
                         </FormItem>

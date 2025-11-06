@@ -21,6 +21,12 @@ export class OperationTypeResponseDto {
     public description: string | null;
 
     @ApiProperty({
+        description: 'Отображать как отдельный таб на странице операций',
+        example: false,
+    })
+    public isSeparateTab: boolean;
+
+    @ApiProperty({
         description: 'ID пользователя, создавшего запись',
         example: '123e4567-e89b-12d3-a456-426614174000',
     })

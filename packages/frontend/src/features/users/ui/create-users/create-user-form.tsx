@@ -1,12 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { RegisterRequestSchema } from '@/entities/auth';
 import { UserRole } from '@/entities/users/model/user-schemas';
 import { useCreateUser } from '@/features/users/hooks/use-user-create';
+import { ROUTER_MAP } from '@/shared';
 import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
@@ -26,7 +28,14 @@ import {
   SelectValue,
 } from '@/shared/ui/shadcn/select';
 
+const ROLE_LABELS: Record<UserRole, string> = {
+  [UserRole.ADMIN]: 'Администратор',
+  [UserRole.MODERATOR]: 'Модератор',
+  [UserRole.USER]: 'Пользователь',
+};
+
 export function CreateUserForm() {
+  const router = useRouter();
   const createUserMutation = useCreateUser();
 
   const form = useForm<z.infer<typeof RegisterRequestSchema>>({
@@ -40,7 +49,10 @@ export function CreateUserForm() {
 
   const onSubmit = (values: z.infer<typeof RegisterRequestSchema>) => {
     createUserMutation.mutate(values, {
-      onSuccess: () => form.reset(),
+      onSuccess: () => {
+        form.reset();
+        router.push(ROUTER_MAP.USERS);
+      },
     });
   };
 
@@ -68,7 +80,9 @@ export function CreateUserForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Пароль</FormLabel>
-              <FormDescription>Укажите пароль пользователю</FormDescription>
+              <FormDescription>
+                Минимум 8 символов, должен содержать буквы и цифры
+              </FormDescription>
               <FormControl>
                 <Input
                   type="password"
@@ -101,7 +115,7 @@ export function CreateUserForm() {
                   <SelectContent>
                     {Object.values(UserRole).map((role) => (
                       <SelectItem key={role} value={role}>
-                        {role}
+                        {ROLE_LABELS[role]}
                       </SelectItem>
                     ))}
                   </SelectContent>

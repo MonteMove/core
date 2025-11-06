@@ -4,6 +4,7 @@ import {
   CreateNetworkRequest,
   CreateNetworkResponseSchema,
   DeleteNetworkResponseSchema,
+  GetNetworkResponseSchema,
   GetNetworksResponseSchema,
   RestoreNetworkResponseSchema,
   UpdateNetworkRequest,
@@ -13,6 +14,7 @@ import {
   CreateNetworkTypeRequest,
   CreateNetworkTypeResponseSchema,
   DeleteNetworkTypeResponseSchema,
+  GetNetworkTypeResponseSchema,
   GetNetworkTypesResponseSchema,
   RestoreNetworkTypeResponseSchema,
   UpdateNetworkTypeRequest,
@@ -22,6 +24,7 @@ import {
 import type {
   CreateNetworkResponse,
   DeleteNetworkResponse,
+  GetNetworkResponse,
   GetNetworksResponse,
   RestoreNetworkResponse,
   UpdateNetworkResponse,
@@ -29,6 +32,7 @@ import type {
 import type {
   CreateNetworkTypeResponse,
   DeleteNetworkTypeResponse,
+  GetNetworkTypeResponse,
   GetNetworkTypesResponse,
   RestoreNetworkTypeResponse,
   UpdateNetworkTypeResponse,
@@ -40,6 +44,11 @@ export const networkApi = {
       params: deleted !== undefined ? { deleted } : {},
     });
     return GetNetworksResponseSchema.parse(data);
+  },
+
+  getNetwork: async (id: string): Promise<GetNetworkResponse> => {
+    const { data } = await axiosInstance.get(`/networks/${id}`);
+    return GetNetworkResponseSchema.parse(data);
   },
 
   createNetwork: async (
@@ -67,7 +76,6 @@ export const networkApi = {
     return RestoreNetworkResponseSchema.parse(data);
   },
 
-  // Network Types
   getNetworkTypes: async (
     networkId?: string,
   ): Promise<GetNetworkTypesResponse> => {
@@ -75,6 +83,11 @@ export const networkApi = {
       params: networkId ? { networkId } : {},
     });
     return GetNetworkTypesResponseSchema.parse(data);
+  },
+
+  getNetworkType: async (id: string): Promise<GetNetworkTypeResponse> => {
+    const { data } = await axiosInstance.get(`/network-types/${id}`);
+    return GetNetworkTypeResponseSchema.parse(data);
   },
 
   createNetworkType: async (

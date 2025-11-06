@@ -25,6 +25,10 @@ export const GetNetworksResponseSchema = z.object({
   networks: z.array(NetworkSchema),
 });
 
+export const GetNetworkResponseSchema = z.object({
+  network: NetworkSchema,
+});
+
 export const CreateNetworkResponseSchema = z.object({
   message: z.string(),
   network: NetworkSchema,
@@ -47,6 +51,7 @@ export type Network = z.infer<typeof NetworkSchema>;
 export type CreateNetworkRequest = z.infer<typeof CreateNetworkSchema>;
 export type UpdateNetworkRequest = z.infer<typeof UpdateNetworkSchema>;
 export type GetNetworksResponse = z.infer<typeof GetNetworksResponseSchema>;
+export type GetNetworkResponse = z.infer<typeof GetNetworkResponseSchema>;
 export type CreateNetworkResponse = z.infer<typeof CreateNetworkResponseSchema>;
 export type UpdateNetworkResponse = z.infer<typeof UpdateNetworkResponseSchema>;
 export type DeleteNetworkResponse = z.infer<typeof DeleteNetworkResponseSchema>;

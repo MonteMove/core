@@ -12,8 +12,5 @@ export const useDeleteWalletType = () => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
       toast.success(response.message || 'Тип кошелька успешно удалён');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при удалении типа кошелька');
-    },
   });
 };

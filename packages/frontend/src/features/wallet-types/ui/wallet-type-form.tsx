@@ -154,12 +154,15 @@ export function WalletTypeForm({
                 <FormControl>
                   <Input
                     type="number"
-                    value={field.value ?? 0}
-                    onChange={(e) =>
+                    min="0"
+                    step="1"
+                    value={field.value ?? ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
                       field.onChange(
-                        e.target.value === '' ? 0 : Number(e.target.value),
-                      )
-                    }
+                        value === '' ? undefined : parseInt(value, 10),
+                      );
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

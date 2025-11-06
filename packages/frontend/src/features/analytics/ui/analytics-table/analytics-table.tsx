@@ -1,121 +1,146 @@
-import React from 'react';
+'use client';
 
-import { Skeleton } from '@/shared/ui/shadcn/skeleton';
+import React, { useMemo, useState } from 'react';
+
+import { ArrowDown, ArrowUp, ArrowUpDown, BarChart3 } from 'lucide-react';
+
+import { useWalletAnalytics } from '@/entities/analytics';
+import { useAnalyticsFilters } from '@/features/analytics/hook/use-analytics-filters';
+import { formatNumber } from '@/shared/lib/utils/format-number';
 import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/shadcn/table';
+} from '@/shared';
 
-type AnalyticsData = {
-  id: number;
-  name: string;
-  currency: string;
-  incoming: number;
-  outgoing: number;
-  transactions: number;
-};
-
-const data: AnalyticsData[] = [
-  {
-    id: 1,
-    name: 'Счет 1',
-    currency: 'RUB',
-    incoming: 423,
-    outgoing: 198,
-    transactions: 134,
-  },
-  {
-    id: 2,
-    name: 'Счёт 2',
-    currency: 'USD',
-    incoming: 312,
-    outgoing: 256,
-    transactions: 101,
-  },
-  {
-    id: 3,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-  {
-    id: 7,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-  {
-    id: 8,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-  {
-    id: 9,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-  {
-    id: 11,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-  {
-    id: 21,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-  {
-    id: 5,
-    name: 'Счёт 3',
-    currency: 'EUR',
-    incoming: 287,
-    outgoing: 174,
-    transactions: 92,
-  },
-];
+type SortField =
+  | 'walletName'
+  | 'walletCurrency'
+  | 'holder'
+  | 'currentBalance'
+  | 'coming'
+  | 'expenditure'
+  | 'netFlow'
+  | 'operationsCount';
+type SortDirection = 'asc' | 'desc' | null;
 
 export const AnalyticsTable = () => {
-  const isLoading = false;
+  const { filters } = useAnalyticsFilters();
+  const { data: analyticsData, isLoading } = useWalletAnalytics(filters);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null);
+        setSortField(null);
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedData = useMemo(() => {
+    if (!analyticsData?.analytics || !sortField || !sortDirection) {
+      return analyticsData?.analytics || [];
+    }
+
+    return [...analyticsData.analytics].sort((a, b) => {
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+
+      if (aValue === null || aValue === undefined) return 1;
+      if (bValue === null || bValue === undefined) return -1;
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+
+      return sortDirection === 'asc'
+        ? (aValue as number) - (bValue as number)
+        : (bValue as number) - (aValue as number);
+    });
+  }, [analyticsData?.analytics, sortField, sortDirection]);
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="ml-2 h-4 w-4 inline" />;
+    }
+    if (sortDirection === 'asc') {
+      return <ArrowUp className="ml-2 h-4 w-4 inline" />;
+    }
+    return <ArrowDown className="ml-2 h-4 w-4 inline" />;
+  };
 
   return (
     <div className="overflow-x-auto border rounded-lg shadow-sm">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableCell className="text-center text-base font-semibold">
-              Кошельки
-            </TableCell>
-            <TableCell className="text-center text-base font-semibold">
-              Валюта
-            </TableCell>
-            <TableCell className="text-center text-base font-semibold">
-              Сумма поступлений
-            </TableCell>
-            <TableCell className="text-center text-base font-semibold">
-              Сумма расходов
-            </TableCell>
-            <TableCell className="text-center text-base font-semibold">
-              Количество операций
-            </TableCell>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('walletName')}
+            >
+              Кошелек <SortIcon field="walletName" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('walletCurrency')}
+            >
+              Валюта <SortIcon field="walletCurrency" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('holder')}
+            >
+              Держатель <SortIcon field="holder" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('currentBalance')}
+            >
+              Текущий баланс <SortIcon field="currentBalance" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('coming')}
+            >
+              Поступления <SortIcon field="coming" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('expenditure')}
+            >
+              Расходы <SortIcon field="expenditure" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('netFlow')}
+            >
+              Чистый поток <SortIcon field="netFlow" />
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer hover:bg-muted/50"
+              onClick={() => handleSort('operationsCount')}
+            >
+              Операций <SortIcon field="operationsCount" />
+            </TableHead>
           </TableRow>
         </TableHeader>
 
@@ -123,7 +148,7 @@ export const AnalyticsTable = () => {
           {isLoading &&
             [...Array(5)].map((_, i) => (
               <TableRow key={i}>
-                {[...Array(5)].map((_, j) => (
+                {[...Array(8)].map((_, j) => (
                   <TableCell key={j}>
                     <Skeleton className="h-4 w-full" />
                   </TableCell>
@@ -131,30 +156,55 @@ export const AnalyticsTable = () => {
               </TableRow>
             ))}
 
-          {!isLoading && data && data.length > 0
-            ? data.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="text-center text-sm font-medium">
-                    {item.name}
+          {!isLoading && sortedData && sortedData.length > 0
+            ? sortedData.map((item) => (
+                <TableRow key={item.walletId}>
+                  <TableCell className="text-center text-sm">
+                    {item.walletName}
                   </TableCell>
                   <TableCell className="text-center text-sm font-medium">
-                    {item.currency}
+                    {item.walletCurrency}
+                  </TableCell>
+                  <TableCell className="text-center text-sm">
+                    {item.holder || '—'}
                   </TableCell>
                   <TableCell className="text-center text-sm font-medium">
-                    {item.incoming}
+                    {formatNumber(item.currentBalance)}
                   </TableCell>
-                  <TableCell className="text-center text-sm font-medium">
-                    {item.outgoing}
+                  <TableCell className="text-center text-sm text-green-600">
+                    +{formatNumber(item.coming)}
                   </TableCell>
-                  <TableCell className="text-center text-sm font-medium">
-                    {item.transactions}
+                  <TableCell className="text-center text-sm text-red-600">
+                    -{formatNumber(item.expenditure)}
+                  </TableCell>
+                  <TableCell
+                    className={`text-center text-sm font-medium ${item.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {item.netFlow >= 0 ? '+' : ''}
+                    {formatNumber(item.netFlow)}
+                  </TableCell>
+                  <TableCell className="text-center text-sm">
+                    {formatNumber(item.operationsCount)}
                   </TableCell>
                 </TableRow>
               ))
             : !isLoading && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-sm">
-                    Данных аналитики нет
+                  <TableCell colSpan={8} className="p-0">
+                    <Empty>
+                      <EmptyHeader>
+                        <EmptyMedia variant="icon">
+                          <BarChart3 />
+                        </EmptyMedia>
+                        <EmptyContent>
+                          <EmptyTitle>Нет данных аналитики</EmptyTitle>
+                          <EmptyDescription>
+                            Данные аналитики отсутствуют. Попробуйте изменить
+                            фильтры или создайте кошельки и операции.
+                          </EmptyDescription>
+                        </EmptyContent>
+                      </EmptyHeader>
+                    </Empty>
                   </TableCell>
                 </TableRow>
               )}

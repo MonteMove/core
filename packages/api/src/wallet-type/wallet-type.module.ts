@@ -9,6 +9,7 @@ import {
     UpdateWalletTypeUseCase,
 } from './use-cases';
 import { WalletTypeController } from './wallet-type.controller';
+import { WalletTypeInitService } from './wallet-type-init.service';
 
 @Module({
     imports: [AuthModule],
@@ -19,6 +20,7 @@ import { WalletTypeController } from './wallet-type.controller';
         CreateWalletTypeUseCase,
         UpdateWalletTypeUseCase,
         DeleteWalletTypeUseCase,
+        WalletTypeInitService,
     ],
 })
 export class WalletTypeModule {}

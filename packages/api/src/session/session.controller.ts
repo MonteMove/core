@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGua
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 import { RoleCode } from '../../prisma/generated/prisma';
+import { CurrentJti } from '../auth/decorators/current-jti.decorator';
 import { CurrentUserId } from '../auth/decorators/current-user-id.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth';
@@ -84,7 +85,6 @@ export class SessionController {
 
     @Get('my')
     @HttpCode(HttpStatus.OK)
-    @Roles(RoleCode.admin, RoleCode.moderator)
     @ApiOperation({
         summary: 'Получить мои сессии',
         description: 'Возвращает список сессий текущего пользователя',
@@ -122,9 +122,10 @@ export class SessionController {
     @ApiReadResponses()
     public async getMySessions(
         @CurrentUserId() userId: string,
+        @CurrentJti() currentJti: string,
         @Query() getSessionsDto: GetSessionsDto,
     ): Promise<GetSessionsResponseDto> {
-        const dto = { ...getSessionsDto, userId };
+        const dto = { ...getSessionsDto, userId, currentJti };
 
         const result = await this.getSessionsUseCase.execute(dto);
 
@@ -164,7 +165,6 @@ export class SessionController {
 
     @Post('deactivate-my')
     @HttpCode(HttpStatus.OK)
-    @Roles(RoleCode.admin, RoleCode.moderator)
     @ApiOperation({
         summary: 'Деактивировать мои сессии',
         description: 'Деактивирует все сессии текущего пользователя',
@@ -191,7 +191,6 @@ export class SessionController {
 
     @Post('deactivate-my/:sessionId')
     @HttpCode(HttpStatus.OK)
-    @Roles(RoleCode.admin, RoleCode.moderator)
     @ApiOperation({
         summary: 'Деактивировать мою сессию',
         description: 'Деактивирует конкретную сессию текущего пользователя',

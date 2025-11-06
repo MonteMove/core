@@ -11,7 +11,7 @@ export class GetSessionsUseCase {
     constructor(private readonly prisma: PrismaService) {}
 
     public async execute(dto: GetSessionsDto): Promise<GetSessionsOutput> {
-        const { page, limit, sortField = 'createdAt', sortOrder = 'desc', userId, revoked, ip } = dto;
+        const { page, limit, sortField = 'createdAt', sortOrder = 'desc', userId, revoked, ip, currentJti } = dto;
 
         const pagination = calculatePagination({ page, limit });
 
@@ -23,6 +23,8 @@ export class GetSessionsUseCase {
 
         if (revoked !== undefined) {
             where.revoked = revoked;
+        } else {
+            where.revoked = false;
         }
 
         if (ip) {
@@ -47,6 +49,10 @@ export class GetSessionsUseCase {
                 revoked: true,
                 userAgent: true,
                 ip: true,
+                device: true,
+                browser: true,
+                os: true,
+                lastActivityAt: true,
                 createdAt: true,
                 updatedAt: true,
             },
@@ -62,12 +68,17 @@ export class GetSessionsUseCase {
             this.prisma.session.count({ where }),
         ]);
 
+        const sessionsWithCurrent = sessions.map((session) => ({
+            ...session,
+            isCurrent: currentJti ? session.jti === currentJti : false,
+        }));
+
         const paginationResponse = pagination.shouldPaginate
             ? createPaginationResponse(total, page!, limit!)
             : createAllDataPaginationResponse(total);
 
         return {
-            sessions,
+            sessions: sessionsWithCurrent,
             pagination: paginationResponse,
         };
     }

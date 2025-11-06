@@ -14,8 +14,5 @@ export const useUpdateWalletType = () => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
       toast.success(response.message || 'Тип кошелька успешно обновлён');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при обновлении типа кошелька');
-    },
   });
 };

@@ -14,6 +14,7 @@ import {
   Home,
   Layers,
   LifeBuoy,
+  ListChecks,
   MessageCircle,
   Network,
   Ticket,
@@ -88,6 +89,11 @@ const data = {
       title: 'Типы сетей',
       url: ROUTER_MAP.NETWORK_TYPES,
       icon: Layers,
+    },
+    {
+      title: 'Типы операций',
+      url: ROUTER_MAP.OPERATION_TYPES,
+      icon: ListChecks,
     },
     {
       title: 'Типы кошельков',

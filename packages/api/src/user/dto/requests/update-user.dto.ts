@@ -49,6 +49,24 @@ export class UpdateUserDto {
     public telegramNotifications?: boolean;
 
     @ApiProperty({
+        description: 'Является ли пользователь держателем',
+        example: false,
+        required: false,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Статус держателя должен быть boolean' })
+    public isHolder?: boolean;
+
+    @ApiProperty({
+        description: 'Является ли пользователь курьером',
+        example: false,
+        required: false,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Статус курьера должен быть boolean' })
+    public isCourier?: boolean;
+
+    @ApiProperty({
         description: 'Пароль пользователя',
         example: 'newPassword123',
         minLength: 8,

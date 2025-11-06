@@ -82,6 +82,16 @@ export class GetUsersDto {
     public isCourier?: boolean;
 
     @ApiProperty({
+        description: 'Показать удалённых пользователей',
+        example: false,
+        required: false,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Статус удаления должен быть boolean' })
+    @Type(() => Boolean)
+    public deleted?: boolean;
+
+    @ApiProperty({
         description: 'Поле для сортировки',
         enum: UserSortField,
         example: UserSortField.CREATED_AT,

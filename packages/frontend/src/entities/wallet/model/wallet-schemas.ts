@@ -267,14 +267,6 @@ export const CreateWalletSchema = z
           message: 'Укажите владельца карты',
         });
       }
-
-      if (!details.card) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['details', 'card'],
-          message: 'Укажите номер карты',
-        });
-      }
     }
 
     if (data.walletKind === WalletKind.crypto) {
@@ -330,10 +322,10 @@ export const GetWalletsFilterSchema = z.object({
   deleted: z.boolean().optional(),
 
   sortField: z
-    .enum(WalletSortField)
+    .nativeEnum(WalletSortField)
     .default(WalletSortField.CREATED_AT)
     .optional(),
-  sortOrder: z.enum(SortOrder).default(SortOrder.DESC).optional(),
+  sortOrder: z.nativeEnum(SortOrder).default(SortOrder.DESC).optional(),
 
   page: z.number().int().min(1).default(1).optional(),
   limit: z.number().int().min(1).max(100).default(10).optional(),

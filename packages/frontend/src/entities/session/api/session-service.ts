@@ -16,7 +16,7 @@ export class SessionService {
     page?: number;
     limit?: number;
   }): Promise<GetSessionsResponseDto> {
-    const { data } = await axiosInstance.get(API_MAP.SESSIONS.SESSIONS, {
+    const { data } = await axiosInstance.get(API_MAP.SESSIONS.MY_SESSIONS, {
       params,
     });
     return GetSessionsResponseDtoSchema.parse(data);

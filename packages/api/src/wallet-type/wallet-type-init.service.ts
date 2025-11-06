@@ -20,8 +20,6 @@ export class WalletTypeInitService implements OnModuleInit {
                 description: 'Кошельки для работы с Инскеш',
                 showInTabs: true,
                 tabOrder: 1,
-                color: '#3B82F6',
-                icon: 'wallet',
             },
             {
                 code: 'bet11',
@@ -29,8 +27,6 @@ export class WalletTypeInitService implements OnModuleInit {
                 description: 'Кошельки для работы с Bet11',
                 showInTabs: true,
                 tabOrder: 2,
-                color: '#10B981',
-                icon: 'wallet',
             },
             {
                 code: 'vnj',
@@ -38,8 +34,6 @@ export class WalletTypeInitService implements OnModuleInit {
                 description: 'Кошельки для ВНЖ',
                 showInTabs: true,
                 tabOrder: 3,
-                color: '#F59E0B',
-                icon: 'wallet',
             },
         ];
 

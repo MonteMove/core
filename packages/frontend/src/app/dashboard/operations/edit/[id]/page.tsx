@@ -21,7 +21,7 @@ export default function EditOperationPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <Card>
           <CardHeader>
             <Skeleton className="h-8 w-64" />
@@ -39,7 +39,7 @@ export default function EditOperationPage() {
 
   if (isError || !operation) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-destructive">Не удалось загрузить операцию</p>
         </div>
@@ -48,7 +48,7 @@ export default function EditOperationPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Редактировать операцию</CardTitle>

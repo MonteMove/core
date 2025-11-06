@@ -40,6 +40,6 @@ import { LoginUserUseCase, LogoutUserUseCase, RefreshTokensUseCase, RegisterUser
         JwtAuthGuard,
         RolesGuard,
     ],
-    exports: [PrismaService, BcryptHasher, JwtAuthGuard, RolesGuard],
+    exports: [PrismaService, BcryptHasher, JwtAuthGuard, RolesGuard, JwtTokenService],
 })
 export class AuthModule {}

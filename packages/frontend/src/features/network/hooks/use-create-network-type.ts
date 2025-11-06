@@ -14,8 +14,5 @@ export const useCreateNetworkType = () => {
       queryClient.invalidateQueries({ queryKey: ['network-types'] });
       toast.success(response.message || 'Тип сети успешно создан');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при создании типа сети');
-    },
   });
 };

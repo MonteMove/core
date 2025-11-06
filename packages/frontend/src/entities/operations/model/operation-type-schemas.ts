@@ -8,6 +8,7 @@ export const OperationTypeSchema = z.object({
   updatedById: z.string().uuid(),
   name: z.string(),
   description: z.string().nullable(),
+  isSeparateTab: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   created_by: z
@@ -40,7 +41,22 @@ export const CreateOperationTypeSchema = z.object({
   description: z
     .string()
     .max(1000, 'Описание не должно превышать 1000 символов')
-    .optional(),
+    .optional()
+    .nullable(),
+  isSeparateTab: z.boolean(),
+});
+
+export const UpdateOperationTypeSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Название должно содержать минимум 2 символа')
+    .max(100, 'Название не должно превышать 100 символов'),
+  description: z
+    .string()
+    .max(1000, 'Описание не должно превышать 1000 символов')
+    .optional()
+    .nullable(),
+  isSeparateTab: z.boolean(),
 });
 
 export const OperationTypesResponseSchema = z.object({
@@ -58,6 +74,20 @@ export const OperationInfoSchema = z.object({
   description: z.string().nullable(),
 });
 
+export const CreateOperationTypeResponseSchema = z.object({
+  message: z.string(),
+  operationType: OperationTypeSchema,
+});
+
+export const UpdateOperationTypeResponseSchema = z.object({
+  message: z.string(),
+  operationType: OperationTypeSchema,
+});
+
+export const DeleteOperationTypeResponseSchema = z.object({
+  message: z.string(),
+});
+
 export type OperationType = z.infer<typeof OperationTypeSchema>;
 export type GetOperationTypesParams = z.infer<
   typeof GetOperationTypesParamsSchema
@@ -65,6 +95,18 @@ export type GetOperationTypesParams = z.infer<
 export type CreateOperationTypeRequest = z.infer<
   typeof CreateOperationTypeSchema
 >;
+export type UpdateOperationTypeRequest = z.infer<
+  typeof UpdateOperationTypeSchema
+>;
 export type OperationTypesResponse = z.infer<
   typeof OperationTypesResponseSchema
+>;
+export type CreateOperationTypeResponse = z.infer<
+  typeof CreateOperationTypeResponseSchema
+>;
+export type UpdateOperationTypeResponse = z.infer<
+  typeof UpdateOperationTypeResponseSchema
+>;
+export type DeleteOperationTypeResponse = z.infer<
+  typeof DeleteOperationTypeResponseSchema
 >;

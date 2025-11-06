@@ -33,7 +33,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <PageTransition>{children}</PageTransition>
+          <div className="max-w-5xl mx-auto w-full">
+            <PageTransition>{children}</PageTransition>
+          </div>
         </main>
       </SidebarInset>
       <ReportsSheet />

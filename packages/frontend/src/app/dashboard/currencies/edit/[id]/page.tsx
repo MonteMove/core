@@ -22,7 +22,7 @@ export default function EditCurrencyPage({
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Загрузка...</p>
         </div>
@@ -32,7 +32,7 @@ export default function EditCurrencyPage({
 
   if (!currency) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Валюта не найдена</p>
         </div>
@@ -41,7 +41,7 @@ export default function EditCurrencyPage({
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Редактировать валюту</CardTitle>

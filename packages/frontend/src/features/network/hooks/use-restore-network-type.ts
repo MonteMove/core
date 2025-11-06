@@ -12,8 +12,5 @@ export const useRestoreNetworkType = () => {
       queryClient.invalidateQueries({ queryKey: ['network-types'] });
       toast.success(response.message || 'Тип сети успешно восстановлен');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при восстановлении типа сети');
-    },
   });
 };

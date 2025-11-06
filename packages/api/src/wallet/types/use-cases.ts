@@ -124,3 +124,15 @@ export interface GetWalletDailyOperationsOutput {
         totalChange: number;
     };
 }
+
+export interface GetWalletsAggregationOutput {
+    currencyGroups: {
+        currency: {
+            id: string;
+            code: string;
+            name: string;
+        };
+        totalAmount: number;
+        walletsCount: number;
+    }[];
+}

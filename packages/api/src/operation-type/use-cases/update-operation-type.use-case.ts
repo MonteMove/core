@@ -35,6 +35,9 @@ export class UpdateOperationTypeUseCase {
                 ...(updateOperationTypeDto.description !== undefined && {
                     description: updateOperationTypeDto.description,
                 }),
+                ...(updateOperationTypeDto.isSeparateTab !== undefined && {
+                    isSeparateTab: updateOperationTypeDto.isSeparateTab,
+                }),
             },
             select: {
                 id: true,
@@ -42,6 +45,7 @@ export class UpdateOperationTypeUseCase {
                 updatedById: true,
                 name: true,
                 description: true,
+                isSeparateTab: true,
                 createdAt: true,
                 updatedAt: true,
             },

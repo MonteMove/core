@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { cn, formatDate } from '@/shared/lib/utils';
+import { formatNumber } from '@/shared/lib/utils/format-number';
 import {
   Card,
   CardDescription,
@@ -164,13 +165,13 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
   const getBorderClass = (status: string) => {
     switch (status) {
       case 'positive':
-        return 'border-l-[6px] border-l-emerald-300';
+        return 'border-l-[6px] border-l-green-600';
       case 'negative':
-        return 'border-l-[6px] border-l-red-300';
+        return 'border-l-[6px] border-l-destructive/60';
       case 'neutral':
-        return 'border-l-[6px] border-l-slate-400';
+        return 'border-l-[6px] border-l-gray-700 dark:border-l-gray-600';
       default:
-        return 'border-l-[6px] border-l-transparent';
+        return '';
     }
   };
 
@@ -221,7 +222,7 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
               !wallet.active && 'opacity-40',
             )}
           >
-            <CardHeader className="py-0">
+            <CardHeader>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2 sm:max-w-[70%]">
                   <div className="flex flex-wrap items-center gap-2">
@@ -236,7 +237,7 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 </div>
                 <div className="text-left sm:text-right">
                   <p className="text-xl font-bold leading-tight sm:text-2xl">
-                    {wallet.amount.toLocaleString()} {wallet.currency.code}
+                    {formatNumber(wallet.amount)} {wallet.currency.code}
                   </p>
                   <div className="mt-2 space-y-1">
                     <p className="text-xs text-muted-foreground">
@@ -262,8 +263,8 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 className={cn(
                   'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
                   wallet.balanceStatus === 'unknown'
-                    ? 'border-slate-800 bg-white'
-                    : 'border-slate-300 bg-white',
+                    ? 'border-muted-foreground bg-background'
+                    : 'border-muted-foreground/30 bg-background',
                 )}
                 title="Без цвета"
               />
@@ -272,8 +273,8 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 className={cn(
                   'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
                   wallet.balanceStatus === 'negative'
-                    ? 'border-red-800 bg-red-500'
-                    : 'border-red-300 bg-red-500',
+                    ? 'border-destructive bg-destructive/60'
+                    : 'border-destructive/30 bg-destructive/60',
                 )}
                 title="Красный"
               />
@@ -282,8 +283,8 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 className={cn(
                   'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
                   wallet.balanceStatus === 'positive'
-                    ? 'border-emerald-800 bg-emerald-500'
-                    : 'border-emerald-300 bg-emerald-500',
+                    ? 'border-green-600 bg-green-600'
+                    : 'border-green-600/30 bg-green-600/60',
                 )}
                 title="Зеленый"
               />
@@ -292,10 +293,10 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 className={cn(
                   'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
                   wallet.balanceStatus === 'neutral'
-                    ? 'border-slate-800 bg-slate-500'
-                    : 'border-slate-300 bg-slate-500',
+                    ? 'border-gray-700 dark:border-gray-600 bg-gray-700 dark:bg-gray-600'
+                    : 'border-gray-700/30 dark:border-gray-600/30 bg-gray-700/60 dark:bg-gray-600/60',
                 )}
-                title="Серый"
+                title="Темно-серый"
               />
             </div>
           </div>
@@ -315,7 +316,7 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
             {wallet.pinOnMain ? 'Открепить с главной' : 'Закрепить на главной'}
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-destructive"
+            className="text-destructive/60"
             onSelect={handleDelete}
           >
             Удалить

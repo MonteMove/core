@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function CreateWalletTypePage() {
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Создать тип кошелька</CardTitle>

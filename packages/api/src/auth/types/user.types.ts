@@ -24,6 +24,7 @@ export interface UserPayload {
     id: string;
     username: string;
     roles: RoleCode[];
+    jti?: string;
 }
 
 export interface SessionInfo {

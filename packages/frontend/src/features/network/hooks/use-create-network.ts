@@ -13,8 +13,5 @@ export const useCreateNetwork = () => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
       toast.success(response.message || 'Сеть успешно создана');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при создании сети');
-    },
   });
 };

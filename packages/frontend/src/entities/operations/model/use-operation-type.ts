@@ -6,12 +6,14 @@ import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { OperationTypeService } from '@/entities/operations/api/operation-type-sevice';
+import { OperationType } from '@/entities/operations/model/operation-type-schemas';
 import { OPERATION_TYPES_QUERY_KEY } from '@/shared/utils/constants/operation-types-query-key';
 
 export const useOperationTypes = () => {
-  const queryResult = useQuery({
+  const queryResult = useQuery<OperationType[]>({
     queryKey: [OPERATION_TYPES_QUERY_KEY],
-    queryFn: () => OperationTypeService.getOperationTypes(),
+    queryFn: (): Promise<OperationType[]> =>
+      OperationTypeService.getOperationTypes(),
   });
 
   useEffect(() => {

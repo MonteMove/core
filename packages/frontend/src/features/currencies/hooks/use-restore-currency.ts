@@ -12,8 +12,5 @@ export const useRestoreCurrency = () => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success(response.message || 'Валюта успешно восстановлена');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при восстановлении валюты');
-    },
   });
 };

@@ -12,8 +12,5 @@ export const useDeleteNetwork = () => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
       toast.success(response.message || 'Сеть успешно удалена');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при удалении сети');
-    },
   });
 };

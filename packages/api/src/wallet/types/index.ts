@@ -8,6 +8,7 @@ export {
     GetWalletAnalyticsOutput,
     GetWalletByIdOutput,
     GetWalletDailyOperationsOutput,
+    GetWalletsAggregationOutput,
     GetWalletsOutput,
     OperationEntryWithDetails,
     UpdateWalletOutput,

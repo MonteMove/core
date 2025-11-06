@@ -19,7 +19,7 @@ export default function EditApplicationPage() {
 
   if (isLoading)
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Загрузка...</p>
         </div>
@@ -27,7 +27,7 @@ export default function EditApplicationPage() {
     );
   if (error)
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Ошибка загрузки заявки</CardTitle>
@@ -39,7 +39,7 @@ export default function EditApplicationPage() {
 
   if (!application)
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Заявка не найдена</p>
         </div>
@@ -47,7 +47,7 @@ export default function EditApplicationPage() {
     );
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Редактировать заявку</CardTitle>

@@ -7,8 +7,6 @@ export const env = {
   JWT_SECRET: process.env.JWT_SECRET ?? '',
 };
 
-export type EnvConfig = typeof env;
-
 export const isDevelopment = env.NODE_ENV === 'development';
 export const isProduction = env.NODE_ENV === 'production';
 export const isTest = env.NODE_ENV === 'test';

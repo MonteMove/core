@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus } from 'lucide-react';
+import { Plus, Wallet as WalletIcon } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import {
@@ -20,17 +20,27 @@ import {
   useWallets,
 } from '@/entities/wallet';
 import { useWalletTypes } from '@/entities/wallet-type';
-import { Button } from '@/shared/ui/shadcn/button';
 import {
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
-import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs';
-import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  Input,
+  ROUTER_MAP,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared';
 
-import { WalletsFilters } from '../../../features/wallets/ui/wallet-filters/wallets-filters';
+import { WalletsFiltersSheet } from '../../../features/wallets/ui/wallet-filters/wallets-filters-sheet';
+import { WalletsAggregationSwiper } from '../../../features/wallets/ui/wallets-aggregation-swiper/wallets-aggregation-swiper';
 
 const baseFilters: GetWalletsFilter = {
   search: '',
@@ -43,7 +53,7 @@ const baseFilters: GetWalletsFilter = {
   currencyId: undefined,
   userId: undefined,
   active: undefined,
-  pinned: false,
+  pinned: true,
   visible: true,
   deleted: false,
   sortField: WalletSortField.CREATED_AT,
@@ -57,7 +67,9 @@ export default function WalletsPage() {
   const searchParams = useSearchParams();
   const { data: walletTypesData } = useWalletTypes();
   const walletTypes = walletTypesData?.walletTypes ?? [];
-  const tabTypes = walletTypes.filter((type) => type.showInTabs);
+  const tabTypes = walletTypes
+    .filter((type) => type.showInTabs)
+    .sort((a, b) => a.tabOrder - b.tabOrder);
 
   const form = useForm<GetWalletsFilter>({
     resolver: zodResolver(GetWalletsFilterSchema),
@@ -183,22 +195,31 @@ export default function WalletsPage() {
       <Card>
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <CardTitle className="text-2xl">Список кошельков</CardTitle>
-          <Button asChild className="md:w-auto">
-            <Link
-              href={ROUTER_MAP.WALLETS_CREATE}
-              className="inline-flex items-center gap-2"
-            >
-              <Plus className="size-4" />
-              <span>Создать кошелек</span>
-            </Link>
-          </Button>
+          <div className="flex gap-2 items-center flex-wrap">
+            <Input
+              placeholder="Поиск по названию или описанию..."
+              value={formValues?.search ?? ''}
+              onChange={(e) =>
+                form.setValue('search', e.target.value || undefined)
+              }
+              className="w-full md:w-64"
+            />
+            <WalletsFiltersSheet form={form} baseFilters={baseFilters} />
+            <Button asChild className="md:w-auto">
+              <Link
+                href={ROUTER_MAP.WALLETS_CREATE}
+                className="inline-flex items-center gap-2"
+              >
+                <Plus className="size-4" />
+                <span>Создать кошелек</span>
+              </Link>
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
-          <WalletsFilters form={form} />
-        </CardContent>
       </Card>
 
-      {/* Табы */}
+      <WalletsAggregationSwiper filters={filteredValues} />
+
       <Tabs
         value={
           formValues?.deleted
@@ -217,13 +238,18 @@ export default function WalletsPage() {
               pinned: false,
             });
           } else if (val === 'deleted') {
-            form.reset({ ...baseFilters, deleted: true });
+            form.reset({ ...baseFilters, deleted: true, pinned: false });
           } else if (val === 'hidden') {
-            form.reset({ ...baseFilters, visible: false });
+            form.reset({ ...baseFilters, visible: false, pinned: false });
           } else if (val === 'pinned') {
             form.reset({ ...baseFilters, pinned: true });
           } else {
-            form.reset({ ...baseFilters, walletTypeId: val });
+            form.reset({
+              ...baseFilters,
+              walletTypeId: val,
+              pinned: false,
+              walletTypeIdIsNull: false,
+            });
           }
         }}
       >
@@ -260,9 +286,20 @@ export default function WalletsPage() {
           </div>
         )}
         {!isLoading && data?.wallets.length === 0 && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Нет кошельков</p>
-          </div>
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <WalletIcon />
+              </EmptyMedia>
+              <EmptyContent>
+                <EmptyTitle>Нет кошельков</EmptyTitle>
+                <EmptyDescription>
+                  Кошельки не найдены. Создайте новый кошелек или измените
+                  фильтры.
+                </EmptyDescription>
+              </EmptyContent>
+            </EmptyHeader>
+          </Empty>
         )}
         {!isLoading && data?.wallets.map(renderWalletCard)}
       </div>

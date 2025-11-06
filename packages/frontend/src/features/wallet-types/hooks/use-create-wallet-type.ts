@@ -14,8 +14,5 @@ export const useCreateWalletType = () => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
       toast.success(response.message || 'Тип кошелька успешно создан');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при создании типа кошелька');
-    },
   });
 };

@@ -1,9 +1,10 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { toast } from 'sonner';
 
 import { AuthService } from '@/entities/auth/api/auth-service';
 import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
 import { env } from '@/shared/lib/env-config';
-import { AUTH_TOKEN_KEY } from '@/shared/utils/constants/storage-keys';
+import { getErrorMessage } from '@/shared/lib/utils/get-error-message';
 
 export const BASE_URL = env.NEXT_PUBLIC_BASE_URL;
 
@@ -28,7 +29,7 @@ axiosInstance.interceptors.request.use((config) => {
   const token =
     useAuthStore.getState().token ||
     (typeof window !== 'undefined'
-      ? localStorage.getItem(AUTH_TOKEN_KEY)
+      ? localStorage.getItem(env.NEXT_PUBLIC_AUTH_TOKEN_KEY)
       : null);
 
   if (token) {
@@ -47,6 +48,11 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
+
+    if (error.response?.status !== 401) {
+      const errorMessage = getErrorMessage(error);
+      toast.error(errorMessage);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -74,7 +80,7 @@ axiosInstance.interceptors.response.use(
         const currentToken =
           stateToken ||
           (typeof window !== 'undefined'
-            ? localStorage.getItem(AUTH_TOKEN_KEY)
+            ? localStorage.getItem(env.NEXT_PUBLIC_AUTH_TOKEN_KEY)
             : null);
 
         const data = await AuthService.refreshTokenRaw(

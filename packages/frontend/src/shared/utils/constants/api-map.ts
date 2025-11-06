@@ -35,9 +35,11 @@ export const API_MAP = {
   },
   OPERATION_TYPES: {
     OPERATION_TYPES: '/operation-types',
+    OPERATION_TYPE_BY_ID: (id: string) => `/operation-types/${id}`,
   },
   SESSIONS: {
     SESSIONS: '/sessions',
+    MY_SESSIONS: '/sessions/my',
     SESSION_BY_ID: (id: string) => `/sessions/${id}`,
     DEACTIVATE_MY_SESSIONS: '/sessions/deactivate-my',
     DEACTIVATE_MY_SESSION_BY_ID: (id: string) =>
@@ -53,6 +55,7 @@ export const API_MAP = {
   },
   WALLETS: {
     WALLETS: '/wallets',
+    ANALYTICS: '/wallets/analytics',
     PINNED: '/wallets/pinned',
     WALLET_BY_ID: (id: string) => `/wallets/${id}`,
     WALLET_BALANCE: (id: string) => `/wallets/${id}/balance`,
@@ -61,7 +64,7 @@ export const API_MAP = {
       `/wallets/${walletId}/transactions/${transactionId}`,
   },
 
-  HELP: {
-    HELP: '/help',
+  FEEDBACK: {
+    FEEDBACK: '/feedback',
   },
 };

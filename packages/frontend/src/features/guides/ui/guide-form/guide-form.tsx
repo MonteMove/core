@@ -18,13 +18,14 @@ import {
   useUpdateGuide,
 } from '@/features/guides/hooks/use-guide';
 import {
+  cn,
   findPhoneRule,
   formatByRule,
   formatCardNumber,
   formatDate,
   normalizeDigits,
 } from '@/shared/lib/utils';
-import { cn } from '@/shared/lib/utils';
+import { RequiredLabel } from '@/shared';
 
 import { Button } from '../../../../shared/ui/shadcn/button';
 import { Calendar } from '../../../../shared/ui/shadcn/calendar';
@@ -78,10 +79,7 @@ export function GuideForm({
   };
 
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(
-    initialData?.birthDate ? new Date(initialData.birthDate) : undefined,
-  );
-  const [month, setMonth] = React.useState<Date | undefined>(date);
+  const [rawInput, setRawInput] = React.useState('');
 
   useEffect(() => {
     if (initialData) {
@@ -95,8 +93,7 @@ export function GuideForm({
       });
       if (initialData.birthDate) {
         const initialDate = new Date(initialData.birthDate);
-        setDate(initialDate);
-        setMonth(initialDate);
+        setRawInput(formatDate(initialDate));
       }
     }
   }, [initialData, form]);
@@ -116,7 +113,7 @@ export function GuideForm({
                 name="fullName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>ФИО</FormLabel>
+                    <RequiredLabel required>ФИО</RequiredLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -132,54 +129,71 @@ export function GuideForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Дата рождения</FormLabel>
-                    <div className="flex flex-col gap-3">
-                      <div className="relative flex gap-2">
-                        <FormControl>
-                          <Input
-                            value={date ? formatDate(date) : ''}
-                            placeholder="Выберите дату"
-                            className={cn('bg-background pr-10')}
-                            readOnly
-                          />
-                        </FormControl>
-                        <Popover open={open} onOpenChange={setOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
-                            >
-                              <CalendarIcon className="size-3.5" />
-                              <span className="sr-only">Выбрать дату</span>
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto overflow-hidden p-0"
-                            align="end"
-                            alignOffset={-8}
-                            sideOffset={10}
+                    <div className="relative flex gap-2">
+                      <FormControl>
+                        <Input
+                          value={rawInput}
+                          placeholder="дд.мм.гггг"
+                          className="bg-background pr-10"
+                          onChange={(e) => {
+                            let raw = e.target.value.replace(/\D/g, '');
+                            if (raw.length > 8) raw = raw.slice(0, 8);
+
+                            let formatted = raw;
+                            if (raw.length > 4)
+                              formatted = `${raw.slice(0, 2)}.${raw.slice(2, 4)}.${raw.slice(4)}`;
+                            else if (raw.length > 2)
+                              formatted = `${raw.slice(0, 2)}.${raw.slice(2)}`;
+
+                            setRawInput(formatted);
+
+                            const parts = formatted.split('.');
+                            if (parts.length === 3) {
+                              const [dd, mm, yyyy] = parts.map(Number);
+                              const parsed = new Date(yyyy, mm - 1, dd);
+                              if (!isNaN(parsed.getTime())) {
+                                field.onChange(parsed.toISOString());
+                                return;
+                              }
+                            }
+
+                            field.onChange(formatted);
+                          }}
+                        />
+                      </FormControl>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
                           >
-                            <Calendar
-                              mode="single"
-                              selected={date}
-                              captionLayout="dropdown"
-                              locale={ru}
-                              month={month}
-                              onMonthChange={setMonth}
-                              onSelect={(newDate) => {
-                                setDate(newDate ?? undefined);
-                                setMonth(newDate ?? undefined);
-                                setOpen(false);
-                                field.onChange(
-                                  newDate ? newDate.toISOString() : '',
-                                );
-                              }}
-                              fromYear={1900}
-                              toYear={new Date().getFullYear()}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
+                            <CalendarIcon className="size-3.5" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-auto overflow-hidden p-0"
+                          align="end"
+                        >
+                          <Calendar
+                            mode="single"
+                            selected={
+                              field.value ? new Date(field.value) : undefined
+                            }
+                            onSelect={(date) => {
+                              if (date) {
+                                field.onChange(date.toISOString());
+                                setRawInput(formatDate(date));
+                              }
+                              setOpen(false);
+                            }}
+                            captionLayout="dropdown"
+                            locale={ru}
+                            fromYear={1900}
+                            toYear={new Date().getFullYear()}
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <FormMessage />
                   </FormItem>

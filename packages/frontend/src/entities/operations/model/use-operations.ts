@@ -12,7 +12,12 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { GetWalletsResponseDtoSchema } from '@/entities/wallet';
+import {
+  GetWalletsResponseDto,
+  WalletSortField,
+  SortOrder,
+  WalletService,
+} from '@/entities/wallet';
 import { ROUTER_MAP } from '@/shared';
 import {
   FILTERED_OPERATIONS_QUERY_KEY,
@@ -48,12 +53,14 @@ export const useCreateOperation = () => {
 };
 
 export const useWallets = () => {
-  return useQuery({
-    queryKey: ['wallets'],
-    queryFn: async () => {
-      const res = await fetch('/api/wallets');
-      const json = await res.json();
-      return GetWalletsResponseDtoSchema.parse(json);
+  return useQuery<GetWalletsResponseDto>({
+    queryKey: ['wallets', 'all'],
+    queryFn: () => {
+      console.log('🔍 Fetching wallets...');
+      return WalletService.getWallets({
+        page: 1,
+        limit: 100,
+      });
     },
   });
 };

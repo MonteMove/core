@@ -12,6 +12,8 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { formatDateTime } from '@/shared/lib/utils';
+
 import { GuideService } from '@/entities/guides/api/guide-service';
 import {
   type CreateGuideRequest,
@@ -40,9 +42,6 @@ export const useCreateGuide = () => {
       router.push(ROUTER_MAP.GUIDES);
       toast.success('Справочник успешно создан');
     },
-    onError: () => {
-      toast.error('Произошла неизвестная ошибка. Попробуйте снова.');
-    },
   });
 };
 
@@ -55,7 +54,6 @@ export const useUpdateGuide = () => {
       router.push(ROUTER_MAP.GUIDES);
       toast.success('Справочник обновлён');
     },
-    onError: () => toast.error('Ошибка при обновлении'),
   });
 };
 
@@ -149,10 +147,6 @@ export const useDeleteGuide = (filters?: GetGuidesParamsRequest) => {
         queryKey: GUIDES_WITH_FILTERS_KEY(filters) as readonly unknown[],
       });
     },
-
-    onError: () => {
-      toast.error('Ошибка при удалении');
-    },
   });
 };
 
@@ -160,11 +154,12 @@ export function useCopyGuide() {
   const copyGuide = useCallback(async (guide: GuideResponse) => {
     const text = `
 ФИО: ${guide.fullName || 'Не указано'}
-Дата рождения: ${guide.birthDate || 'Не указано'}
 Телефон: ${guide.phone || 'Не указано'}
+Дата рождения: ${guide.birthDate || 'Не указано'}
 Номер карты: ${guide.cardNumber || 'Не указано'}
 Адрес: ${guide.address || 'Не указано'}
-Создан: ${new Date(guide.createdAt).toLocaleString()}
+Описание: ${guide.description || 'Не указано'}
+Создан: ${formatDateTime(guide.createdAt)}
 `;
 
     try {

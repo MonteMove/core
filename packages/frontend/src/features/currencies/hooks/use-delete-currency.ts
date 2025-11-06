@@ -12,8 +12,5 @@ export const useDeleteCurrency = () => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success(response.message || 'Валюта успешно удалена');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при удалении валюты');
-    },
   });
 };

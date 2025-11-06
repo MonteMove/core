@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { Plus, RotateCcw, Trash2 } from 'lucide-react';
+import { Layers, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
 
 import { useNetworkTypesList } from '@/entities/network/model/use-network-types-list';
 import { useDeleteNetworkType } from '@/features/network/hooks/use-delete-network-type';
@@ -19,24 +19,28 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/ui/shadcn/alert-dialog';
-import { Button } from '@/shared/ui/shadcn/button';
-import {
+  Button,
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
-import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  ROUTER_MAP,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/ui/shadcn/table';
-import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs';
-import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from '@/shared';
 
 export default function NetworkTypesPage() {
   const router = useRouter();
@@ -78,38 +82,48 @@ export default function NetworkTypesPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="space-y-6">
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-2xl">Типы сетей</CardTitle>
           <Button asChild>
             <Link href={ROUTER_MAP.NETWORK_TYPES_CREATE}>
               <Plus className="w-4 h-4 mr-2" />
-              Создать тип сети
+              Создать тип
             </Link>
           </Button>
         </CardHeader>
-
-        <Tabs value={tab} onValueChange={handleTabChange} className="px-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="all">Все</TabsTrigger>
-            <TabsTrigger value="deleted">Удалённые</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <CardContent>
+        <CardContent className="space-y-4">
+          <Tabs value={tab} onValueChange={handleTabChange}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="all">Все</TabsTrigger>
+              <TabsTrigger value="deleted">Удалённые</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">
               Загрузка...
             </div>
           ) : data?.networkTypes.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">
-                {tab === 'deleted'
-                  ? 'Нет удалённых типов сетей'
-                  : 'Типы сетей ещё не созданы'}
-              </p>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Layers />
+                </EmptyMedia>
+                <EmptyContent>
+                  <EmptyTitle>
+                    {tab === 'deleted'
+                      ? 'Нет удалённых типов сетей'
+                      : 'Типы сетей ещё не созданы'}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {tab === 'deleted'
+                      ? 'Все удалённые типы сетей будут отображаться здесь.'
+                      : 'Создайте первый тип сети для использования в системе.'}
+                  </EmptyDescription>
+                </EmptyContent>
+              </EmptyHeader>
+            </Empty>
           ) : (
             <Table>
               <TableHeader>
@@ -121,29 +135,60 @@ export default function NetworkTypesPage() {
               </TableHeader>
               <TableBody>
                 {data?.networkTypes.map((networkType) => (
-                  <TableRow key={networkType.id}>
+                  <TableRow
+                    key={networkType.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() =>
+                      !showDeleted &&
+                      router.push(
+                        `${ROUTER_MAP.NETWORK_TYPES_EDIT}/${networkType.id}`,
+                      )
+                    }
+                  >
                     <TableCell className="font-medium">
                       {networkType.code}
                     </TableCell>
                     <TableCell>{networkType.name}</TableCell>
                     <TableCell className="text-right">
-                      {networkType.deleted ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRestore(networkType.id)}
-                        >
-                          <RotateCcw className="w-4 h-4" />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteClick(networkType.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      )}
+                      <div className="flex justify-end gap-2">
+                        {showDeleted ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRestore(networkType.id);
+                            }}
+                          >
+                            <RotateCcw className="w-4 h-4" />
+                          </Button>
+                        ) : (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `${ROUTER_MAP.NETWORK_TYPES_EDIT}/${networkType.id}`,
+                                );
+                              }}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(networkType.id);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -158,7 +203,8 @@ export default function NetworkTypesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить тип сети?</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие нельзя отменить. Тип сети будет удалён из системы.
+              Тип сети будет перемещен в удаленные. Вы сможете восстановить его
+              позже из вкладки "Удалённые".
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -37,10 +37,29 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException('Аккаунт удален');
         }
 
+        if (payload.jti) {
+            const session = await this._prisma.session.findUnique({
+                where: { jti: payload.jti },
+            });
+
+            if (!session) {
+                throw new UnauthorizedException('Сессия не найдена');
+            }
+
+            if (session.revoked) {
+                throw new UnauthorizedException('Сессия деактивирована');
+            }
+
+            if (session.expiresAt < new Date()) {
+                throw new UnauthorizedException('Сессия истекла');
+            }
+        }
+
         return {
             id: user.id,
             username: user.username,
             roles: user.roles.map((role) => role.code),
+            jti: payload.jti,
         };
     }
 }

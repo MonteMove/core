@@ -7,7 +7,7 @@ import { FileText, Upload, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { CreateHelp, CreateHelpSchema } from '@/entities/help';
-import { useCreateHelp } from '@/features/help';
+import { useCreateHelp } from '@/features/feedback';
 import {
   Form,
   FormControl,
@@ -28,7 +28,7 @@ import {
   CardTitle,
 } from '@/shared';
 
-export function HelpForm() {
+export function FeedbackForm() {
   const [files, setFiles] = useState<File[]>([]);
   const { mutate: createHelp, isPending } = useCreateHelp();
 
@@ -68,7 +68,7 @@ export function HelpForm() {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Форма обратной связи</CardTitle>
         <CardDescription>

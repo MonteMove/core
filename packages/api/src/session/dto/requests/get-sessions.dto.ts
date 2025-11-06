@@ -77,4 +77,12 @@ export class GetSessionsDto {
     @IsOptional()
     @IsString({ message: 'IP адрес должен быть строкой' })
     public ip?: string;
+
+    @ApiPropertyOptional({
+        description: 'JTI текущей сессии для определения isCurrent',
+        example: 'jti-uuid',
+    })
+    @IsOptional()
+    @IsString()
+    public currentJti?: string;
 }

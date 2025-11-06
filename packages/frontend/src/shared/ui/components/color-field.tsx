@@ -11,6 +11,29 @@ type ColorFieldProps = {
   onChange: (value: string) => void;
 };
 
+function oklchToHex(oklch: string): string {
+  try {
+    const temp = document.createElement('div');
+    temp.style.color = oklch;
+    document.body.appendChild(temp);
+    const computed = window.getComputedStyle(temp).color;
+    document.body.removeChild(temp);
+
+    const match = computed.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (match) {
+      const r = parseInt(match[1]);
+      const g = parseInt(match[2]);
+      const b = parseInt(match[3]);
+      return (
+        '#' + [r, g, b].map((x) => x.toString(16).padStart(2, '0')).join('')
+      );
+    }
+  } catch (e) {
+    console.error('Error converting OKLCH to HEX:', e);
+  }
+  return '#000000';
+}
+
 export function ColorField({ label, value, onChange }: ColorFieldProps) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -28,6 +51,13 @@ export function ColorField({ label, value, onChange }: ColorFieldProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handlePickerChange = (hexColor: string) => {
+    onChange(hexColor);
+  };
+
+  const isHexColor = value.startsWith('#');
+  const displayColor = isHexColor ? value : oklchToHex(value);
+
   return (
     <div
       ref={wrapperRef}
@@ -35,10 +65,10 @@ export function ColorField({ label, value, onChange }: ColorFieldProps) {
       onClick={() => setOpen((prev) => !prev)}
     >
       <span className="select-none text-sm">{label}</span>
-
       <div
         className="w-5 h-5 border rounded-sm"
         style={{ backgroundColor: value }}
+        title="Открыть палитру цветов"
       ></div>
 
       {open && (
@@ -48,8 +78,8 @@ export function ColorField({ label, value, onChange }: ColorFieldProps) {
         >
           <HexColorPicker
             className="border-4 border-primary rounded-[12]"
-            color={value}
-            onChange={onChange}
+            color={displayColor}
+            onChange={handlePickerChange}
           />
         </div>
       )}

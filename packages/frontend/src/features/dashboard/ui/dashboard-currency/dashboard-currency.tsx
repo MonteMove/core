@@ -11,6 +11,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import type { WalletCurrencyGroup } from '@/entities/wallet';
 import { Card, CardContent } from '@/shared';
 import { Skeleton } from '@/shared';
+import { formatNumber } from '@/shared/lib/utils/format-number';
 
 interface DashboardCurrencyProps {
   isLoading: boolean;
@@ -128,7 +129,7 @@ export function DashboardCurrency({
                 <Card className="w-full h-fit p-0">
                   <CardContent className="flex flex-col p-4 gap-1">
                     <p className="text-2xl font-semibold">
-                      {summary.totalAmount.toLocaleString()}
+                      {formatNumber(summary.totalAmount)}
                     </p>
                     <p className="text-sm font-medium text-muted-foreground uppercase">
                       {summary.currencyCode}

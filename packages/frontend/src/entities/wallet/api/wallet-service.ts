@@ -35,6 +35,32 @@ export class WalletService {
     return GetWalletsResponseSchema.parse(data);
   }
 
+  public static async getWalletsAggregation(params: GetWalletsFilter): Promise<{
+    currencyGroups: {
+      currency: {
+        id: string;
+        code: string;
+        name: string;
+      };
+      totalAmount: number;
+      walletsCount: number;
+    }[];
+  }> {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        queryParams.append(key, String(value));
+      }
+    });
+
+    const response = await axiosInstance.get(
+      `${API_MAP.WALLETS.WALLETS}/aggregation?${queryParams.toString()}`,
+    );
+
+    return response.data;
+  }
+
   public static async createWallet(
     payload: CreateWalletRequest,
   ): Promise<Wallet> {

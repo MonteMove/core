@@ -42,6 +42,39 @@ export class SessionResponseDto {
     public ip: string | null;
 
     @ApiProperty({
+        description: 'Устройство',
+        example: 'Desktop',
+        nullable: true,
+    })
+    public device: string | null;
+
+    @ApiProperty({
+        description: 'Браузер',
+        example: 'Chrome',
+        nullable: true,
+    })
+    public browser: string | null;
+
+    @ApiProperty({
+        description: 'Операционная система',
+        example: 'macOS',
+        nullable: true,
+    })
+    public os: string | null;
+
+    @ApiProperty({
+        description: 'Дата последней активности',
+        example: '2024-01-01T12:00:00.000Z',
+    })
+    public lastActivityAt: Date;
+
+    @ApiProperty({
+        description: 'Является ли сессия текущей',
+        example: true,
+    })
+    public isCurrent: boolean;
+
+    @ApiProperty({
         description: 'Дата создания',
         example: '2024-01-01T00:00:00.000Z',
     })

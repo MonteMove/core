@@ -60,6 +60,7 @@ export const GetUsersParamsSchema = z.object({
   blocked: z.boolean().optional(),
   telegramNotifications: z.boolean().optional(),
   telegramId: z.string().optional(),
+  deleted: z.boolean().optional(),
   sortField: z
     .enum(['username', 'createdAt', 'updatedAt', 'lastLogin'])
     .optional(),

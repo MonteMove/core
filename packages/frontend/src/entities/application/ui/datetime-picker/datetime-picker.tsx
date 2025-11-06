@@ -35,14 +35,14 @@ function formatDate(date: Date | undefined, locale: Locale = ru) {
   if (!date) {
     return '';
   }
-  return format(date, 'dd MMMM yyyy', { locale });
+  return format(date, 'dd.MM.yyyy', { locale });
 }
 
 function formatTime(date: Date | undefined) {
   if (!date) {
-    return '00:00:00';
+    return '00:00';
   }
-  return format(date, 'HH:mm:ss');
+  return format(date, 'HH:mm');
 }
 
 function isValidDate(date: Date | undefined) {
@@ -68,10 +68,10 @@ export function DateTimePicker({
 
   React.useEffect(() => {
     if (date) {
-      const [hours, minutes, seconds] = timeValue.split(':').map(Number);
-      let newDate = setHours(date, hours);
-      newDate = setMinutes(newDate, minutes);
-      newDate = setSeconds(newDate, seconds || 0);
+      const [hours, minutes] = timeValue.split(':').map(Number);
+      let newDate = setHours(date, hours || 0);
+      newDate = setMinutes(newDate, minutes || 0);
+      newDate = setSeconds(newDate, 0);
       onChange(newDate.toISOString());
     }
   }, [date, timeValue, onChange]);
@@ -97,7 +97,14 @@ export function DateTimePicker({
   };
 
   const handleTimeInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+    let input = e.target.value.replace(/[^\d]/g, '');
+
+    if (input.length >= 2) {
+      const hours = input.slice(0, 2);
+      const minutes = input.slice(2, 4);
+      input = minutes ? `${hours}:${minutes}` : hours;
+    }
+
     setTimeValue(input);
   };
 
@@ -124,7 +131,7 @@ export function DateTimePicker({
             <Input
               id="date"
               value={dateValue}
-              placeholder="Введите дату"
+              placeholder="дд.мм.гггг"
               className="bg-background pr-10"
               onChange={handleDateInputChange}
               onKeyDown={(e) => {
@@ -167,11 +174,42 @@ export function DateTimePicker({
 
         <div className="w-32">
           <Input
-            type="time"
-            step="1"
+            type="text"
             value={timeValue}
             onChange={handleTimeInputChange}
+            placeholder="00:00"
             className="w-full"
+            maxLength={5}
+            inputMode="numeric"
+            onKeyDown={(e) => {
+              const allowedKeys = [
+                'Backspace',
+                'Delete',
+                'ArrowLeft',
+                'ArrowRight',
+                'Tab',
+              ];
+              if (allowedKeys.includes(e.key)) return;
+              if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            onBlur={(e) => {
+              const value = e.target.value.replace(/[^\d]/g, '');
+              if (value.length >= 1) {
+                const hours = Math.min(
+                  23,
+                  parseInt(value.slice(0, 2), 10) || 0,
+                );
+                const minutes = Math.min(
+                  59,
+                  parseInt(value.slice(2, 4), 10) || 0,
+                );
+                setTimeValue(
+                  `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
+                );
+              }
+            }}
           />
         </div>
       </div>

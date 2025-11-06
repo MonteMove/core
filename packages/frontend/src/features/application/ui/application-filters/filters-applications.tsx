@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Search, X } from 'lucide-react';
-import { useForm, useWatch } from 'react-hook-form';
+import { FilterIcon } from 'lucide-react';
 import { z } from 'zod';
 
 import {
@@ -12,211 +10,163 @@ import {
   useSetApplicationQueryParam,
 } from '@/entities/application';
 import {
+  Badge,
   Button,
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
 } from '@/shared';
-import { cn } from '@/shared/lib/utils';
 
-const sortByOptions = [
-  { value: 'createdAt', label: 'Дате создания' },
-  { value: 'meetingDate', label: 'Дате встречи' },
-];
+type ApplicationsFiltersState = z.infer<typeof getApplicationsFiltersSchema>;
 
-const sortOrderOptions = [
+const SORT_ORDERS: {
+  value: ApplicationsFiltersState['sortOrder'];
+  label: string;
+}[] = [
   { value: 'desc', label: 'Сначала новые' },
   { value: 'asc', label: 'Сначала старые' },
 ];
 
-const statusApplications = [
-  { value: 'all', label: 'Все' },
+const STATUS_OPTIONS: {
+  value: NonNullable<ApplicationsFiltersState['status']>;
+  label: string;
+}[] = [
   { value: 'open', label: 'В работе' },
   { value: 'done', label: 'Завершена' },
 ];
 
-export function ApplicationsFilters({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
+export function ApplicationsFilters() {
   const { setAllQueryParams } = useSetApplicationQueryParam();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-  const form = useForm<z.input<typeof getApplicationsFiltersSchema>>({
-    resolver: zodResolver(getApplicationsFiltersSchema),
-    defaultValues: {
-      search: '',
-      status: 'all',
-      sortField: 'createdAt',
-      sortOrder: 'desc',
+  const defaults = useMemo<ApplicationsFiltersState>(
+    () => ({
       page: 1,
       limit: 10,
-    },
-  });
+    }),
+    [],
+  );
+  const [localFilters, setLocalFilters] =
+    useState<ApplicationsFiltersState>(defaults);
 
-  const search = useWatch({ control: form.control, name: 'search' });
-  const status = useWatch({ control: form.control, name: 'status' });
-  const sortField = useWatch({ control: form.control, name: 'sortField' });
-  const sortOrder = useWatch({ control: form.control, name: 'sortOrder' });
-
-  useEffect(() => {
-    const currentValues = {
-      search: search || undefined,
-      status: status === 'all' ? undefined : status,
-      sortField: sortField || undefined,
-      sortOrder: sortOrder || undefined,
-      page: 1,
-      limit: 10,
-    };
-
-    setAllQueryParams(currentValues);
-  }, [search, status, sortField, sortOrder, setAllQueryParams]);
-
-  const handleReset = () => {
-    form.reset({
-      search: '',
-      status: 'all',
-      sortField: 'createdAt',
-      sortOrder: 'desc',
-      page: 1,
-      limit: 10,
-    });
-    setAllQueryParams({
-      search: undefined,
-      status: 'all',
-      sortField: undefined,
-      sortOrder: undefined,
-      page: 1,
-      limit: 10,
-    });
+  const handleApplyFilters = () => {
+    setAllQueryParams(localFilters);
+    setSheetOpen(false);
   };
 
+  const resetFilters = () => {
+    const resetState = { page: 1, limit: 10 };
+    setLocalFilters(resetState);
+    setAllQueryParams(resetState);
+    setSheetOpen(false);
+  };
+
+  useEffect(() => {
+    setLocalFilters(defaults);
+  }, [defaults]);
+
+  const activeFiltersCount = [
+    localFilters.status,
+    localFilters.sortField,
+    localFilters.sortOrder,
+  ].filter(Boolean).length;
+
   return (
-    <div className={cn('flex flex-col gap-2', className)} {...props}>
-      <Form {...form}>
-        <form>
-          <div className="lg:flex justify-center max-xl:flex-wrap md:items-end lg:gap-4">
-            <FormField
-              control={form.control}
-              name="search"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Поиск:</FormLabel>
-                  <FormControl>
-                    <div className="relative w-full">
-                      <Input
-                        type="search"
-                        placeholder="Введите данные"
-                        {...field}
-                        className="pl-8 pr-8 w-full [appearance:textfield] [&::-webkit-search-cancel-button]:appearance-none"
-                      />
-                      <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                      {field.value && (
-                        <button
-                          type="button"
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800"
-                          onClick={() => form.setValue('search', '')}
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="lg:mt-0 mt-2">Статус:</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="lg:w-[160px] w-full">
-                        <SelectValue placeholder="По умолчанию" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {statusApplications.map((s) => (
-                        <SelectItem key={s.value} value={s.value}>
-                          {s.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="sortField"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="lg:mt-0 mt-2">
-                    Сортировать по:
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="lg:w-[150px] w-full">
-                        <SelectValue placeholder="Все" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {sortByOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="sortOrder"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="lg:mt-0 mt-2">Порядок:</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger className="lg:w-[170px] w-full">
-                        <SelectValue placeholder="По умолчанию" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {sortOrderOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-
-            <Button
-              className="lg:w-[200px] lg:mt-0 mt-2 w-full"
-              type="button"
-              onClick={handleReset}
+    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="sm" className="relative">
+          <FilterIcon className="h-4 w-4 mr-2" />
+          Фильтры
+          {activeFiltersCount > 0 && (
+            <Badge
+              variant="destructive"
+              className="ml-2 h-5 min-w-5 px-1 flex items-center justify-center"
             >
+              {activeFiltersCount}
+            </Badge>
+          )}
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Фильтры заявок</SheetTitle>
+          <SheetDescription>
+            Настройте параметры для фильтрации списка заявок
+          </SheetDescription>
+        </SheetHeader>
+        <div className="space-y-6 px-4">
+          <div className="space-y-2">
+            <Label>Статус</Label>
+            <Select
+              value={localFilters.status ?? ''}
+              onValueChange={(val) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  status: val
+                    ? (val as ApplicationsFiltersState['status'])
+                    : undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Все" />
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Порядок сортировки</Label>
+            <Select
+              value={localFilters.sortOrder ?? ''}
+              onValueChange={(val) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  sortOrder: val
+                    ? (val as ApplicationsFiltersState['sortOrder'])
+                    : undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Сначала новые" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_ORDERS.map((order) => (
+                  <SelectItem key={order.value!} value={order.value!}>
+                    {order.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex gap-3 pt-6">
+            <Button variant="outline" onClick={resetFilters} className="flex-1">
               Сбросить
             </Button>
+            <Button onClick={handleApplyFilters} className="flex-1">
+              Применить
+            </Button>
           </div>
-        </form>
-      </Form>
-    </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

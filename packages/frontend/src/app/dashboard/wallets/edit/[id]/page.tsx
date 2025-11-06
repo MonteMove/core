@@ -34,7 +34,7 @@ export default function EditWalletPage({ params }: EditWalletPageProps) {
 
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Загрузка...</p>
         </div>
@@ -44,7 +44,7 @@ export default function EditWalletPage({ params }: EditWalletPageProps) {
 
   if (error || !wallet) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center py-12">
           <p className="text-destructive mb-4">Ошибка загрузки кошелька</p>
           <button
@@ -59,7 +59,7 @@ export default function EditWalletPage({ params }: EditWalletPageProps) {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Редактировать кошелек</CardTitle>

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 
 export class CreateOperationTypeDto {
     @ApiProperty({
@@ -26,4 +26,12 @@ export class CreateOperationTypeDto {
     @IsString({ message: 'Описание должно быть строкой' })
     @MaxLength(500, { message: 'Описание не должно превышать 500 символов' })
     public description?: string;
+
+    @ApiProperty({
+        description: 'Отображать как отдельный таб на странице операций',
+        example: false,
+        default: false,
+    })
+    @IsBoolean({ message: 'isSeparateTab должно быть булевым значением' })
+    public isSeparateTab: boolean;
 }

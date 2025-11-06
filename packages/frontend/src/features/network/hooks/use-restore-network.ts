@@ -12,8 +12,5 @@ export const useRestoreNetwork = () => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
       toast.success(response.message || 'Сеть успешно восстановлена');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при восстановлении сети');
-    },
   });
 };

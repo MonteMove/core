@@ -33,7 +33,6 @@ export const CreateApplicationRequestSchema = z.object({
     .max(20, 'Телефон не должен превышать 20 символов')
     .optional(),
   meetingDate: z.string().datetime('Неверный формат даты'),
-  advance: z.boolean().optional(),
 });
 
 export type CreateApplicationRequest = z.infer<
@@ -148,7 +147,6 @@ export const UpdateApplicationSchema = z.object({
   telegramUsername: z.string().max(100).optional(),
   phone: z.string().max(20).optional(),
   meetingDate: z.string().datetime().optional(),
-  advance: z.boolean().optional(),
 });
 
 export type UpdateApplicationRequest = z.infer<typeof UpdateApplicationSchema>;

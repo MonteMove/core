@@ -3,10 +3,14 @@ model Session {
   userId           String   @map("user_id") @db.Uuid
   ip               String?
   userAgent        String?  @map("user_agent")
+  device           String?
+  browser          String?
+  os               String?
   jti              String
   refreshTokenHash String   @map("refresh_token_hash")
   revoked          Boolean  @default(false)
   expiresAt        DateTime @map("expires_at")
+  lastActivityAt   DateTime @default(now()) @map("last_activity_at")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 

@@ -4,7 +4,7 @@ import React, { Fragment, useMemo } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Copy, Pencil, Trash } from 'lucide-react';
+import { Copy, FileText, Pencil, Trash } from 'lucide-react';
 
 import {
   CardApplication,
@@ -14,15 +14,21 @@ import {
   useInfiniteApplications,
   useUpdateStatusApplication,
 } from '@/entities/application';
-import { Card } from '@/shared';
 import {
+  Card,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  ROUTER_MAP,
+  Skeleton,
 } from '@/shared';
-import { Skeleton } from '@/shared';
-import { ROUTER_MAP } from '@/shared';
 import { useLastItemObserver } from '@/shared/lib/hooks/use-last-Item-observer';
 
 export const InfiniteApplicationsList = () => {
@@ -60,9 +66,20 @@ export const InfiniteApplicationsList = () => {
           </Card>
         ))
       ) : applications.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Заявки не найдены</p>
-        </div>
+        <Empty>
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <FileText />
+            </EmptyMedia>
+            <EmptyContent>
+              <EmptyTitle>Заявки не найдены</EmptyTitle>
+              <EmptyDescription>
+                Нет заявок, соответствующих выбранным фильтрам. Создайте новую
+                заявку.
+              </EmptyDescription>
+            </EmptyContent>
+          </EmptyHeader>
+        </Empty>
       ) : (
         applications.map((app, index) => {
           const isLast = index === applications.length - 1;

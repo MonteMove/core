@@ -1,12 +1,14 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 
 import { ApplicationModule } from './application/application.module';
 import { AuthModule } from './auth/auth.module';
+import { SessionActivityMiddleware } from './auth/middleware/session-activity.middleware';
 import { BcryptHasher } from './common/services/bcrypt-hasher.service';
 import { PrismaService } from './common/services/prisma.service';
 import { CurrencyModule } from './currency/currency.module';
+import { FeedbackModule } from './feedback/feedback.module';
 import { GuideModule } from './guide/guide.module';
 import { NetworkModule } from './network/network.module';
 import { NetworkTypeModule } from './network-type/network-type.module';
@@ -34,6 +36,7 @@ import { WalletTypeModule } from './wallet-type/wallet-type.module';
         AuthModule,
         GuideModule,
         CurrencyModule,
+        FeedbackModule,
         ApplicationModule,
         UserModule,
         OperationModule,
@@ -47,4 +50,8 @@ import { WalletTypeModule } from './wallet-type/wallet-type.module';
     ],
     providers: [PrismaService, BcryptHasher, AdminInitService],
 })
-export class MainModule {}
+export class MainModule implements NestModule {
+    public configure(consumer: MiddlewareConsumer): void {
+        consumer.apply(SessionActivityMiddleware).forRoutes('*');
+    }
+}

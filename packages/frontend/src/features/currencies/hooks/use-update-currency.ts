@@ -14,8 +14,5 @@ export const useUpdateCurrency = () => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success(response.message || 'Валюта успешно обновлена');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при обновлении валюты');
-    },
   });
 };

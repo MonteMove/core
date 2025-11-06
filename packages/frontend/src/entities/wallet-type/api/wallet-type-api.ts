@@ -14,8 +14,12 @@ import {
 } from '../model/wallet-type-schemas';
 
 export const walletTypeApi = {
-  getWalletTypes: async (): Promise<GetWalletTypesResponse> => {
-    const { data } = await axiosInstance.get('/wallet-types');
+  getWalletTypes: async (
+    deleted?: boolean,
+  ): Promise<GetWalletTypesResponse> => {
+    const { data } = await axiosInstance.get('/wallet-types', {
+      params: { deleted },
+    });
     return GetWalletTypesResponseSchema.parse(data);
   },
 

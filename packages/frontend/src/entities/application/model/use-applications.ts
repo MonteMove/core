@@ -12,6 +12,8 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { formatDateTime } from '@/shared/lib/utils';
+
 import { ApplicationService } from '@/entities/application/api/application-service';
 import {
   ApplicationResponse,
@@ -152,9 +154,9 @@ id заявки: ${application.id}
 Сумма: ${application.amount}
 Валюта: ${application.currency.code}
 Тип операции: ${application.operation_type.name}
-Создана: ${new Date(application.createdAt).toLocaleString()}
+Создана: ${formatDateTime(application.createdAt)}
 Исполнитель: ${application.assignee_user.username}
-Дата встречи: ${new Date(application.meetingDate).toLocaleString()}
+Дата встречи: ${formatDateTime(application.meetingDate)}
 Телефон: ${application.phone || 'Не указано'}
 Telegram: ${application.telegramUsername || 'Не указано'}
 Описание: ${application.description || 'Не указано'}

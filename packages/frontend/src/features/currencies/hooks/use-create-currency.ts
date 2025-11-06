@@ -14,8 +14,5 @@ export const useCreateCurrency = () => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success(response.message || 'Валюта успешно создана');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при создании валюты');
-    },
   });
 };

@@ -9,6 +9,7 @@ import {
 } from '@/entities/auth/model/auth-schemas';
 import { useLogin } from '@/features/auth/hooks/use-login';
 import { cn } from '@/shared/lib/utils';
+import { RequiredLabel } from '@/shared';
 import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
@@ -59,9 +60,7 @@ export function LoginForm({
             name="username"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Имя пользователя <span className="text-destructive">*</span>
-                </FormLabel>
+                <RequiredLabel required>Имя пользователя</RequiredLabel>
                 <FormControl>
                   <Input
                     type="username"
@@ -82,9 +81,7 @@ export function LoginForm({
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  Пароль <span className="text-destructive">*</span>
-                </FormLabel>
+                <RequiredLabel required>Пароль</RequiredLabel>
                 <FormControl>
                   <Input
                     type="password"

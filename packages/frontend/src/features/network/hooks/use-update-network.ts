@@ -14,8 +14,5 @@ export const useUpdateNetwork = () => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
       toast.success(response.message || 'Сеть успешно обновлена');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при обновлении сети');
-    },
   });
 };

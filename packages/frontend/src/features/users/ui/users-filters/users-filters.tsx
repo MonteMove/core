@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { FilterIcon } from 'lucide-react';
 import { z } from 'zod';
 
 import { GetUsersParamsSchema } from '@/entities/users';
 import {
+  Badge,
   Button,
   Input,
   Label,
@@ -14,6 +16,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
   Switch,
 } from '@/shared';
 
@@ -45,6 +53,7 @@ const USER_ROLES: {
 
 export const UsersFilters = () => {
   const { setAllQueryParams } = useSetQueryParam();
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const defaults = useMemo<UsersFiltersState>(
     () => ({
@@ -53,192 +62,150 @@ export const UsersFilters = () => {
     }),
     [],
   );
-  const [filters, setFilters] = useState<UsersFiltersState>(defaults);
+  const [localFilters, setLocalFilters] = useState<UsersFiltersState>(defaults);
 
-  useEffect(() => {
-    setAllQueryParams(filters);
-  }, [filters, setAllQueryParams]);
+  const handleApplyFilters = () => {
+    setAllQueryParams(localFilters);
+    setSheetOpen(false);
+  };
 
   const resetFilters = () => {
-    setFilters({ page: 1, limit: 100 });
-    setAllQueryParams({ page: 1, limit: 100 });
+    const resetState = { page: 1, limit: 100 };
+    setLocalFilters(resetState);
+    setAllQueryParams(resetState);
+    setSheetOpen(false);
   };
 
   useEffect(() => {
-    setFilters(defaults);
+    setLocalFilters(defaults);
   }, [defaults]);
 
+  const activeFiltersCount = [
+    localFilters.roleCode,
+    localFilters.isHolder,
+    localFilters.isCourier,
+    localFilters.blocked,
+    localFilters.telegramNotifications,
+  ].filter(Boolean).length;
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="flex flex-col gap-2">
-          <Label>Поиск</Label>
-          <Input
-            value={filters.search ?? ''}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                search: e.target.value || undefined,
-              }))
-            }
-            placeholder="Введите имя"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label>Telegram ID</Label>
-          <Input
-            value={filters.telegramId ?? ''}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                telegramId: e.target.value || undefined,
-              }))
-            }
-            placeholder="Введите Telegram ID"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label>Роли</Label>
-          <Select
-            value={filters.roleCode ?? ''}
-            onValueChange={(val) =>
-              setFilters((prev) => ({
-                ...prev,
-                roleCode: val
-                  ? (val as UsersFiltersState['roleCode'])
-                  : undefined,
-              }))
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Все" />
-            </SelectTrigger>
-            <SelectContent>
-              {USER_ROLES.map((r) => (
-                <SelectItem key={r.value} value={r.value}>
-                  {r.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="flex flex-col gap-2">
-          <Label>Сортировать по</Label>
-          <Select
-            value={filters.sortField ?? ''}
-            onValueChange={(val) =>
-              setFilters((prev) => ({
-                ...prev,
-                sortField: val
-                  ? (val as UsersFiltersState['sortField'])
-                  : undefined,
-              }))
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Все" />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_FIELDS.map((f) => (
-                <SelectItem key={f.value} value={String(f.value)}>
-                  {f.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label>Порядок сортировки</Label>
-          <Select
-            value={filters.sortOrder ?? ''}
-            onValueChange={(val) =>
-              setFilters((prev) => ({
-                ...prev,
-                sortOrder: val
-                  ? (val as UsersFiltersState['sortOrder'])
-                  : undefined,
-              }))
-            }
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Все" />
-            </SelectTrigger>
-            <SelectContent>
-              {SORT_ORDERS.map((o) => (
-                <SelectItem key={o.value} value={String(o.value)}>
-                  {o.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="flex flex-wrap gap-4 items-center justify-between">
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 border rounded-md p-3">
-            <Switch
-              checked={!!filters.isHolder}
-              onCheckedChange={(checked: boolean) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  isHolder: checked ? true : undefined,
-                }))
-              }
-            />
-            <Label className="text-sm font-medium">Держатели</Label>
-          </div>
-
-          <div className="flex items-center gap-2 border rounded-md p-3">
-            <Switch
-              checked={!!filters.isCourier}
-              onCheckedChange={(checked: boolean) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  isCourier: checked ? true : undefined,
-                }))
-              }
-            />
-            <Label className="text-sm font-medium">Курьеры</Label>
-          </div>
-
-          <div className="flex items-center gap-2 border rounded-md p-3">
-            <Switch
-              checked={!!filters.blocked}
-              onCheckedChange={(checked: boolean) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  blocked: checked ? true : undefined,
-                }))
-              }
-            />
-            <Label className="text-sm font-medium">Заблокированные</Label>
-          </div>
-
-          <div className="flex items-center gap-2 border rounded-md p-3">
-            <Switch
-              checked={!!filters.telegramNotifications}
-              onCheckedChange={(checked: boolean) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  telegramNotifications: checked ? true : undefined,
-                }))
-              }
-            />
-            <Label className="text-sm font-medium">Telegram уведомления</Label>
-          </div>
-        </div>
-
-        <Button variant="outline" onClick={resetFilters}>
-          Сбросить
+    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="sm" className="relative">
+          <FilterIcon className="h-4 w-4 mr-2" />
+          Фильтры
+          {activeFiltersCount > 0 && (
+            <Badge
+              variant="destructive"
+              className="ml-2 h-5 min-w-5 px-1 flex items-center justify-center"
+            >
+              {activeFiltersCount}
+            </Badge>
+          )}
         </Button>
-      </div>
-    </div>
+      </SheetTrigger>
+      <SheetContent className="overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Фильтры пользователей</SheetTitle>
+          <SheetDescription>
+            Настройте параметры для фильтрации списка пользователей
+          </SheetDescription>
+        </SheetHeader>
+        <div className="space-y-6 px-4">
+          <div className="space-y-2">
+            <Label>Роли</Label>
+            <Select
+              value={localFilters.roleCode ?? ''}
+              onValueChange={(val) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  roleCode: val
+                    ? (val as UsersFiltersState['roleCode'])
+                    : undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Все" />
+              </SelectTrigger>
+              <SelectContent>
+                {USER_ROLES.map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {r.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Дополнительные фильтры</Label>
+
+            <div className="flex items-center gap-2 border rounded-md p-3">
+              <Switch
+                checked={!!localFilters.isHolder}
+                onCheckedChange={(checked: boolean) =>
+                  setLocalFilters((prev) => ({
+                    ...prev,
+                    isHolder: checked ? true : undefined,
+                  }))
+                }
+              />
+              <Label className="text-sm font-medium">Держатели</Label>
+            </div>
+
+            <div className="flex items-center gap-2 border rounded-md p-3">
+              <Switch
+                checked={!!localFilters.isCourier}
+                onCheckedChange={(checked: boolean) =>
+                  setLocalFilters((prev) => ({
+                    ...prev,
+                    isCourier: checked ? true : undefined,
+                  }))
+                }
+              />
+              <Label className="text-sm font-medium">Курьеры</Label>
+            </div>
+
+            <div className="flex items-center gap-2 border rounded-md p-3">
+              <Switch
+                checked={!!localFilters.blocked}
+                onCheckedChange={(checked: boolean) =>
+                  setLocalFilters((prev) => ({
+                    ...prev,
+                    blocked: checked ? true : undefined,
+                  }))
+                }
+              />
+              <Label className="text-sm font-medium">Заблокированные</Label>
+            </div>
+
+            <div className="flex items-center gap-2 border rounded-md p-3">
+              <Switch
+                checked={!!localFilters.telegramNotifications}
+                onCheckedChange={(checked: boolean) =>
+                  setLocalFilters((prev) => ({
+                    ...prev,
+                    telegramNotifications: checked ? true : undefined,
+                  }))
+                }
+              />
+              <Label className="text-sm font-medium">
+                Telegram уведомления
+              </Label>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-6">
+            <Button variant="outline" onClick={resetFilters} className="flex-1">
+              Сбросить
+            </Button>
+            <Button onClick={handleApplyFilters} className="flex-1">
+              Применить
+            </Button>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };

@@ -46,7 +46,7 @@ export class UserService {
   ): Promise<Couriers[]> {
     const response = await axiosInstance.get(API_MAP.USERS.USERS, {
       params: {
-        roleCode: 'courier',
+        isCourier: true,
         ...params,
       },
     });

@@ -295,7 +295,7 @@ function formatRate(value: number) {
  *
  * @example
  * ```typescript
- * formatDate('2024-01-15T10:30:00Z'); // "15.01.2024, 13:30:00"
+ * formatDate('2024-01-15T10:30:00Z'); // "15.01.2024, 13:30"
  * formatDate(null); // "—"
  * formatDate('invalid-date'); // "invalid-date"
  * ```
@@ -311,7 +311,7 @@ function formatDate(value: string | null | undefined) {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
+    hour12: false,
   });
 }
 

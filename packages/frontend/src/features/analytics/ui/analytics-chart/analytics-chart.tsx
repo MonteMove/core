@@ -13,149 +13,141 @@ import {
   YAxis,
 } from 'recharts';
 
-import { useAnalytics } from '@/entities/analytics/model/use-analytics';
+import { useWalletAnalytics } from '@/entities/analytics';
+import { useMonthlyAnalytics } from '@/entities/analytics/model/use-monthly-analytics';
+import { useAnalyticsFilters } from '@/features/analytics/hook/use-analytics-filters';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
-import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from '@/shared/ui/shadcn/chart';
-import { Skeleton } from '@/shared/ui/shadcn/skeleton';
+  Skeleton,
+} from '@/shared';
 
 export const AnalyticsCharts = () => {
-  const { data, isLoading, isError } = useAnalytics();
+  const { filters } = useAnalyticsFilters();
+  const { data: analyticsData, isLoading } = useWalletAnalytics(filters);
+  const { data: monthlyData, isLoading: isMonthlyLoading } =
+    useMonthlyAnalytics();
 
-  if (isLoading) {
+  if (isLoading || isMonthlyLoading) {
     return (
-      <div className="flex flex-col md:flex-row gap-4 my-10">
-        <Card className="w-full md:w-1/2">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold">
-              Доходы и Расходы
-            </CardTitle>
-            <CardDescription className="text-base text-muted-foreground">
-              Суммы по месяцам
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-60 w-full animate-pulse rounded-sm bg-gray-300" />
-          </CardContent>
-        </Card>
-        <Card className="w-full md:w-1/2">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold">
-              Количество операций
-            </CardTitle>
-            <CardDescription className="text-base text-muted-foreground">
-              За последние 6 месяцев
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-60 w-full animate-pulse rounded-sm bg-gray-300" />
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        {[...Array(2)].map((_, i) => (
+          <Card key={i}>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-48" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-[300px] w-full" />
+            </CardContent>
+          </Card>
+        ))}
       </div>
     );
   }
 
-  if (isError || !data || data.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          {isError ? 'Ошибка загрузки аналитики' : 'Нет данных для отображения'}
-        </p>
-      </div>
-    );
+  if (!analyticsData?.summary) {
+    return null;
   }
 
-  const pieData = data.map((item) => ({
-    name: item.month,
-    value: item.incoming,
-  }));
+  const { summary } = analyticsData;
 
-  const barChartConfig: ChartConfig = {
-    incoming: { label: 'Поступления', color: 'var(--primary)' },
-    outgoing: { label: 'Расходы', color: '#0b3f61' },
+  const chartConfig: ChartConfig = {
+    coming: {
+      label: 'Поступления',
+      color: 'var(--chart-1)',
+    },
+    expenditure: {
+      label: 'Расходы',
+      color: 'var(--chart-2)',
+    },
+    balance: {
+      label: 'Баланс',
+      color: 'var(--chart-3)',
+    },
+    operations: {
+      label: 'Операций',
+      color: 'var(--chart-4)',
+    },
   };
 
   const COLORS = [
-    '#79bce9',
-    '#4285F4',
-    '#3367D6',
-    '#1A73E8',
-    '#174EA6',
-    '#2C6BED',
+    'var(--chart-1)',
+    'var(--chart-2)',
+    'var(--chart-3)',
+    'var(--chart-4)',
+    'var(--chart-5)',
   ];
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 my-10">
-      <Card className="w-full md:w-1/2">
+    <div className="grid gap-4 md:grid-cols-2">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold">
-            Доходы и Расходы
-          </CardTitle>
-          <CardDescription className="text-base text-muted-foreground">
-            Суммы по месяцам
-          </CardDescription>
+          <CardTitle>Динамика за 6 месяцев</CardTitle>
+          <CardDescription>Поступления и расходы по месяцам</CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={barChartConfig}>
-            <BarChart data={data} margin={{ left: 12, right: 12 }}>
+          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+            <BarChart accessibilityLayer data={monthlyData?.analytics || []}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="month"
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                tickFormatter={(value) => value.slice(0, 3)}
+                tickFormatter={(value) => value.split(' ')[0]}
               />
-              <YAxis />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="dashed" />}
+              <YAxis tickLine={false} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar
+                dataKey="coming"
+                fill="var(--chart-1)"
+                radius={[4, 4, 0, 0]}
               />
               <Bar
-                dataKey="incoming"
-                fill={barChartConfig.incoming.color}
-                radius={4}
-              />
-              <Bar
-                dataKey="outgoing"
-                fill={barChartConfig.outgoing.color}
-                radius={4}
+                dataKey="expenditure"
+                fill="var(--chart-2)"
+                radius={[4, 4, 0, 0]}
               />
             </BarChart>
           </ChartContainer>
         </CardContent>
       </Card>
 
-      <Card className="w-full md:w-1/2 flex flex-col">
-        <CardHeader className="items-center pb-0">
-          <CardTitle className="text-2xl font-semibold">
-            Количество операций
-          </CardTitle>
-          <CardDescription className="text-base text-muted-foreground">
-            За последние 6 месяцев
-          </CardDescription>
+      <Card>
+        <CardHeader>
+          <CardTitle>Финансовые потоки</CardTitle>
+          <CardDescription>Поступления vs Расходы</CardDescription>
         </CardHeader>
-        <CardContent className="flex-1 pb-0">
-          <ChartContainer config={{ pie: { label: 'Доходы' } }}>
+        <CardContent className="flex justify-center">
+          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
             <PieChart>
-              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-              <Pie data={pieData} dataKey="value" nameKey="name" label>
-                {pieData.map((_, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Pie
+                data={[
+                  { name: 'Поступления', value: summary.totalComing },
+                  { name: 'Расходы', value: summary.totalExpenditure },
+                ]}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                label
+              >
+                <Cell fill="var(--chart-1)" />
+                <Cell fill="var(--chart-2)" />
               </Pie>
             </PieChart>
           </ChartContainer>

@@ -27,6 +27,7 @@ import {
     CreateWalletResponseDto,
     DeleteWalletResponseDto,
     GetPinnedWalletsResponseDto,
+    GetWalletAnalyticsDto,
     GetWalletsDto,
     GetWalletsResponseDto,
     ToggleWalletPinDto,
@@ -34,12 +35,16 @@ import {
     UpdateWalletResponseDto,
     WalletResponseDto,
 } from './dto';
+import { GetWalletAnalyticsOutput } from './types';
 import {
     ChangeWalletOwnerUseCase,
     CreateWalletUseCase,
     DeleteWalletUseCase,
     GetPinnedWalletsUseCase,
+    GetWalletAnalyticsUseCase,
     GetWalletByIdUseCase,
+    GetWalletMonthlyAnalyticsUseCase,
+    GetWalletsAggregationUseCase,
     GetWalletsUseCase,
     ToggleWalletPinUseCase,
     UpdateWalletUseCase,
@@ -51,15 +56,70 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class WalletController {
     constructor(
+        private readonly changeWalletOwnerUseCase: ChangeWalletOwnerUseCase,
         private readonly createWalletUseCase: CreateWalletUseCase,
         private readonly getWalletsUseCase: GetWalletsUseCase,
+        private readonly getWalletsAggregationUseCase: GetWalletsAggregationUseCase,
         private readonly getPinnedWalletsUseCase: GetPinnedWalletsUseCase,
+        private readonly getWalletAnalyticsUseCase: GetWalletAnalyticsUseCase,
+        private readonly getWalletMonthlyAnalyticsUseCase: GetWalletMonthlyAnalyticsUseCase,
         private readonly getWalletByIdUseCase: GetWalletByIdUseCase,
         private readonly updateWalletUseCase: UpdateWalletUseCase,
         private readonly toggleWalletPinUseCase: ToggleWalletPinUseCase,
-        private readonly changeWalletOwnerUseCase: ChangeWalletOwnerUseCase,
         private readonly deleteWalletUseCase: DeleteWalletUseCase,
     ) {}
+
+    @Get('analytics')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Получить аналитику кошельков',
+        description: 'Возвращает аналитические данные по кошелькам с возможностью фильтрации',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Аналитика успешно получена',
+    })
+    @ApiReadResponses()
+    public async getWalletAnalytics(
+        @Query() getWalletAnalyticsDto: GetWalletAnalyticsDto,
+    ): Promise<GetWalletAnalyticsOutput> {
+        return this.getWalletAnalyticsUseCase.execute(getWalletAnalyticsDto);
+    }
+
+    @Get('analytics/monthly')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({
+        summary: 'Получить месячную аналитику',
+        description: 'Возвращает аналитику по месяцам за последние 6 месяцев',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Месячная аналитика успешно получена',
+    })
+    @ApiReadResponses()
+    public async getWalletMonthlyAnalytics() {
+        return this.getWalletMonthlyAnalyticsUseCase.execute();
+    }
+
+    @Get('aggregation')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Получить агрегацию кошельков',
+        description:
+            'Возвращает агрегированные данные по кошелькам (сумма по валютам) с учетом фильтров. Доступно только администраторам.',
+    })
+    @ApiListParams('Фильтры для агрегации')
+    @ApiResponse({
+        status: 200,
+        description: 'Агрегация успешно получена',
+    })
+    @ApiReadResponses()
+    public async getWalletsAggregation(@Query() getWalletsDto: GetWalletsDto) {
+        const result = await this.getWalletsAggregationUseCase.execute(getWalletsDto);
+
+        return result;
+    }
 
     @Get()
     @HttpCode(HttpStatus.OK)

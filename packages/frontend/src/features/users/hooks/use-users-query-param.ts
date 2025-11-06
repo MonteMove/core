@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo } from 'react';
 
 import { useSearchParams } from 'next/navigation';
@@ -7,6 +9,7 @@ import { GetUsersParams } from '@/entities/users/model/user-schemas';
 export function useUsersQueryParams(): Partial<GetUsersParams> {
   const searchParams = useSearchParams();
 
+  const tab = searchParams.get('tab');
   const sortField = searchParams.get('sortField') ?? undefined;
   const sortOrder = searchParams.get('sortOrder') ?? undefined;
   const search = searchParams.get('search') ?? undefined;
@@ -18,6 +21,7 @@ export function useUsersQueryParams(): Partial<GetUsersParams> {
     searchParams.get('telegramNotifications') !== null
       ? searchParams.get('telegramNotifications') === 'true'
       : undefined;
+  const deleted = tab === 'deleted' ? true : undefined;
   const roleCode = searchParams.get('roleCode') ?? undefined;
   const telegramId = searchParams.get('telegramId') ?? undefined;
   const pageParam = searchParams.get('page');
@@ -36,15 +40,18 @@ export function useUsersQueryParams(): Partial<GetUsersParams> {
     if (blocked !== undefined) params.blocked = blocked;
     if (telegramNotifications !== undefined)
       params.telegramNotifications = telegramNotifications;
+    if (deleted !== undefined) params.deleted = deleted;
     if (roleCode) params.roleCode = roleCode as GetUsersParams['roleCode'];
     if (telegramId) params.telegramId = telegramId;
     return params;
   }, [
+    tab,
     search,
     sortField,
     sortOrder,
     blocked,
     telegramNotifications,
+    deleted,
     roleCode,
     telegramId,
     page,

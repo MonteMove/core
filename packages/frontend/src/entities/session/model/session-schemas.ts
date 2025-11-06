@@ -8,6 +8,11 @@ export const SessionResponseDtoSchema = z.object({
   revoked: z.boolean(),
   userAgent: z.string().nullable(),
   ip: z.string().nullable(),
+  device: z.string().nullable(),
+  browser: z.string().nullable(),
+  os: z.string().nullable(),
+  lastActivityAt: z.string().datetime(),
+  isCurrent: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

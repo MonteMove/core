@@ -47,6 +47,8 @@ export const useInfiniteUsers = (
         safeFilters.blocked = queryFilters.blocked;
       if (queryFilters.telegramNotifications !== undefined)
         safeFilters.telegramNotifications = queryFilters.telegramNotifications;
+      if (queryFilters.deleted !== undefined)
+        safeFilters.deleted = queryFilters.deleted;
       if (queryFilters.sortField)
         safeFilters.sortField = queryFilters.sortField;
       if (queryFilters.sortOrder)

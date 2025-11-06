@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Patch, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 import { RoleCode } from '../../prisma/generated/prisma';
@@ -147,6 +147,33 @@ export class UserController {
     })
     @ApiCrudResponses()
     public async updateUser(
+        @Param('id') userId: string,
+        @Body() updateUserDto: UpdateUserDto,
+    ): Promise<UpdateUserResponseDto> {
+        const result = await this.updateUserUseCase.execute(userId, updateUserDto);
+
+        return {
+            message: result.message,
+            user: result.user,
+        };
+    }
+
+    @Patch(':id')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Частично обновить пользователя',
+        description: 'Частично обновляет данные существующего пользователя. Доступно только администраторам.',
+    })
+    @ApiIdParam('Уникальный идентификатор пользователя')
+    @ApiBody({ type: UpdateUserDto })
+    @ApiResponse({
+        status: 200,
+        description: 'Пользователь успешно обновлен',
+        type: UpdateUserResponseDto,
+    })
+    @ApiCrudResponses()
+    public async patchUser(
         @Param('id') userId: string,
         @Body() updateUserDto: UpdateUserDto,
     ): Promise<UpdateUserResponseDto> {

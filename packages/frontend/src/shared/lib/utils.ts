@@ -84,6 +84,11 @@ export function formatByRule(digitsRaw?: string) {
   return '+' + rule.code + (parts.length ? ' ' + parts.join(' ') : '');
 }
 
+/**
+ * Форматирует дату в формат dd.MM.yyyy
+ * @param date - Дата для форматирования
+ * @returns Отформатированная строка даты или пустая строка
+ */
 export function formatDate(date: Date | undefined) {
   if (!date) {
     return '';
@@ -95,21 +100,40 @@ export function formatDate(date: Date | undefined) {
   });
 }
 
+/**
+ * Форматирует дату и время в формат dd.MM.yyyy, HH:mm (24-часовой формат)
+ * @param date - Дата для форматирования
+ * @returns Отформатированная строка даты и времени или пустая строка
+ */
+export function formatDateTime(date: Date | string | undefined | null): string {
+  if (!date) {
+    return '';
+  }
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) {
+    return '';
+  }
+  return d.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
 export function formatCardNumber(value: string | undefined) {
   const digits = (value ?? '').replace(/\D/g, '');
   return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
 }
 
-export function getCurrentSessionId(
-  sessions: SessionResponseDto[],
-): string | null {
-  const now = new Date();
-  const current = sessions.find(
-    (s) => !s.revoked && new Date(s.expiresAt) > now,
-  );
-  return current ? current.id : null;
-}
-
+/**
+ * Безопасно форматирует дату и время в формат dd.MM.yyyy, HH:mm (24-часовой формат)
+ * Обрабатывает различные форматы входных данных
+ * @param value - Строка с датой или null/undefined
+ * @returns Отформатированная строка даты или сообщение об ошибке
+ */
 export function formatDateSafe(value?: string | null) {
   if (!value) return 'Не указано';
   const iso =
@@ -124,6 +148,7 @@ export function formatDateSafe(value?: string | null) {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false,
     });
   }
   const num = Number(value);
@@ -136,6 +161,7 @@ export function formatDateSafe(value?: string | null) {
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
+        hour12: false,
       });
     }
   }

@@ -19,8 +19,5 @@ export const useUpdateNetworkType = () => {
       queryClient.invalidateQueries({ queryKey: ['network-types'] });
       toast.success(response.message || 'Тип сети успешно обновлён');
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Ошибка при обновлении типа сети');
-    },
   });
 };

@@ -60,6 +60,7 @@ export class GetOperationTypesUseCase {
                 updatedById: true,
                 name: true,
                 description: true,
+                isSeparateTab: true,
                 createdAt: true,
                 updatedAt: true,
             },
