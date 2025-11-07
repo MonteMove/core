@@ -61,3 +61,4 @@ pnpm clean            # Очистка
 
 **Backend:** NestJS 11, PostgreSQL, Prisma, JWT  
 **Frontend:** Next.js 15, React 19, TailwindCSS, Zustand
+
