@@ -17,12 +17,14 @@ import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/shared/ui/shadcn/form';
 import { Input } from '@/shared/ui/shadcn/input';
+import { Switch } from '@/shared/ui/shadcn/switch';
 import {
   Select,
   SelectContent,
@@ -59,11 +61,13 @@ export function NetworkTypeForm({
             networkId: initialData.networkId,
             code: initialData.code,
             name: initialData.name,
+            active: initialData.active,
           }
         : {
             networkId: '',
             code: '',
             name: '',
+            active: true,
           },
   });
 
@@ -146,6 +150,24 @@ export function NetworkTypeForm({
                 <Input placeholder="ERC-20 Token Standard" {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="active"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
+              <div className="space-y-0.5">
+                <FormLabel>Активность</FormLabel>
+                <FormDescription>
+                  Активные типы сетей доступны для выбора при создании кошельков
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
             </FormItem>
           )}
         />

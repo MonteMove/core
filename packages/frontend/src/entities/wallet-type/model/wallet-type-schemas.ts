@@ -54,6 +54,7 @@ export const CreateWalletTypeSchema = z.object({
     .refine(Number.isInteger, 'Порядок должен быть целым числом')
     .min(0, 'Порядок не может быть отрицательным')
     .optional(),
+  active: z.boolean().default(true),
 });
 
 export const UpdateWalletTypeSchema = z.object({
@@ -82,6 +83,7 @@ export const UpdateWalletTypeSchema = z.object({
     .int('Порядок должен быть целым числом')
     .min(0, 'Порядок не может быть отрицательным')
     .optional(),
+  active: z.boolean().optional(),
 });
 
 export const GetWalletTypesResponseSchema = z.object({

@@ -5,6 +5,7 @@ model NetworkType {
   networkId   String   @map("network_id") @db.Uuid
   code        String
   name        String
+  active      Boolean  @default(true)
   deleted     Boolean  @default(false)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -19,6 +20,7 @@ model NetworkType {
   @@index([updatedById], map: "network_types_updated_by_idx")
   @@index([networkId], map: "network_types_network_idx")
   @@index([code], map: "network_types_code_idx")
+  @@index([active], map: "network_types_active_idx")
   @@index([deleted], map: "network_types_deleted_idx")
   @@map("network_types")
 }

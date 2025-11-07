@@ -9,7 +9,7 @@ export class CreateCurrencyUseCase {
     constructor(private readonly prisma: PrismaService) {}
 
     public async execute(createCurrencyDto: CreateCurrencyDto, userId: string): Promise<CreateCurrencyOutput> {
-        const { code, name } = createCurrencyDto;
+        const { code, name, active } = createCurrencyDto;
 
         const existingCurrencyByCode = await this.prisma.currency.findFirst({
             where: {
@@ -39,6 +39,7 @@ export class CreateCurrencyUseCase {
                 updatedById: userId,
                 code,
                 name,
+                active: active ?? true,
             },
             include: {
                 created_by: {

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Copy, FileText, Pencil, Trash } from 'lucide-react';
+import { Copy, FileText, Info, Pencil, Trash } from 'lucide-react';
 
 import {
   CardApplication,
@@ -14,6 +14,7 @@ import {
   useInfiniteApplications,
   useUpdateStatusApplication,
 } from '@/entities/application';
+import { OperationViewDialog } from '@/features/operations';
 import {
   Card,
   DropdownMenu,
@@ -34,6 +35,8 @@ import { useLastItemObserver } from '@/shared/lib/hooks/use-last-Item-observer';
 export const InfiniteApplicationsList = () => {
   const router = useRouter();
   const params = useApplicationsQueryParams();
+  const [selectedOperationId, setSelectedOperationId] = useState<string | null>(null);
+  
   const {
     data: infiniteData,
     isLoading,
@@ -97,16 +100,42 @@ export const InfiniteApplicationsList = () => {
               >
                 <DropdownMenuItem
                   className="hover:bg-primary/60 dark:hover:bg-primary/60"
-                  onClick={() =>
-                    updateStatuseApplicationMutation({
-                      id: app.id.toString(),
-                      status: app.status == 'done' ? 'open' : 'done',
-                    })
-                  }
+                  onClick={() => {
+                    if (app.status === 'done') {
+                      // Вернуть в работу
+                      updateStatuseApplicationMutation({
+                        id: app.id.toString(),
+                        status: 'open',
+                      });
+                    } else {
+                      // Завершить заявку
+                      // Если заявка с авансом и НЕТ операции - открываем создание операции
+                      if (app.hasAdvance && !app.operationId) {
+                        router.push(ROUTER_MAP.OPERATIONS_CREATE + '?applicationId=' + app.id);
+                      } else if (app.hasAdvance && app.operationId) {
+                        // Если заявка с авансом и ЕСТЬ операция - открываем редактирование операции
+                        router.push(ROUTER_MAP.OPERATIONS_EDIT + '/' + app.operationId);
+                      } else {
+                        // Обычная заявка - просто меняем статус
+                        updateStatuseApplicationMutation({
+                          id: app.id.toString(),
+                          status: 'done',
+                        });
+                      }
+                    }
+                  }}
                 >
                   <Pencil className="mr-2 h-4 w-4 text-primary" />{' '}
                   {app.status == 'done' ? 'В работе' : 'Завершить'}
                 </DropdownMenuItem>
+                {app.operationId && (
+                  <DropdownMenuItem
+                    className="hover:bg-primary/60 dark:hover:bg-primary/60"
+                    onClick={() => setSelectedOperationId(app.operationId)}
+                  >
+                    <Info className="mr-2 h-4 w-4 text-primary" /> Об операции
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   className="hover:bg-primary/60 dark:hover:bg-primary/60"
                   onClick={() =>
@@ -132,6 +161,12 @@ export const InfiniteApplicationsList = () => {
           );
         })
       )}
+      
+      <OperationViewDialog
+        operationId={selectedOperationId}
+        open={!!selectedOperationId}
+        onOpenChange={(open) => !open && setSelectedOperationId(null)}
+      />
     </Fragment>
   );
 };

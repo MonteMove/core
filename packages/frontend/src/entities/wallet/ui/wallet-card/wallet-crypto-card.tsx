@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import { WalletOwner } from '@/entities/wallet';
 import type { Wallet } from '@/entities/wallet';
 import { WalletService } from '@/entities/wallet/api/wallet-service';
+import { WalletMonthlyLimit } from '@/entities/wallet/ui/wallet-monthly-limit/wallet-monthly-limit';
 import { ChangeOwnerDialog } from '@/features/wallets/ui/change-owner-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { cn, formatDate } from '@/shared/lib/utils';
+import { Button } from '@/shared/ui/shadcn/button';
 import { formatNumber } from '@/shared/lib/utils/format-number';
 import {
   Card,
@@ -193,18 +195,7 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
       return '';
     }
 
-    const typeCode = typeof type === 'string' ? type : type.code;
-
-    switch (typeCode) {
-      case 'inskech':
-        return 'Inskech';
-      case 'bet11':
-        return 'Bet11';
-      case 'vnj':
-        return 'VNJ';
-      default:
-        return typeof type === 'string' ? type : type.name;
-    }
+    return typeof type === 'string' ? type : type.name;
   };
 
   return (
@@ -214,21 +205,49 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
           <Card
             role="button"
             tabIndex={0}
-            onClick={() => setMenuOpen(true)}
+            onClick={(e) => {
+              // Не открываем меню если кликнули на кнопку названия
+              if ((e.target as HTMLElement).closest('button[data-wallet-link]')) {
+                return;
+              }
+              setMenuOpen(true);
+            }}
             onKeyDown={handleKeyDown}
             className={cn(
-              'w-full gap-3 cursor-pointer',
+              'w-full cursor-pointer overflow-hidden',
+              wallet.monthlyLimit && wallet.monthlyLimit > 0 ? 'py-0 gap-0' : 'gap-3',
               getBorderClass(wallet.balanceStatus),
               !wallet.active && 'opacity-40',
             )}
           >
-            <CardHeader>
+            {wallet.monthlyLimit && wallet.monthlyLimit > 0 && (
+              <div className="border-b border-border/40 bg-muted/20 px-6 py-1.5">
+                <WalletMonthlyLimit
+                  walletId={wallet.id}
+                  currencyCode={wallet.currency.code}
+                  limit={wallet.monthlyLimit}
+                />
+              </div>
+            )}
+            <CardHeader className={wallet.monthlyLimit && wallet.monthlyLimit > 0 ? 'pt-6 pb-6' : ''}>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2 sm:max-w-[70%]">
                   <div className="flex flex-wrap items-center gap-2">
-                    <CardTitle className="text-lg sm:text-xl">
+                    <Button
+                      variant="link"
+                      className="text-lg sm:text-xl p-0 h-auto font-semibold relative z-10 no-underline hover:no-underline"
+                      data-wallet-link
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        router.push(ROUTER_MAP.WALLET_OPERATIONS(wallet.id));
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                      }}
+                    >
                       {getWalletTypeLabel(wallet.walletType)} {wallet.name}
-                    </CardTitle>
+                    </Button>
                     <WalletOwner user={wallet.user} />
                   </div>
                   {getFullDescription() && (
@@ -283,8 +302,8 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 className={cn(
                   'w-6 h-6 rounded-full border-2 transition-all hover:scale-110',
                   wallet.balanceStatus === 'positive'
-                    ? 'border-green-600 bg-green-600'
-                    : 'border-green-600/30 bg-green-600/60',
+                    ? 'border-success bg-success'
+                    : 'border-success/30 bg-success/60',
                 )}
                 title="Зеленый"
               />

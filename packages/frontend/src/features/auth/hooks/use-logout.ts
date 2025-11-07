@@ -16,6 +16,12 @@ export const useLogout = () => {
     mutationFn: async () => await AuthService.Logout(),
     onSuccess: async () => {
       await clearToken();
+      
+      // Удаляем dev куку в dev режиме
+      if (process.env.NODE_ENV === 'development') {
+        document.cookie = 'dev_auth_token=; path=/; max-age=0';
+      }
+      
       router.push(ROUTER_MAP.LOGIN);
     },
   });

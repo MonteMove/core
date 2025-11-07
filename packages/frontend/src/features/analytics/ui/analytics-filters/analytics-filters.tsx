@@ -169,7 +169,8 @@ export const AnalyticsFilters = () => {
                     const parts = formatted.split('.');
                     if (parts.length === 3) {
                       const [dd, mm, yyyy] = parts.map(Number);
-                      const parsed = new Date(yyyy, mm - 1, dd);
+                      // Создаем дату напрямую в UTC
+                      const parsed = new Date(Date.UTC(yyyy, mm - 1, dd));
                       if (!isNaN(parsed.getTime())) {
                         setLocalDateFrom(parsed);
                         return;
@@ -228,7 +229,8 @@ export const AnalyticsFilters = () => {
                     const parts = formatted.split('.');
                     if (parts.length === 3) {
                       const [dd, mm, yyyy] = parts.map(Number);
-                      const parsed = new Date(yyyy, mm - 1, dd);
+                      // Создаем дату напрямую в UTC
+                      const parsed = new Date(Date.UTC(yyyy, mm - 1, dd));
                       if (!isNaN(parsed.getTime())) {
                         setLocalDateTo(parsed);
                         return;

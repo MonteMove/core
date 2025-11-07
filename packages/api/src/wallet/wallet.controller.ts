@@ -28,6 +28,7 @@ import {
     DeleteWalletResponseDto,
     GetPinnedWalletsResponseDto,
     GetWalletAnalyticsDto,
+    GetWalletMonthlyLimitResponseDto,
     GetWalletsDto,
     GetWalletsResponseDto,
     ToggleWalletPinDto,
@@ -44,6 +45,7 @@ import {
     GetWalletAnalyticsUseCase,
     GetWalletByIdUseCase,
     GetWalletMonthlyAnalyticsUseCase,
+    GetWalletMonthlyLimitUseCase,
     GetWalletsAggregationUseCase,
     GetWalletsUseCase,
     ToggleWalletPinUseCase,
@@ -63,6 +65,7 @@ export class WalletController {
         private readonly getPinnedWalletsUseCase: GetPinnedWalletsUseCase,
         private readonly getWalletAnalyticsUseCase: GetWalletAnalyticsUseCase,
         private readonly getWalletMonthlyAnalyticsUseCase: GetWalletMonthlyAnalyticsUseCase,
+        private readonly getWalletMonthlyLimitUseCase: GetWalletMonthlyLimitUseCase,
         private readonly getWalletByIdUseCase: GetWalletByIdUseCase,
         private readonly updateWalletUseCase: UpdateWalletUseCase,
         private readonly toggleWalletPinUseCase: ToggleWalletPinUseCase,
@@ -187,6 +190,24 @@ export class WalletController {
         const result = await this.getWalletByIdUseCase.execute(walletId);
 
         return result.wallet;
+    }
+
+    @Get(':id/monthly-limit')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Получить месячный лимит кошелька',
+        description: 'Возвращает информацию о месячном лимите, потраченной сумме и остатке за текущий месяц. Доступно только администраторам.',
+    })
+    @ApiIdParam('Уникальный идентификатор кошелька')
+    @ApiResponse({
+        status: 200,
+        description: 'Месячный лимит успешно получен',
+        type: GetWalletMonthlyLimitResponseDto,
+    })
+    @ApiReadResponses()
+    public async getWalletMonthlyLimit(@Param('id') walletId: string): Promise<GetWalletMonthlyLimitResponseDto> {
+        return this.getWalletMonthlyLimitUseCase.execute(walletId);
     }
 
     @Post()

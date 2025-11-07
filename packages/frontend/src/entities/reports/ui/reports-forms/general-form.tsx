@@ -132,7 +132,14 @@ export function ReportGeneralForm() {
                         }
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString());
+                            const utcDate = new Date(
+                              Date.UTC(
+                                date.getFullYear(),
+                                date.getMonth(),
+                                date.getDate(),
+                              ),
+                            );
+                            field.onChange(utcDate.toISOString());
                             setRawInputStart(formatDate(date));
                           }
                           setOpenStart(false);
@@ -203,7 +210,14 @@ export function ReportGeneralForm() {
                         }
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString());
+                            const utcDate = new Date(
+                              Date.UTC(
+                                date.getFullYear(),
+                                date.getMonth(),
+                                date.getDate(),
+                              ),
+                            );
+                            field.onChange(utcDate.toISOString());
                             setRawInputEnd(formatDate(date));
                           }
                           setOpenEnd(false);

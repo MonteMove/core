@@ -182,7 +182,15 @@ export function GuideForm({
                             }
                             onSelect={(date) => {
                               if (date) {
-                                field.onChange(date.toISOString());
+                                // Создаем дату в UTC из выбранного дня, чтобы избежать смещения часовых поясов
+                                const utcDate = new Date(
+                                  Date.UTC(
+                                    date.getFullYear(),
+                                    date.getMonth(),
+                                    date.getDate(),
+                                  ),
+                                );
+                                field.onChange(utcDate.toISOString());
                                 setRawInput(formatDate(date));
                               }
                               setOpen(false);

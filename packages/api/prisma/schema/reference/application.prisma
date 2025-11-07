@@ -18,6 +18,7 @@ model Application {
   amount           Int
   telegramUsername String?           @map("telegram_username")
   phone            String?
+  hasAdvance       Boolean           @default(false) @map("has_advance")
   deleted          Boolean           @default(false)
   meetingDate      DateTime          @map("meeting_date")
   createdAt        DateTime          @default(now()) @map("created_at")

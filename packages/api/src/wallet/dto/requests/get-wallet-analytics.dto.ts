@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsDateString, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class GetWalletAnalyticsDto {
@@ -53,6 +54,7 @@ export class GetWalletAnalyticsDto {
         required: false,
     })
     @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean({
         message: 'Флаг включения удаленных должен быть булевым значением',
     })
@@ -64,6 +66,7 @@ export class GetWalletAnalyticsDto {
         required: false,
     })
     @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean({
         message: 'Флаг включения наличных должен быть булевым значением',
     })
@@ -75,6 +78,7 @@ export class GetWalletAnalyticsDto {
         required: false,
     })
     @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
     @IsBoolean({ message: 'Флаг включения Visa должен быть булевым значением' })
     public includeVisa?: boolean = true;
 }

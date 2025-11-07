@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsNotEmpty, IsOptional, IsString, Length, MaxLength } from 'class-validator';
 
 export class CreateOperationTypeDto {
@@ -34,4 +34,13 @@ export class CreateOperationTypeDto {
     })
     @IsBoolean({ message: 'isSeparateTab должно быть булевым значением' })
     public isSeparateTab: boolean;
+
+    @ApiPropertyOptional({
+        description: 'Активность типа операции',
+        example: true,
+        default: true,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Активность должна быть булевым значением' })
+    public active?: boolean;
 }

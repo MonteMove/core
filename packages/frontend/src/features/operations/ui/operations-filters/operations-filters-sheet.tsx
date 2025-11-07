@@ -152,19 +152,42 @@ export function OperationsFiltersSheet({
                       if (!range) return;
 
                       if (range.from && !range.to) {
+                        // Создаем дату в UTC
+                        const utcFrom = new Date(
+                          Date.UTC(
+                            range.from.getFullYear(),
+                            range.from.getMonth(),
+                            range.from.getDate(),
+                          ),
+                        );
                         setLocalFilters((prev) => ({
                           ...prev,
-                          dateFrom: range.from!.toISOString(),
+                          dateFrom: utcFrom.toISOString(),
                           dateTo: undefined,
                         }));
                         return;
                       }
 
                       if (range.from && range.to) {
+                        // Создаем даты в UTC
+                        const utcFrom = new Date(
+                          Date.UTC(
+                            range.from.getFullYear(),
+                            range.from.getMonth(),
+                            range.from.getDate(),
+                          ),
+                        );
+                        const utcTo = new Date(
+                          Date.UTC(
+                            range.to.getFullYear(),
+                            range.to.getMonth(),
+                            range.to.getDate(),
+                          ),
+                        );
                         setLocalFilters((prev) => ({
                           ...prev,
-                          dateFrom: range.from!.toISOString(),
-                          dateTo: range.to!.toISOString(),
+                          dateFrom: utcFrom.toISOString(),
+                          dateTo: utcTo.toISOString(),
                         }));
                         setCalendarOpen(false);
                       }

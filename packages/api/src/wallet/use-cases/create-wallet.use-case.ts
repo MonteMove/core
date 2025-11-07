@@ -22,6 +22,7 @@ export class CreateWalletUseCase {
             pinOnMain = false,
             pinned = false,
             visible = true,
+            monthlyLimit,
             details,
         } = createWalletDto;
 
@@ -44,6 +45,7 @@ export class CreateWalletUseCase {
                 pinOnMain,
                 pinned,
                 visible,
+                ...(monthlyLimit !== undefined && { monthlyLimit }),
                 ...(hasDetails && {
                     details: {
                         create: {

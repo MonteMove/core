@@ -26,6 +26,7 @@ export class UpdateWalletUseCase {
             pinned,
             visible,
             deleted,
+            monthlyLimit,
         } = updateWalletDto;
 
         const existingWallet = await this.prisma.wallet.findUnique({
@@ -52,6 +53,7 @@ export class UpdateWalletUseCase {
                 ...(pinned !== undefined && { pinned }),
                 ...(visible !== undefined && { visible }),
                 ...(deleted !== undefined && { deleted }),
+                ...(monthlyLimit !== undefined && { monthlyLimit }),
             },
             include: {
                 user: {

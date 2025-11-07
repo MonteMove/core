@@ -165,6 +165,12 @@ export class ApplicationResponseDto {
     public meetingDate: Date;
 
     @ApiProperty({
+        description: 'Наличие аванса',
+        example: false,
+    })
+    public hasAdvance: boolean;
+
+    @ApiProperty({
         description: 'Дата создания',
         example: '2024-01-01T00:00:00.000Z',
     })

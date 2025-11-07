@@ -3,8 +3,10 @@ import { Type } from 'class-transformer';
 import {
     ArrayMinSize,
     IsArray,
+    IsDateString,
     IsEnum,
     IsInt,
+    IsNumber,
     IsOptional,
     IsString,
     IsUUID,
@@ -84,6 +86,17 @@ export class UpdateOperationDto {
     public conversionGroupId?: number;
 
     @ApiProperty({
+        description: 'ID заявки',
+        example: 1,
+        minimum: 1,
+        required: false,
+    })
+    @IsOptional()
+    @IsNumber(undefined, { message: 'ID заявки должен быть числом' })
+    @Min(1, { message: 'ID заявки должен быть больше 0' })
+    public applicationId?: number;
+
+    @ApiProperty({
         description: 'Список записей операции',
         type: [UpdateOperationEntryDto],
         required: false,
@@ -94,4 +107,13 @@ export class UpdateOperationDto {
     @ValidateNested({ each: true })
     @Type(() => UpdateOperationEntryDto)
     public entries?: UpdateOperationEntryDto[];
+
+    @ApiProperty({
+        description: 'Дата операции',
+        example: '2024-12-25T15:30:00.000Z',
+        required: false,
+    })
+    @IsOptional()
+    @IsDateString({}, { message: 'Дата операции должна быть валидной датой' })
+    public creatureDate?: string;
 }

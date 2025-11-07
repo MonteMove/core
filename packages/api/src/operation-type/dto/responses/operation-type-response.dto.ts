@@ -33,10 +33,16 @@ export class OperationTypeResponseDto {
     public userId: string;
 
     @ApiProperty({
-        description: 'ID пользователя, обновившего запись',
+        description: 'Ид пользователя, обновившего запись',
         example: '123e4567-e89b-12d3-a456-426614174001',
     })
     public updatedById: string;
+
+    @ApiProperty({
+        description: 'Активность типа операции',
+        example: true,
+    })
+    public active: boolean;
 
     @ApiProperty({
         description: 'Дата создания записи',

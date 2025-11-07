@@ -7,6 +7,7 @@ import Link from 'next/link';
 
 import {
   Book,
+  Boxes,
   ChartColumnIncreasing,
   Coins,
   FolderKanban,
@@ -99,6 +100,11 @@ const data = {
       title: 'Типы кошельков',
       url: ROUTER_MAP.WALLET_TYPES,
       icon: FolderKanban,
+    },
+    {
+      title: 'Платформы',
+      url: ROUTER_MAP.PLATFORMS,
+      icon: Boxes,
     },
   ],
   navSecondary: [

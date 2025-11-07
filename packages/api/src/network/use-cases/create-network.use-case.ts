@@ -9,7 +9,7 @@ export class CreateNetworkUseCase {
     constructor(private readonly prisma: PrismaService) {}
 
     public async execute(createNetworkDto: CreateNetworkDto, userId: string): Promise<CreateNetworkResponse> {
-        const { code, name } = createNetworkDto;
+        const { code, name, active } = createNetworkDto;
 
         const existingNetworkByCode = await this.prisma.network.findFirst({
             where: {
@@ -52,6 +52,7 @@ export class CreateNetworkUseCase {
                 updatedById: userId,
                 code,
                 name,
+                active: active ?? true,
             },
             include: {
                 created_by: {

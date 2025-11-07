@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
 import { WalletRecalculationService } from '../../wallet/services/wallet-recalculation.service';
@@ -19,7 +19,11 @@ export class UpdateOperationUseCase {
     ): Promise<UpdateOperationResponse> {
         const existingOperation = await this.prisma.operation.findUnique({
             where: { id: operationId },
-            include: {
+            select: {
+                id: true,
+                typeId: true,
+                applicationId: true,
+                deleted: true,
                 entries: {
                     where: { deleted: false },
                     select: {
@@ -27,6 +31,12 @@ export class UpdateOperationUseCase {
                         walletId: true,
                         direction: true,
                         amount: true,
+                    },
+                },
+                type: {
+                    select: {
+                        id: true,
+                        name: true,
                     },
                 },
             },
@@ -37,7 +47,59 @@ export class UpdateOperationUseCase {
         }
 
         return await this.prisma.$transaction(async (tx) => {
-            const { typeId, description, conversionGroupId, entries } = updateOperationDto;
+            const { typeId, description, conversionGroupId, entries, creatureDate, applicationId } = updateOperationDto;
+
+            // Получаем тип операции для проверки специальной логики
+            let operationType: { name: string } | null = null;
+            if (typeId) {
+                operationType = await tx.operationType.findUnique({
+                    where: { id: typeId },
+                    select: { name: true },
+                });
+            }
+
+            // Валидация и обработка для типа "Корректировка"
+            if (operationType && operationType.name === 'Корректировка' && entries) {
+                if (entries.length !== 1) {
+                    throw new BadRequestException(
+                        'Операция "Корректировка" должна содержать ровно одну запись (один кошелек)',
+                    );
+                }
+
+                // Для корректировки: amount - это желаемый баланс, нужно вычислить разницу
+                const entry = entries[0];
+                const currentBalance = await this.walletRecalculationService.getCalculatedWalletAmount(tx, entry.walletId);
+                const desiredBalance = entry.amount;
+                const difference = desiredBalance - currentBalance;
+
+                // Обновляем amount на разницу и устанавливаем правильное направление
+                if (difference > 0) {
+                    entry.amount = difference;
+                    entry.direction = 'credit';
+                } else if (difference < 0) {
+                    entry.amount = Math.abs(difference);
+                    entry.direction = 'debit';
+                } else {
+                    throw new BadRequestException(
+                        'Баланс кошелька уже равен указанному значению. Корректировка не требуется.',
+                    );
+                }
+            }
+
+            // Проверяем смену типа операции с "Аванс" на другой
+            let shouldCompleteApplication = false;
+            if (typeId && typeId !== existingOperation.typeId) {
+                // Получаем новый тип операции
+                const newType = await tx.operationType.findUnique({
+                    where: { id: typeId },
+                    select: { name: true },
+                });
+
+                // Если старый тип был "Аванс", а новый - нет, то нужно завершить заявку
+                if (existingOperation.type.name === 'Аванс' && newType?.name !== 'Аванс') {
+                    shouldCompleteApplication = true;
+                }
+            }
 
             await tx.operation.update({
                 where: { id: operationId },
@@ -46,11 +108,111 @@ export class UpdateOperationUseCase {
                     ...(typeId !== undefined && { typeId }),
                     ...(description !== undefined && { description }),
                     ...(conversionGroupId !== undefined && { conversionGroupId }),
+                    ...(creatureDate !== undefined && { createdAt: creatureDate }),
+                    ...(applicationId !== undefined && { applicationId }),
                 },
             });
 
+            // Если изменился applicationId, обновляем operationId в заявке
+            if (applicationId !== undefined && applicationId !== null) {
+                // Сначала очищаем operationId у старой заявки (если была)
+                if (existingOperation.applicationId) {
+                    await tx.application.updateMany({
+                        where: {
+                            id: existingOperation.applicationId,
+                            deleted: false,
+                        },
+                        data: {
+                            operationId: null,
+                            updatedById,
+                        },
+                    });
+                }
+
+                // Устанавливаем operationId у новой заявки
+                await tx.application.update({
+                    where: { id: applicationId },
+                    data: {
+                        operationId: operationId,
+                        updatedById,
+                    },
+                });
+            }
+
+            // Если нужно завершить заявку, связанную с этой операцией
+            if (shouldCompleteApplication) {
+                await tx.application.updateMany({
+                    where: {
+                        operationId: operationId,
+                        deleted: false,
+                    },
+                    data: {
+                        status: 'done',
+                        updatedById,
+                    },
+                });
+            }
+
             if (entries) {
                 const existingEntries = existingOperation.entries;
+
+                // Проверка месячных лимитов для всех изменяемых/новых записей
+                for (const entry of entries) {
+                    const wallet = await tx.wallet.findUnique({
+                        where: { id: entry.walletId },
+                        select: {
+                            id: true,
+                            name: true,
+                            monthlyLimit: true,
+                            currency: {
+                                select: {
+                                    code: true,
+                                },
+                            },
+                        },
+                    });
+
+                    if (!wallet) {
+                        throw new BadRequestException(`Кошелек с ID ${entry.walletId} не найден`);
+                    }
+
+                    // Если у кошелька установлен месячный лимит, проверяем его
+                    if (wallet.monthlyLimit && wallet.monthlyLimit > 0) {
+                        // Определяем границы текущего месяца
+                        const now = new Date();
+                        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+                        // Получаем сумму всех операций за текущий месяц (кроме текущей редактируемой записи)
+                        const monthlyEntries = await tx.operationEntry.findMany({
+                            where: {
+                                walletId: entry.walletId,
+                                deleted: false,
+                                createdAt: {
+                                    gte: startOfMonth,
+                                    lt: endOfMonth,
+                                },
+                                // Исключаем текущую редактируемую запись, если она существует
+                                ...(entry.id && { id: { not: entry.id } }),
+                            },
+                            select: {
+                                amount: true,
+                            },
+                        });
+
+                        const currentSpent = monthlyEntries.reduce((sum, e) => sum + e.amount, 0);
+                        const remaining = wallet.monthlyLimit - currentSpent;
+
+                        // Проверяем, не превысит ли измененная/новая операция лимит
+                        if (entry.amount > remaining) {
+                            throw new BadRequestException(
+                                `Превышен месячный лимит кошелька "${wallet.name}". ` +
+                                    `Доступно: ${remaining.toLocaleString('ru-RU')} ${wallet.currency.code}, ` +
+                                    `требуется: ${entry.amount.toLocaleString('ru-RU')} ${wallet.currency.code}`,
+                            );
+                        }
+                    }
+                }
 
                 for (const entry of entries) {
                     if (entry.id) {
@@ -96,10 +258,18 @@ export class UpdateOperationUseCase {
                             walletId: true,
                             direction: true,
                             amount: true,
+                            before: true,
+                            after: true,
                             userId: true,
                             updatedById: true,
                             createdAt: true,
                             updatedAt: true,
+                            wallet: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                },
+                            },
                         },
                     },
                     type: {

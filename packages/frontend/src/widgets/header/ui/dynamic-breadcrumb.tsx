@@ -30,25 +30,19 @@ export function DynamicBreadcrumb() {
     return uuidRegex.test(str);
   };
 
-  const items = subSegments.map((segment, index) => {
-    const href = [
-      ROUTER_MAP.DASHBOARD,
-      ...subSegments.slice(0, index + 1),
-    ].join('/');
-    let title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
-
-    const isLast = index === subSegments.length - 1;
-    if (isLast && isUUID(segment) && index > 0) {
-      const parentHref = [
+  const items = subSegments
+    .filter((segment) => !isUUID(segment))
+    .map((segment, index) => {
+      const href = [
         ROUTER_MAP.DASHBOARD,
-        ...subSegments.slice(0, index),
+        ...subSegments.filter((s) => !isUUID(s)).slice(0, index + 1),
       ].join('/');
-      const editHref = parentHref + '/edit';
-      title = ROUTER_TITLES[editHref] ?? ROUTER_TITLES[parentHref] ?? title;
-    }
+      let title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
 
-    return { href, title, isLast };
-  });
+      const isLast = index === subSegments.filter((s) => !isUUID(s)).length - 1;
+
+      return { href, title, isLast };
+    });
 
   return (
     <Breadcrumb>

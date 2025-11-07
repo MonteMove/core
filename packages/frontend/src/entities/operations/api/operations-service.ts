@@ -4,6 +4,8 @@ import { API_MAP } from '@/shared/utils/constants/api-map';
 import {
   CreateOperationDto,
   CreateOperationDtoSchema,
+  CreateOperationBackendDto,
+  CreateOperationBackendDtoSchema,
   GetOperationsParams,
   GetOperationsParamsSchema,
   GetOperationsResponseDto,
@@ -11,12 +13,14 @@ import {
   OperationResponseDto,
   OperationResponseDtoSchema,
   UpdateOperationDto,
+  UpdateOperationBackendDto,
+  UpdateOperationBackendDtoSchema,
   UpdateOperationDtoSchema,
 } from '../model/opeartions-schemas';
 
 export class OperationsService {
-  public static async create(data: CreateOperationDto): Promise<void> {
-    const validated = CreateOperationDtoSchema.parse(data);
+  public static async create(data: CreateOperationBackendDto): Promise<void> {
+    const validated = CreateOperationBackendDtoSchema.parse(data);
     await axiosInstance.post('/operations', validated);
   }
   public static async getOperations(
@@ -40,9 +44,9 @@ export class OperationsService {
 
   public static async update(
     id: string,
-    data: UpdateOperationDto,
+    data: UpdateOperationBackendDto,
   ): Promise<void> {
-    const validated = UpdateOperationDtoSchema.parse(data);
+    const validated = UpdateOperationBackendDtoSchema.parse(data);
     await axiosInstance.put(API_MAP.OPERATIONS.OPERATIONS_BY_ID(id), validated);
   }
 

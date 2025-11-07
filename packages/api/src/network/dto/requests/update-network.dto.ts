@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, Length } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsOptional, IsString, Length } from 'class-validator';
 
 export class UpdateNetworkDto {
     @ApiProperty({
@@ -27,4 +27,12 @@ export class UpdateNetworkDto {
         message: 'Название сети должно содержать от 2 до 100 символов',
     })
     public name?: string;
+
+    @ApiPropertyOptional({
+        description: 'Активность сети',
+        example: true,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Активность должна быть булевым значением' })
+    public active?: boolean;
 }

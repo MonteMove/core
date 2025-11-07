@@ -90,6 +90,16 @@ export const CardApplication = ({ application }: CardApplicationProps) => {
             {application.phone || 'Не указано'}
           </span>
         </p>
+        {application.hasAdvance && (
+          <div className="mt-3 rounded border border-primary/40 bg-primary/10 p-2">
+            <p className="text-sm">
+              <strong className="mr-1">Аванс:</strong>
+              <span className="font-semibold">
+                {formatNumber(application.amount)} {application.currency.code}
+              </span>
+            </p>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="flex justify-between items-start gap-2">

@@ -49,11 +49,11 @@ export class CreateOperationDto {
     @IsUUID('4', { message: 'ID типа операции должен быть валидным UUID' })
     public typeId: string;
 
-    @ApiProperty({ description: 'ID заявки', example: 1 })
+    @ApiProperty({ description: 'ID заявки', example: 1, required: false })
     @IsOptional()
     @IsNumber(undefined, { message: 'ID заявки должен быть числом' })
     @Min(1, { message: 'ID заявки должен быть больше 0' })
-    public applicationId: number;
+    public applicationId?: number;
 
     @ApiProperty({
         description: 'Описание операции',

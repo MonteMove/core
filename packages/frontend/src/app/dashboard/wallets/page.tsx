@@ -14,6 +14,7 @@ import {
   GetWalletsFilter,
   GetWalletsFilterSchema,
   Wallet,
+  WalletCardSkeleton,
   SimpleWalletCard,
   SortOrder,
   WalletSortField,
@@ -47,13 +48,12 @@ const baseFilters: GetWalletsFilter = {
   balanceStatus: undefined,
   walletKind: undefined,
   walletTypeId: undefined,
-  walletTypeIdIsNull: undefined,
   minAmount: null,
   maxAmount: null,
   currencyId: undefined,
   userId: undefined,
   active: undefined,
-  pinned: true,
+  pinned: false,
   visible: true,
   deleted: false,
   sortField: WalletSortField.CREATED_AT,
@@ -167,16 +167,22 @@ export default function WalletsPage() {
       (filtered as Record<keyof GetWalletsFilter, unknown>)[k] = value;
     });
 
-    return {
+    const result = {
       ...filtered,
+      pinned: formValues.pinned ?? baseFilters.pinned,
+      visible: formValues.visible ?? baseFilters.visible,
+      deleted: formValues.deleted ?? baseFilters.deleted,
       sortField: formValues.sortField || baseFilters.sortField,
       sortOrder: formValues.sortOrder || baseFilters.sortOrder,
       page: formValues.page || baseFilters.page,
       limit: formValues.limit || baseFilters.limit,
     } as GetWalletsFilter;
+
+    return result;
   }, [formValues]);
 
-  const { data, isLoading } = useWallets(filteredValues);
+  const { data, isLoading, isFetching } = useWallets(filteredValues);
+  const showSkeleton = isLoading || isFetching;
 
   const renderWalletCard = (wallet: Wallet) => {
     switch (wallet.walletKind) {
@@ -197,7 +203,7 @@ export default function WalletsPage() {
           <CardTitle className="text-2xl">Список кошельков</CardTitle>
           <div className="flex gap-2 items-center flex-wrap">
             <Input
-              placeholder="Поиск по названию или описанию..."
+              placeholder="Поиск"
               value={formValues?.search ?? ''}
               onChange={(e) =>
                 form.setValue('search', e.target.value || undefined)
@@ -228,27 +234,32 @@ export default function WalletsPage() {
               ? 'hidden'
               : formValues?.pinned
                 ? 'pinned'
-                : formValues?.walletTypeId || 'all'
+                : formValues?.walletTypeId
+                  ? formValues.walletTypeId
+                  : 'all'
         }
         onValueChange={(val) => {
           if (val === 'all') {
             form.reset({
               ...baseFilters,
-              walletTypeIdIsNull: true,
+              walletTypeId: undefined,
               pinned: false,
+              visible: true,
+              deleted: false,
             });
           } else if (val === 'deleted') {
-            form.reset({ ...baseFilters, deleted: true, pinned: false });
+            form.reset({ ...baseFilters, deleted: true, visible: true, pinned: false });
           } else if (val === 'hidden') {
-            form.reset({ ...baseFilters, visible: false, pinned: false });
+            form.reset({ ...baseFilters, visible: false, deleted: false, pinned: false });
           } else if (val === 'pinned') {
-            form.reset({ ...baseFilters, pinned: true });
+            form.reset({ ...baseFilters, pinned: true, visible: true, deleted: false });
           } else {
             form.reset({
               ...baseFilters,
               walletTypeId: val,
               pinned: false,
-              walletTypeIdIsNull: false,
+              visible: true,
+              deleted: false,
             });
           }
         }}
@@ -280,12 +291,14 @@ export default function WalletsPage() {
       </Tabs>
 
       <div className="space-y-4">
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Загрузка...</p>
-          </div>
+        {showSkeleton && (
+          <>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <WalletCardSkeleton key={index} />
+            ))}
+          </>
         )}
-        {!isLoading && data?.wallets.length === 0 && (
+        {!showSkeleton && data?.wallets.length === 0 && (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -301,7 +314,7 @@ export default function WalletsPage() {
             </EmptyHeader>
           </Empty>
         )}
-        {!isLoading && data?.wallets.map(renderWalletCard)}
+        {!showSkeleton && data?.wallets.map(renderWalletCard)}
       </div>
     </div>
   );

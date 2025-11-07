@@ -9,6 +9,7 @@ export const OperationTypeSchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   isSeparateTab: z.boolean(),
+  active: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   created_by: z
@@ -44,19 +45,22 @@ export const CreateOperationTypeSchema = z.object({
     .optional()
     .nullable(),
   isSeparateTab: z.boolean(),
+  active: z.boolean().default(true),
 });
 
 export const UpdateOperationTypeSchema = z.object({
   name: z
     .string()
     .min(2, 'Название должно содержать минимум 2 символа')
-    .max(100, 'Название не должно превышать 100 символов'),
+    .max(100, 'Название не должно превышать 100 символов')
+    .optional(),
   description: z
     .string()
     .max(1000, 'Описание не должно превышать 1000 символов')
     .optional()
     .nullable(),
-  isSeparateTab: z.boolean(),
+  isSeparateTab: z.boolean().optional(),
+  active: z.boolean().optional(),
 });
 
 export const OperationTypesResponseSchema = z.object({

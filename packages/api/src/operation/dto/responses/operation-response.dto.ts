@@ -16,6 +16,15 @@ export class OperationEntryResponseDto {
     public walletId: string;
 
     @ApiProperty({
+        description: 'Информация о кошельке',
+        type: () => Object,
+    })
+    public wallet: {
+        id: string;
+        name: string;
+    };
+
+    @ApiProperty({
         description: 'Направление движения средств',
         enum: OperationDirection,
     })
@@ -23,6 +32,20 @@ export class OperationEntryResponseDto {
 
     @ApiProperty({ description: 'Сумма движения', example: 1500 })
     public amount: number;
+
+    @ApiProperty({
+        description: 'Баланс кошелька до операции',
+        example: 5000,
+        nullable: true,
+    })
+    public before: number | null;
+
+    @ApiProperty({
+        description: 'Баланс кошелька после операции',
+        example: 6500,
+        nullable: true,
+    })
+    public after: number | null;
 
     @ApiProperty({
         description: 'ID пользователя, создавшего запись',
@@ -98,6 +121,13 @@ export class OperationResponseDto {
         example: '123e4567-e89b-12d3-a456-426614174100',
     })
     public typeId: string;
+
+    @ApiProperty({
+        description: 'ID заявки',
+        example: 1,
+        nullable: true,
+    })
+    public applicationId: number | null;
 
     @ApiProperty({
         description: 'Описание операции',

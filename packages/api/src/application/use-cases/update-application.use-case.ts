@@ -34,6 +34,16 @@ export class UpdateApplicationUseCase {
             throw new NotFoundException('Заявка не найдена');
         }
 
+        // Если изменился тип операции, пересчитываем hasAdvance
+        let hasAdvance: boolean | undefined;
+        if (operationTypeId !== undefined) {
+            const operationType = await this.prisma.operationType.findUnique({
+                where: { id: operationTypeId },
+                select: { name: true },
+            });
+            hasAdvance = operationType?.name === 'Аванс';
+        }
+
         const application = await this.prisma.application.update({
             where: { id: applicationId },
             data: {
@@ -50,6 +60,7 @@ export class UpdateApplicationUseCase {
                 ...(meetingDate !== undefined && {
                     meetingDate: new Date(meetingDate),
                 }),
+                ...(hasAdvance !== undefined && { hasAdvance }),
             },
             include: {
                 created_by: {

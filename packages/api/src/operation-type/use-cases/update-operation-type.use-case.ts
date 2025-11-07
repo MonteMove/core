@@ -38,6 +38,9 @@ export class UpdateOperationTypeUseCase {
                 ...(updateOperationTypeDto.isSeparateTab !== undefined && {
                     isSeparateTab: updateOperationTypeDto.isSeparateTab,
                 }),
+                ...(updateOperationTypeDto.active !== undefined && {
+                    active: updateOperationTypeDto.active,
+                }),
             },
             select: {
                 id: true,
@@ -46,6 +49,7 @@ export class UpdateOperationTypeUseCase {
                 name: true,
                 description: true,
                 isSeparateTab: true,
+                active: true,
                 createdAt: true,
                 updatedAt: true,
             },

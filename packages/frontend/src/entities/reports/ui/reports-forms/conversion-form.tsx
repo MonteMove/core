@@ -126,7 +126,15 @@ export function ReportsConversionForm() {
                         }
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString());
+                            // Создаем дату в UTC
+                            const utcDate = new Date(
+                              Date.UTC(
+                                date.getFullYear(),
+                                date.getMonth(),
+                                date.getDate(),
+                              ),
+                            );
+                            field.onChange(utcDate.toISOString());
                             setRawInputStart(formatDate(date));
                           }
                           setOpenStart(false);
@@ -197,7 +205,15 @@ export function ReportsConversionForm() {
                         }
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString());
+                            // Создаем дату в UTC
+                            const utcDate = new Date(
+                              Date.UTC(
+                                date.getFullYear(),
+                                date.getMonth(),
+                                date.getDate(),
+                              ),
+                            );
+                            field.onChange(utcDate.toISOString());
                             setRawInputEnd(formatDate(date));
                           }
                           setOpenEnd(false);

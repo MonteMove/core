@@ -17,6 +17,7 @@ export class GetOperationTypeByIdUseCase {
                 name: true,
                 description: true,
                 isSeparateTab: true,
+                active: true,
                 createdAt: true,
                 updatedAt: true,
                 deleted: true,

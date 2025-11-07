@@ -37,6 +37,10 @@ export const API_MAP = {
     OPERATION_TYPES: '/operation-types',
     OPERATION_TYPE_BY_ID: (id: string) => `/operation-types/${id}`,
   },
+  PLATFORMS: {
+    PLATFORMS: '/platforms',
+    PLATFORM_BY_ID: (id: string) => `/platforms/${id}`,
+  },
   SESSIONS: {
     SESSIONS: '/sessions',
     MY_SESSIONS: '/sessions/my',

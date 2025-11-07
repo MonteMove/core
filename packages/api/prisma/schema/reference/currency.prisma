@@ -4,6 +4,7 @@ model Currency {
   updatedById String   @map("updated_by_id") @db.Uuid
   code        String
   name        String
+  active      Boolean  @default(true)
   deleted     Boolean  @default(false)
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
@@ -17,6 +18,7 @@ model Currency {
   @@unique([name, deleted], map: "currencies_name_deleted_unique")
   @@index([userId], map: "currencies_user_id_idx")
   @@index([updatedById], map: "currencies_updated_by_id_idx")
+  @@index([active], map: "currencies_active_idx")
   @@index([createdAt], map: "currencies_created_at_idx")
   @@index([updatedAt], map: "currencies_updated_at_idx")
   @@index([deleted, createdAt(sort: Desc)], map: "currencies_deleted_created_idx")

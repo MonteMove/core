@@ -215,6 +215,16 @@ export class CreateWalletDto {
     public visible?: boolean = true;
 
     @ApiProperty({
+        description: 'Месячный лимит операций',
+        example: 100000,
+        required: false,
+    })
+    @IsOptional()
+    @IsInt({ message: 'Месячный лимит должен быть целым числом' })
+    @Min(0, { message: 'Месячный лимит не может быть отрицательным' })
+    public monthlyLimit?: number;
+
+    @ApiProperty({
         description: 'Детали кошелька',
         required: false,
         type: WalletDetailsDto,

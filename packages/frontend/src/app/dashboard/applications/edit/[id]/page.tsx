@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 
 import { useApplications } from '@/entities/application';
-import { EditApplicationForm } from '@/features/application/ui/edit-application/edit-application';
+import { ApplicationForm } from '@/features/application';
 import {
   Card,
   CardContent,
@@ -54,7 +54,7 @@ export default function EditApplicationPage() {
           <CardDescription>Измените все необходимые поля ниже.</CardDescription>
         </CardHeader>
         <CardContent>
-          <EditApplicationForm initialData={application} />
+          <ApplicationForm initialData={application} />
         </CardContent>
       </Card>
     </div>

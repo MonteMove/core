@@ -12,15 +12,17 @@ export const OperationSchema = z.object({
   description: z.string().nullable(),
 });
 
-export const OperationEntryDtoSchema = z.object({
+// Схема для получения entries от API (с walletId и wallet объектом)
+export const OperationEntryApiSchema = z.object({
   id: z.string().uuid(),
+  walletId: z.string().uuid(),
   wallet: z.object({
     id: z.string().uuid(),
     name: z.string(),
   }),
   direction: z.enum(['credit', 'debit']),
+  amount: z.number(),
   before: z.number().nullable(),
-  amount: z.number().min(1),
   after: z.number().nullable(),
   userId: z.string().uuid(),
   updatedById: z.string().uuid(),
@@ -28,21 +30,50 @@ export const OperationEntryDtoSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-export const OperationEntryCreateDtoSchema = z.object({
+// Схема для работы в UI (с wallet объектом)
+export const OperationEntryDtoSchema = z.object({
+  id: z.string().uuid().optional(),
   wallet: z.object({
     id: z.string().uuid(),
     name: z.string(),
   }),
   direction: z.enum(['credit', 'debit']),
-  amount: z.number(),
+  before: z.number().nullable().optional(),
+  amount: z.number().min(1),
+  after: z.number().nullable().optional(),
+  userId: z.string().uuid().optional(),
+  updatedById: z.string().uuid().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
+
+export const OperationEntryCreateDtoSchema = z.object({
+  wallet: z.object({
+    id: z.string().uuid('Выберите кошелек'),
+    name: z.string(),
+  }),
+  direction: z.enum(['credit', 'debit']),
+  amount: z.number().positive('Сумма должна быть больше 0'),
 });
 
 export const CreateOperationDtoSchema = z.object({
+  typeId: z.string().uuid('Выберите тип операции'),
+  applicationId: z.number().optional(),
+  description: z.string().max(2000, 'Максимум 2000 символов').optional().nullable(),
+  entries: z.array(OperationEntryCreateDtoSchema).min(1, 'Добавьте хотя бы одну запись операции'),
+  creatureDate: z.string().optional(),
+});
+
+export const CreateOperationBackendDtoSchema = z.object({
   typeId: z.string().uuid(),
-  applicationId: z.number(),
+  applicationId: z.number().optional(),
   description: z.string().max(2000).optional().nullable(),
-  entries: z.array(OperationEntryCreateDtoSchema),
-  creatureDate: z.string(),
+  entries: z.array(z.object({
+    walletId: z.string().uuid(),
+    direction: z.enum(['credit', 'debit']),
+    amount: z.number().positive(),
+  })).min(1),
+  creatureDate: z.string().optional(),
 });
 
 export const OperationEntryUpdateDtoSchema = z.object({
@@ -61,32 +92,53 @@ export const OperationEntryUpdateDtoSchema = z.object({
   updatedAt: z.string(),
 });
 
+// Схема для отправки на бэкенд (с walletId)
+export const UpdateOperationEntryBackendSchema = z.object({
+  id: z.string().uuid().optional(),
+  walletId: z.string().uuid(),
+  direction: z.enum(['credit', 'debit']),
+  amount: z.number().positive('Сумма должна быть больше 0'),
+});
+
 export const UpdateOperationDtoSchema = z.object({
-  typeId: z.string().uuid(),
-  applicationId: z.number(),
+  typeId: z.string().uuid().optional(),
+  applicationId: z.number().optional(),
   description: z
     .string()
     .max(2000, 'Максимум 2000 символов')
     .optional()
     .nullable(),
-  entries: z.array(OperationEntryDtoSchema),
-  creatureDate: z.string(),
+  entries: z.array(OperationEntryDtoSchema).optional(),
+  creatureDate: z.string().optional(),
+});
+
+export const UpdateOperationBackendDtoSchema = z.object({
+  typeId: z.string().uuid().optional(),
+  applicationId: z.number().optional(),
+  description: z
+    .string()
+    .max(2000, 'Максимум 2000 символов')
+    .optional()
+    .nullable(),
+  entries: z.array(UpdateOperationEntryBackendSchema).optional(),
+  creatureDate: z.string().optional(),
 });
 
 export const OperationResponseDtoSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
-  updateById: z.string().uuid(),
+  updatedById: z.string().uuid(),
   typeId: z.string().uuid(),
+  applicationId: z.number().optional().nullable(),
   description: z
     .string()
     .max(2000, 'Максиммум 2000 символов')
     .optional()
     .nullable(),
-  conversionGroupId: z.string().uuid(),
+  conversionGroupId: z.string().uuid().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
-  entries: z.array(OperationEntryDtoSchema),
+  entries: z.array(OperationEntryApiSchema),
   type: z.object({ id: z.string().uuid(), name: z.string() }),
   created_by: z
     .object({
@@ -111,6 +163,7 @@ export const GetOperationsParamsSchema = z.object({
   search: z.string().optional(),
   typeId: z.string().uuid().nullable().optional(),
   userId: z.string().uuid().nullable().optional(),
+  walletId: z.string().uuid().nullable().optional(),
   applicationId: z.string().nullable().optional(),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
@@ -120,6 +173,7 @@ export const GetOperationsParamsSchema = z.object({
 
 export type OperationResponseDto = z.infer<typeof OperationResponseDtoSchema>;
 export type UpdateOperationDto = z.infer<typeof UpdateOperationDtoSchema>;
+export type UpdateOperationBackendDto = z.infer<typeof UpdateOperationBackendDtoSchema>;
 export type GetOperationsResponseDto = z.infer<
   typeof GetOperationsResponseDtoSchema
 >;
@@ -129,6 +183,7 @@ export type ReportsConversion = z.infer<typeof ReportsConversionSchema>;
 export type ReportsPeriod = z.infer<typeof ReportsPeriodSchema>;
 export type OperationEntryDto = z.infer<typeof OperationEntryDtoSchema>;
 export type CreateOperationDto = z.infer<typeof CreateOperationDtoSchema>;
+export type CreateOperationBackendDto = z.infer<typeof CreateOperationBackendDtoSchema>;
 export type OperationEntryCreateDto = z.infer<
   typeof OperationEntryCreateDtoSchema
 >;

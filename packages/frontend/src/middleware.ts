@@ -9,9 +9,15 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, search } = request.nextUrl;
   const isLoginRoute = pathname === ROUTER_MAP.LOGIN;
 
-  const refreshToken = request.cookies.get(
+  let refreshToken = request.cookies.get(
     env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY,
   )?.value;
+  
+  // В dev режиме используем dev куку как fallback
+  if (!refreshToken && process.env.NODE_ENV === 'development') {
+    refreshToken = request.cookies.get('dev_auth_token')?.value;
+  }
+  
   const hasValidToken = refreshToken
     ? (await verifyJwtToken(refreshToken)) !== null
     : false;
@@ -27,6 +33,10 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     const response = NextResponse.redirect(loginUrl);
     if (refreshToken) {
       response.cookies.delete(env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY);
+      // Удаляем dev куку если в dev режиме
+      if (process.env.NODE_ENV === 'development') {
+        response.cookies.delete('dev_auth_token');
+      }
     }
     return response;
   }

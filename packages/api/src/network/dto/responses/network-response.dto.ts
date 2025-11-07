@@ -26,6 +26,12 @@ export class NetworkResponseDto {
     public updatedById: string;
 
     @ApiProperty({
+        description: 'Активность сети',
+        example: true,
+    })
+    public active: boolean;
+
+    @ApiProperty({
         description: 'Флаг удаления записи',
         example: false,
     })

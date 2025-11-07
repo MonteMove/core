@@ -16,12 +16,14 @@ import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/shared/ui/shadcn/form';
 import { Input } from '@/shared/ui/shadcn/input';
+import { Switch } from '@/shared/ui/shadcn/switch';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 import { useCreateNetwork } from '../hooks/use-create-network';
@@ -44,10 +46,12 @@ export function NetworkForm({ isEdit = false, initialData }: NetworkFormProps) {
         ? {
             code: initialData.code,
             name: initialData.name,
+            active: initialData.active,
           }
         : {
             code: '',
             name: '',
+            active: true,
           },
   });
 
@@ -98,6 +102,24 @@ export function NetworkForm({ isEdit = false, initialData }: NetworkFormProps) {
                 <Input placeholder="Bitcoin" {...field} />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="active"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
+              <div className="space-y-0.5">
+                <FormLabel>Активность</FormLabel>
+                <FormDescription>
+                  Активные сети доступны для выбора при создании кошельков
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
             </FormItem>
           )}
         />

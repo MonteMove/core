@@ -16,7 +16,6 @@ export class GetWalletsUseCase {
             balanceStatus,
             walletKind,
             walletTypeId,
-            walletTypeIdIsNull,
             minAmount,
             maxAmount,
             currencyId,
@@ -36,15 +35,47 @@ export class GetWalletsUseCase {
 
         const where: Prisma.WalletWhereInput = {};
 
+        if (pinned !== undefined) {
+            where.pinned = pinned;
+        }
+
+        if (visible !== undefined) {
+            where.visible = visible;
+        }
+
         if (deleted !== undefined) {
             where.deleted = deleted;
         }
 
+        const orConditions: Prisma.WalletWhereInput[] = [];
+
         if (search) {
-            where.OR = [
+            orConditions.push(
                 { name: { contains: search, mode: 'insensitive' } },
                 { description: { contains: search, mode: 'insensitive' } },
-            ];
+                { walletType: { name: { contains: search, mode: 'insensitive' } } },
+                { details: { ownerFullName: { contains: search, mode: 'insensitive' } } },
+                { details: { card: { contains: search, mode: 'insensitive' } } },
+                { details: { phone: { contains: search, mode: 'insensitive' } } },
+                { details: { address: { contains: search, mode: 'insensitive' } } },
+                { details: { exchangeUid: { contains: search, mode: 'insensitive' } } },
+                { details: { username: { contains: search, mode: 'insensitive' } } },
+                { details: { accountId: { contains: search, mode: 'insensitive' } } },
+                { details: { network: { name: { contains: search, mode: 'insensitive' } } } },
+                { details: { networkType: { name: { contains: search, mode: 'insensitive' } } } },
+                { currency: { code: { contains: search, mode: 'insensitive' } } },
+                { currency: { name: { contains: search, mode: 'insensitive' } } },
+                { user: { username: { contains: search, mode: 'insensitive' } } },
+            );
+
+            const searchLower = search.toLowerCase();
+            if ('касса'.startsWith(searchLower) || searchLower.startsWith('касс')) {
+                orConditions.push({ walletKind: 'simple' });
+            }
+        }
+
+        if (orConditions.length > 0) {
+            where.OR = orConditions;
         }
 
         if (balanceStatus !== undefined) {
@@ -57,10 +88,6 @@ export class GetWalletsUseCase {
 
         if (walletTypeId !== undefined) {
             where.walletTypeId = walletTypeId;
-        }
-
-        if (walletTypeIdIsNull === true) {
-            where.walletTypeId = null;
         }
 
         if (minAmount !== undefined || maxAmount !== undefined) {
@@ -87,14 +114,6 @@ export class GetWalletsUseCase {
 
         if (pinOnMain !== undefined) {
             where.pinOnMain = pinOnMain;
-        }
-
-        if (pinned !== undefined) {
-            where.pinned = pinned;
-        }
-
-        if (visible !== undefined) {
-            where.visible = visible;
         }
 
         const total = await this.prisma.wallet.count({ where });

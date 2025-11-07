@@ -5,12 +5,15 @@ import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, Trash2 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 
-import { useApplicationsList } from '@/entities/application';
+import { ApplicationService, useApplicationsList } from '@/entities/application';
 import {
+  CreateOperationBackendDto,
   CreateOperationDto,
   CreateOperationDtoSchema,
   OperationResponseDto,
+  UpdateOperationBackendDto,
   useCreateOperation,
   useOperationTypes,
   useUpdateOperation,
@@ -21,6 +24,7 @@ import {
   Calendar,
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,6 +43,7 @@ import {
   cn,
   formatDate,
 } from '@/shared';
+import { formatNumber, parseFormattedNumber } from '@/shared/lib/utils/format-number';
 
 export function OperationForm({
   initialData,
@@ -58,15 +63,38 @@ export function OperationForm({
   const { data: applications, isLoading: isApplicationsLoading } =
     useApplicationsList();
 
+  // Получаем текущую заявку операции, если она есть (даже если завершена)
+  const currentApplicationId = initialData?.applicationId;
+  const { data: currentApplication } = useQuery({
+    queryKey: ['application', currentApplicationId],
+    queryFn: () =>
+      currentApplicationId
+        ? ApplicationService.getById(String(currentApplicationId))
+        : null,
+    enabled: !!currentApplicationId,
+  });
+
+  // Объединяем открытые заявки и текущую заявку (если она завершена)
+  const availableApplications = React.useMemo(() => {
+    const openApps = applications?.applications || [];
+    
+    // Если есть текущая заявка и её нет в списке открытых, добавляем её
+    if (currentApplication && !openApps.find(app => app.id === currentApplication.id)) {
+      return [currentApplication, ...openApps];
+    }
+    
+    return openApps;
+  }, [applications, currentApplication]);
+
   const form = useForm<CreateOperationDto>({
     resolver: zodResolver(CreateOperationDtoSchema),
     defaultValues: initialData
       ? {
           typeId: initialData.typeId,
-          applicationId: 0,
+          applicationId: initialData.applicationId || undefined,
           description: initialData.description ?? '',
           entries: initialData.entries.map((e) => ({
-            wallet: { id: e.wallet.id, name: e.wallet.name },
+            wallet: e.wallet,
             direction: e.direction,
             amount: e.amount,
           })),
@@ -74,10 +102,10 @@ export function OperationForm({
         }
       : {
           typeId: '',
-          applicationId: 0,
+          applicationId: undefined,
           description: '',
           entries: [],
-          creatureDate: '',
+          creatureDate: undefined,
         },
   });
 
@@ -86,10 +114,50 @@ export function OperationForm({
     name: 'entries',
   });
 
+  // Проверяем, является ли выбранный тип операции "Корректировкой"
+  const selectedTypeId = form.watch('typeId');
+  const selectedOperationType = operationTypes?.find(
+    (type) => type.id === selectedTypeId
+  );
+  const isCorrection = selectedOperationType?.name === 'Корректировка';
+
+  // Для корректировки ограничиваем количество записей до 1
+  React.useEffect(() => {
+    if (isCorrection) {
+      if (fields.length === 0) {
+        // Если нет записей, добавляем одну пустую
+        append({
+          wallet: { id: '', name: '' },
+          direction: 'debit',
+          amount: 0,
+        });
+      } else if (fields.length > 1) {
+        // Если больше одной записи, оставляем только первую
+        while (fields.length > 1) {
+          remove(fields.length - 1);
+        }
+      }
+    }
+  }, [isCorrection, fields.length, remove, append]);
+
   const onSubmit = (data: CreateOperationDto) => {
     if (!data.creatureDate) {
       data.creatureDate = new Date().toISOString();
     }
+
+    const transformedEntries = data.entries.map((entry) => ({
+      walletId: entry.wallet.id,
+      direction: entry.direction,
+      amount: entry.amount,
+    }));
+
+    const payload: CreateOperationBackendDto = {
+      typeId: data.typeId,
+      ...(data.applicationId && data.applicationId > 0 && { applicationId: data.applicationId }),
+      description: data.description ?? null,
+      entries: transformedEntries,
+      creatureDate: data.creatureDate,
+    };
 
     if (initialData) {
       const mergedEntries = data.entries.map((entry) => {
@@ -98,30 +166,34 @@ export function OperationForm({
             e.wallet.id === entry.wallet.id && e.direction === entry.direction,
         );
 
-        return {
-          id: oldEntry?.id ?? crypto.randomUUID(),
-          wallet: { id: entry.wallet.id, name: entry.wallet.name },
-          direction: entry.direction,
-          amount: entry.amount,
-          before: oldEntry?.before ?? null,
-          after: oldEntry?.after ?? null,
-          userId: oldEntry?.userId ?? crypto.randomUUID(),
-          updatedById: oldEntry?.updatedById ?? crypto.randomUUID(),
-          createdAt: oldEntry?.createdAt ?? new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
+        if (oldEntry) {
+          return {
+            id: oldEntry.id,
+            walletId: entry.wallet.id,
+            direction: entry.direction,
+            amount: entry.amount,
+          };
+        } else {
+          return {
+            walletId: entry.wallet.id,
+            direction: entry.direction,
+            amount: entry.amount,
+          };
+        }
       });
 
-      updateMutation.mutate({
+      const updatePayload: { id: string } & UpdateOperationBackendDto = {
         id: initialData.id,
         typeId: data.typeId,
-        applicationId: data.applicationId,
+        ...(data.applicationId && data.applicationId > 0 && { applicationId: data.applicationId }),
         creatureDate: data.creatureDate,
         description: data.description ?? null,
         entries: mergedEntries,
-      });
+      };
+
+      updateMutation.mutate(updatePayload);
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(payload);
     }
   };
 
@@ -141,7 +213,9 @@ export function OperationForm({
             name="typeId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Тип операции:</FormLabel>
+                <FormLabel>
+                  Тип операции <span className="text-destructive">*</span>
+                </FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value || ''}
@@ -179,18 +253,19 @@ export function OperationForm({
                   <Skeleton className="h-8" />
                 ) : (
                   <Select
-                    onValueChange={(v) => field.onChange(Number(v))}
-                    value={String(field.value ?? '')}
+                    onValueChange={(v) => field.onChange(v ? Number(v) : undefined)}
+                    value={field.value ? String(field.value) : ''}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Выберите заявку" />
+                        <SelectValue placeholder="Не выбрано" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {applications?.applications?.map((app) => (
+                      {availableApplications?.map((app) => (
                         <SelectItem key={app.id} value={String(app.id)}>
                           #{app.id} - {app.amount} {app.currency.code}
+                          {app.status === 'done' && ' (завершена)'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -206,7 +281,7 @@ export function OperationForm({
             name="creatureDate"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Дата операции:</FormLabel>
+                <FormLabel>Дата операции</FormLabel>
                 <div className="relative flex gap-2">
                   <FormControl>
                     <Input
@@ -228,7 +303,8 @@ export function OperationForm({
                         const parts = formatted.split('.');
                         if (parts.length === 3) {
                           const [dd, mm, yyyy] = parts.map(Number);
-                          const parsed = new Date(yyyy, mm - 1, dd);
+                          // Создаем дату напрямую в UTC, чтобы избежать смещения часовых поясов
+                          const parsed = new Date(Date.UTC(yyyy, mm - 1, dd));
                           if (!isNaN(parsed.getTime())) {
                             field.onChange(parsed.toISOString());
                             return;
@@ -259,7 +335,15 @@ export function OperationForm({
                         }
                         onSelect={(date) => {
                           if (date) {
-                            field.onChange(date.toISOString());
+                            // Создаем дату в UTC из выбранного дня, чтобы избежать смещения часовых поясов
+                            const utcDate = new Date(
+                              Date.UTC(
+                                date.getFullYear(),
+                                date.getMonth(),
+                                date.getDate(),
+                              ),
+                            );
+                            field.onChange(utcDate.toISOString());
                             setRawInput(formatDate(date));
                           }
                           setOpen(false);
@@ -274,39 +358,135 @@ export function OperationForm({
         </div>
 
         {/* Entries */}
-        <div className="lg:grid lg:grid-cols-2 gap-4">
-          {['credit', 'debit'].map((dir) => (
-            <div key={dir} className="flex flex-col gap-3 mt-2">
-              <div className="lg:flex justify-between items-center">
-                <p className="font-medium">
-                  {dir === 'credit' ? 'Вычесть из...' : 'Прибавить к...'}
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  onClick={() =>
-                    append({
-                      wallet: { id: '', name: '' },
-                      direction: dir as 'credit' | 'debit',
-                      amount: 0,
-                    })
-                  }
-                >
-                  + Добавить строку
-                </Button>
-              </div>
+        {isCorrection ? (
+          // Для корректировки - одна строка: кошелек + сумма корректировки
+          <div className="flex flex-col gap-3 mt-2">
+            {fields.map((item, realIndex) => (
+              <div key={item.id} className="flex gap-3 items-end">
+                <FormField
+                  control={form.control}
+                  name={`entries.${realIndex}.wallet.id`}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>
+                        Кошелек <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value || ''}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Выберите кошелек" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <div className="px-2 pb-2">
+                            <Input
+                              placeholder="Поиск кошелька..."
+                              value={walletSearch}
+                              onChange={(e) =>
+                                setWalletSearch(e.target.value)
+                              }
+                              className="h-8"
+                            />
+                          </div>
+                          {wallets?.wallets
+                            ?.filter((wallet) =>
+                              wallet.name
+                                .toLowerCase()
+                                .includes(walletSearch.toLowerCase()),
+                            )
+                            .map((wallet) => (
+                              <SelectItem key={wallet.id} value={wallet.id}>
+                                {wallet.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              {fields
-                .filter((item) => item.direction === dir)
-                .map((item, index) => (
+                {/* Скрытое поле направления - всегда credit для корректировки */}
+                <FormField
+                  control={form.control}
+                  name={`entries.${realIndex}.direction`}
+                  render={({ field }) => (
+                    <input type="hidden" {...field} value="credit" />
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name={`entries.${realIndex}.amount`}
+                  render={({ field }) => (
+                    <FormItem className="w-[280px]">
+                      <FormLabel>
+                        Сумма <span className="text-destructive">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          value={
+                            typeof field.value === 'number'
+                              ? formatNumber(field.value)
+                              : String(field.value || '')
+                          }
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            const parsed = parseFormattedNumber(value);
+                            field.onChange(isNaN(parsed) ? 0 : parsed);
+                          }}
+                          placeholder="0"
+                          inputMode="numeric"
+                        />
+                      </FormControl>                  
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          // Для обычных операций - две колонки
+          <div className="lg:grid lg:grid-cols-2 gap-4">
+            {['credit', 'debit'].map((dir) => (
+              <div key={dir} className="flex flex-col gap-3 mt-2">
+                <div className="lg:flex justify-between items-center">
+                  <p className="font-medium">
+                    {dir === 'credit' ? 'Вычесть из...' : 'Прибавить к...'}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() =>
+                      append({
+                        wallet: { id: '', name: '' },
+                        direction: dir as 'credit' | 'debit',
+                        amount: 0,
+                      })
+                    }
+                  >
+                    + Добавить строку
+                  </Button>
+                </div>
+
+                {fields
+                  .map((item, realIndex) => ({ item, realIndex }))
+                  .filter(({ item }) => item.direction === dir)
+                  .map(({ item, realIndex }) => (
                   <div key={item.id} className="flex gap-3 items-end">
                     <FormField
                       control={form.control}
-                      name={`entries.${index}.wallet.id`}
+                      name={`entries.${realIndex}.wallet.id`}
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel>Кошелек</FormLabel>
+                          <FormLabel>
+                            Кошелек <span className="text-destructive">*</span>
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value || ''}
@@ -347,17 +527,25 @@ export function OperationForm({
 
                     <FormField
                       control={form.control}
-                      name={`entries.${index}.amount`}
+                      name={`entries.${realIndex}.amount`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Сумма</FormLabel>
+                          <FormLabel>
+                            Сумма <span className="text-destructive">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               {...field}
+                              value={field.value || 0}
+                              onChange={(e) => {
+                                const value = e.target.valueAsNumber;
+                                field.onChange(isNaN(value) ? 0 : value);
+                              }}
                               className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -366,7 +554,7 @@ export function OperationForm({
                       type="button"
                       variant="outline"
                       size="icon"
-                      onClick={() => remove(index)}
+                      onClick={() => remove(realIndex)}
                       className="text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="size-4" />
@@ -375,7 +563,8 @@ export function OperationForm({
                 ))}
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Описание */}
         <FormField

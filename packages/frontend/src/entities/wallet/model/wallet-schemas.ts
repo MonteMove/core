@@ -46,6 +46,7 @@ export const WalletDetailsSchema = z
     category: WalletDetailsCategorySchema.nullable().optional(),
     network: WalletDetailsSimpleEntitySchema.nullable().optional(),
     networkType: WalletDetailsSimpleEntitySchema.nullable().optional(),
+    platform: WalletDetailsSimpleEntitySchema.nullable().optional(),
   })
   .partial({
     phone: true,
@@ -58,6 +59,7 @@ export const WalletDetailsSchema = z
     category: true,
     network: true,
     networkType: true,
+    platform: true,
   });
 
 export const WalletCurrencySchema = z.object({
@@ -93,6 +95,7 @@ export const WalletSchema = z.object({
   pinned: z.boolean(),
   visible: z.boolean(),
   deleted: z.boolean(),
+  monthlyLimit: z.number().nullable().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   created_by: WalletUserSchema,
@@ -202,6 +205,7 @@ const WalletDetailsCreateSchema = z
     ),
     networkId: optionalUuid('Укажите корректный UUID сети'),
     networkTypeId: optionalUuid('Укажите корректный UUID типа сети'),
+    platformId: optionalUuid('Укажите корректный UUID платформы'),
   })
   .transform((details) => {
     const entries = Object.entries(details).filter(
@@ -254,6 +258,13 @@ export const CreateWalletSchema = z
     pinOnMain: z.boolean().default(false),
     pinned: z.boolean().default(false),
     visible: z.boolean().default(true),
+    monthlyLimit: z.coerce
+      .number()
+      .int('Месячный лимит должен быть целым числом')
+      .min(0, 'Месячный лимит не может быть отрицательным')
+      .optional()
+      .nullable()
+      .transform((val) => (val === 0 || val === null ? undefined : val)),
     details: WalletDetailsCreateSchema.optional(),
   })
   .superRefine((data, ctx) => {
@@ -302,8 +313,6 @@ export const GetWalletsFilterSchema = z.object({
   balanceStatus: z.enum(BalanceStatus).optional(),
   walletKind: z.enum(WalletKind).optional(),
   walletTypeId: z.string().uuid().optional(),
-
-  walletTypeIdIsNull: z.boolean().optional(),
 
   minAmount: z.number().int().min(0).optional().nullable(),
   maxAmount: z.number().int().min(0).optional().nullable(),

@@ -98,6 +98,7 @@ export const ApplicationResponseSchema = z.object({
   telegramUsername: z.string().nullable(),
   phone: z.string().nullable(),
   meetingDate: z.string().datetime(),
+  hasAdvance: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

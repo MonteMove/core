@@ -16,6 +16,7 @@ import { Button } from '@/shared/ui/shadcn/button';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -54,10 +55,12 @@ export function WalletTypeForm({
             description: initialData.description || '',
             showInTabs: initialData.showInTabs,
             tabOrder: initialData.tabOrder,
+            active: initialData.active,
           }
         : {
             code: '',
             name: '',
+            active: true,
           },
   });
 
@@ -170,6 +173,24 @@ export function WalletTypeForm({
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="active"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
+              <div className="space-y-0.5">
+                <FormLabel>Активность</FormLabel>
+                <FormDescription>
+                  Активные типы кошельков доступны для выбора при создании кошельков
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         <div className="flex flex-col gap-4 md:flex-row md:justify-end">
           <Button

@@ -31,16 +31,18 @@ model Wallet {
   pinned        Boolean       @default(false)
   visible       Boolean       @default(true)
   deleted       Boolean       @default(false)
+  monthlyLimit  Int?          @map("monthly_limit")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
 
-  user       User           @relation("wallet_owner", fields: [userId], references: [id])
-  created_by User           @relation("wallets_created_by", fields: [updatedById], references: [id], map: "wallets_created_by_fkey")
-  updated_by User           @relation("wallets_updated_by", fields: [updatedById], references: [id], map: "wallets_updated_by_fkey")
-  currency   Currency       @relation(fields: [currencyId], references: [id])
-  walletType WalletType?    @relation(fields: [walletTypeId], references: [id])
-  operations Operation[]
-  details    WalletDetail?
+  user            User             @relation("wallet_owner", fields: [userId], references: [id])
+  created_by      User             @relation("wallets_created_by", fields: [updatedById], references: [id], map: "wallets_created_by_fkey")
+  updated_by      User             @relation("wallets_updated_by", fields: [updatedById], references: [id], map: "wallets_updated_by_fkey")
+  currency        Currency         @relation(fields: [currencyId], references: [id])
+  walletType      WalletType?      @relation(fields: [walletTypeId], references: [id])
+  operations      Operation[]
+  operationEntries OperationEntry[] @relation("operation_entry_wallet")
+  details         WalletDetail?
 
   @@index([userId], map: "wallets_user_idx")
   @@index([updatedById], map: "wallets_updated_by_idx")

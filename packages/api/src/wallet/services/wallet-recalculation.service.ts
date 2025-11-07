@@ -19,6 +19,7 @@ export class WalletRecalculationService {
         }
 
         await this.recalculateWallets(tx, walletIds, updatedById);
+        await this.updateBeforeAfterForWallets(tx, walletIds);
     }
 
     public async recalculateWallet(
@@ -27,6 +28,7 @@ export class WalletRecalculationService {
         updatedById?: string,
     ): Promise<void> {
         await this.recalculateWallets(tx, [walletId], updatedById);
+        await this.updateBeforeAfterForWallets(tx, [walletId]);
     }
 
     public async recalculateWallets(
@@ -62,10 +64,9 @@ export class WalletRecalculationService {
                 return;
             }
 
-            await this.recalculateWallets(
-                tx,
-                wallets.map((wallet) => wallet.id),
-            );
+            const walletIds = wallets.map((wallet) => wallet.id);
+            await this.recalculateWallets(tx, walletIds);
+            await this.updateBeforeAfterForWallets(tx, walletIds);
         });
     }
 
@@ -123,5 +124,47 @@ export class WalletRecalculationService {
         }
 
         return BalanceStatus.neutral;
+    }
+
+    private async updateBeforeAfterForWallets(tx: Prisma.TransactionClient, walletIds: string[]): Promise<void> {
+        for (const walletId of walletIds) {
+            await this.updateBeforeAfterForWallet(tx, walletId);
+        }
+    }
+
+    private async updateBeforeAfterForWallet(tx: Prisma.TransactionClient, walletId: string): Promise<void> {
+        const entries = await tx.operationEntry.findMany({
+            where: {
+                walletId,
+                deleted: false,
+                operation: { deleted: false },
+            },
+            orderBy: { createdAt: 'asc' },
+            select: {
+                id: true,
+                direction: true,
+                amount: true,
+            },
+        });
+
+        let runningBalance = 0;
+
+        for (const entry of entries) {
+            const before = runningBalance;
+            const after =
+                entry.direction === OperationDirection.credit
+                    ? runningBalance + entry.amount
+                    : runningBalance - entry.amount;
+
+            await tx.operationEntry.update({
+                where: { id: entry.id },
+                data: {
+                    before,
+                    after,
+                },
+            });
+
+            runningBalance = after;
+        }
     }
 }

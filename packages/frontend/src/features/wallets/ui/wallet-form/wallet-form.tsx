@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useCurrency } from '@/entities/currency/model/use-currency';
 import { useNetworkTypes } from '@/entities/network/model/use-network-types';
 import { useNetworks } from '@/entities/network/model/use-networks';
+import { usePlatforms } from '@/entities/platform';
 import {
   CreateWalletFormValues,
   CreateWalletRequest,
@@ -22,7 +23,9 @@ import {
   findPhoneRule,
   formatByRule,
   formatCardNumber,
+  formatNumber,
   normalizeDigits,
+  parseFormattedNumber,
 } from '@/shared/lib/utils';
 
 import { Button } from '@/shared/ui/shadcn/button';
@@ -66,6 +69,8 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
   const { data: networksData, isLoading: isNetworksLoading } = useNetworks();
   const { data: walletTypesData, isLoading: isWalletTypesLoading } =
     useWalletTypes();
+  const { data: platformsData, isLoading: isPlatformsLoading } =
+    usePlatforms();
 
   const form = useForm<CreateWalletFormValues>({
     resolver: zodResolver(CreateWalletSchema),
@@ -81,6 +86,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           pinOnMain: initialData.pinOnMain ?? false,
           pinned: initialData.pinned ?? false,
           visible: initialData.visible ?? true,
+          monthlyLimit: initialData.monthlyLimit ?? undefined,
           details: {
             phone: initialData.details?.phone ?? '',
             card: initialData.details?.card ?? '',
@@ -90,6 +96,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
             exchangeUid: initialData.details?.exchangeUid ?? '',
             networkId: initialData.details?.network?.id || '',
             networkTypeId: initialData.details?.networkType?.id || '',
+            platformId: initialData.details?.platform?.id || '',
           },
         }
       : {
@@ -103,6 +110,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           pinOnMain: false,
           pinned: false,
           visible: true,
+          monthlyLimit: undefined,
           details: {
             phone: '',
             card: '',
@@ -112,6 +120,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
             exchangeUid: '',
             networkId: '',
             networkTypeId: '',
+            platformId: '',
           },
         },
   });
@@ -135,6 +144,10 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
   const walletTypes = useMemo(
     () => walletTypesData?.walletTypes ?? [],
     [walletTypesData],
+  );
+  const platforms = useMemo(
+    () => platformsData?.platforms ?? [],
+    [platformsData],
   );
 
   type WalletDetailsKeys = keyof NonNullable<CreateWalletRequest['details']>;
@@ -179,6 +192,28 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
       clearDetailFields(['ownerFullName', 'card', 'phone']);
     }
   }, [walletKind, clearDetailFields]);
+
+  // Автоматическое добавление префикса кода типа кошелька к названию
+  useEffect(() => {
+    if (isEditMode) return; // Не меняем название при редактировании
+    
+    const currentName = form.getValues('name');
+    const selectedWalletTypeId = form.getValues('walletTypeId');
+    
+    // Убираем старый префикс (если был)
+    const nameWithoutPrefix = currentName.replace(/^\[[\w-]+\]\s*/, '');
+    
+    if (selectedWalletTypeId) {
+      const selectedType = walletTypes.find((t) => t.id === selectedWalletTypeId);
+      if (selectedType) {
+        const newName = `[${selectedType.code}] ${nameWithoutPrefix}`;
+        form.setValue('name', newName, { shouldValidate: false });
+      }
+    } else if (currentName.startsWith('[')) {
+      // Если тип не выбран, убираем префикс
+      form.setValue('name', nameWithoutPrefix, { shouldValidate: false });
+    }
+  }, [form.watch('walletTypeId'), walletTypes, isEditMode, form]);
 
   const isCrypto = walletKind === WalletKind.crypto;
   const isBank = walletKind === WalletKind.bank;
@@ -225,13 +260,18 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
                 </FormLabel>
                 <FormControl>
                   <Input
-                    {...field}
                     value={
-                      typeof field.value === 'number' ||
-                      typeof field.value === 'string'
-                        ? field.value
-                        : ''
+                      typeof field.value === 'number'
+                        ? formatNumber(field.value)
+                        : String(field.value || '')
                     }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const parsed = parseFormattedNumber(value);
+                      field.onChange(isNaN(parsed) ? 0 : parsed);
+                    }}
+                    placeholder="0"
+                    inputMode="numeric"
                   />
                 </FormControl>
                 <FormMessage />
@@ -256,6 +296,40 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
               </FormControl>
               <FormDescription>
                 Не обязательно, до 2000 символов.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="monthlyLimit"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Месячный лимит (опционально)</FormLabel>
+              <FormControl>
+                <Input
+                  value={
+                    typeof field.value === 'number'
+                      ? formatNumber(field.value)
+                      : ''
+                  }
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '') {
+                      field.onChange(undefined);
+                      return;
+                    }
+                    const parsed = parseFormattedNumber(value);
+                    field.onChange(isNaN(parsed) ? undefined : parsed);
+                  }}
+                  placeholder="Не установлен"
+                  inputMode="numeric"
+                />
+              </FormControl>
+              <FormDescription>
+                Лимит на сумму всех операций за месяц. Остаток будет рассчитываться автоматически.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -550,6 +624,44 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
                             value={networkType.id}
                           >
                             {networkType.code} — {networkType.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="details.platformId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Платформа</FormLabel>
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(value === 'none' ? undefined : value)
+                      }
+                      value={field.value || 'none'}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Выберите платформу" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Не выбрано</SelectItem>
+                        {isPlatformsLoading && (
+                          <SelectItem value="loading" disabled>
+                            Загрузка...
+                          </SelectItem>
+                        )}
+                        {platforms.map((platform) => (
+                          <SelectItem key={platform.id} value={platform.id}>
+                            {platform.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

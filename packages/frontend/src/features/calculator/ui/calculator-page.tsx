@@ -29,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/shared';
+import { APP_TIMEZONE } from '@/shared/config/timezone';
 import { Button } from '@/shared';
 import {
   Form,
@@ -305,7 +306,7 @@ function formatDate(value: string | null | undefined) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString('ru-RU', {
-    timeZone: 'Europe/Moscow',
+    timeZone: APP_TIMEZONE,
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -948,7 +949,9 @@ export default function CalculatorPage() {
     customEurState != null &&
     Date.now() <= customEurState.expiresAt;
   const customCostExpires = customCostActive
-    ? new Date(customEurState.expiresAt).toLocaleTimeString('ru-RU')
+    ? new Date(customEurState.expiresAt).toLocaleTimeString('ru-RU', {
+        timeZone: APP_TIMEZONE,
+      })
     : null;
 
   return (
@@ -1401,6 +1404,7 @@ export default function CalculatorPage() {
                     действует до{' '}
                     {new Date(profitState.expiresAt).toLocaleTimeString(
                       'ru-RU',
+                      { timeZone: APP_TIMEZONE },
                     )}
                     <br />
                     (или до смены типа операции/страны)

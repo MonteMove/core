@@ -5,6 +5,7 @@ model OperationType {
   name          String
   description   String?
   isSeparateTab Boolean  @default(false) @map("is_separate_tab")
+  active        Boolean  @default(true)
   deleted       Boolean  @default(false)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -17,6 +18,7 @@ model OperationType {
   @@index([userId], map: "operation_types_user_id_idx")
   @@index([updatedById], map: "operation_types_updated_by_id_idx")
   @@index([name], map: "operation_types_name_idx")
+  @@index([active], map: "operation_types_active_idx")
   @@index([createdAt], map: "operation_types_created_at_idx")
   @@map("operation_types")
 }

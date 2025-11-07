@@ -38,6 +38,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formatDateTime,
   FormItem,
   FormLabel,
   Input,
@@ -247,27 +248,27 @@ export default function OperationsPage() {
                                                 'credit' ? (
                                                   <>
                                                     <span className="text-muted-foreground">
-                                                      {entry.before} +{' '}
+                                                      {entry.before ?? 0} +{' '}
                                                     </span>
-                                                    <span className="text-success/60 font-semibold">
+                                                    <span className="text-success/80 font-semibold">
                                                       {entry.amount}
                                                     </span>
                                                     <span className="text-muted-foreground">
                                                       {' '}
-                                                      = {entry.after}
+                                                      = {entry.after ?? 0}
                                                     </span>
                                                   </>
                                                 ) : (
                                                   <>
                                                     <span className="text-muted-foreground">
-                                                      {entry.before} -{' '}
+                                                      {entry.before ?? 0} -{' '}
                                                     </span>
-                                                    <span className="text-destructive/60 font-semibold">
+                                                    <span className="text-destructive/80 font-semibold">
                                                       {entry.amount}
                                                     </span>
                                                     <span className="text-muted-foreground">
                                                       {' '}
-                                                      = {entry.after}
+                                                      = {entry.after ?? 0}
                                                     </span>
                                                   </>
                                                 )}
@@ -277,7 +278,7 @@ export default function OperationsPage() {
                                                 <span className="font-medium">
                                                   {entry.wallet.name}:{' '}
                                                 </span>
-                                                <span>{entry.after}</span>
+                                                <span>{entry.after ?? 0}</span>
                                               </p>
                                             )}
                                           </div>
@@ -293,7 +294,7 @@ export default function OperationsPage() {
 
                                     <div className="text-left sm:text-right">
                                       <p className="text-sm text-muted-foreground">
-                                        {operation.createdAt}
+                                        {formatDateTime(operation.createdAt)}
                                       </p>
                                     </div>
                                   </div>

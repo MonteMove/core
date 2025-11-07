@@ -58,25 +58,6 @@ export class GetWalletsDto {
     public walletTypeId?: string;
 
     @ApiProperty({
-        description: 'Фильтр кошельков без типа (для таба "Все")',
-        example: true,
-        required: false,
-    })
-    @IsOptional()
-    @IsBoolean({ message: 'walletTypeIdIsNull должен быть boolean' })
-    @Transform(({ value }) => {
-        if (value === 'true') {
-            return true;
-        }
-        if (value === 'false') {
-            return false;
-        }
-
-        return value;
-    })
-    public walletTypeIdIsNull?: boolean;
-
-    @ApiProperty({
         description: 'Минимальная сумма в кошельке',
         example: 1000,
         minimum: 0,

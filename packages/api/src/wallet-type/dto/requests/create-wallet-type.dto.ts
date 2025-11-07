@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min, MinLength } from 'class-validator';
 
 export class CreateWalletTypeDto {
@@ -56,4 +56,13 @@ export class CreateWalletTypeDto {
     @IsInt({ message: 'Порядок должен быть целым числом' })
     @Min(0, { message: 'Порядок не может быть отрицательным' })
     public tabOrder?: number = 0;
+
+    @ApiPropertyOptional({
+        description: 'Активность типа кошелька',
+        example: true,
+        default: true,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Активность должна быть булевым значением' })
+    public active?: boolean;
 }

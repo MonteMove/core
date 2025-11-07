@@ -6,6 +6,7 @@ export const CurrencySchema = z.object({
   updatedById: z.string().uuid(),
   code: z.string(),
   name: z.string(),
+  active: z.boolean(),
   deleted: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -14,11 +15,13 @@ export const CurrencySchema = z.object({
 export const CreateCurrencySchema = z.object({
   code: z.string().min(1, 'Код валюты обязателен'),
   name: z.string().min(1, 'Название валюты обязательно'),
+  active: z.boolean().default(true),
 });
 
 export const UpdateCurrencySchema = z.object({
   code: z.string().min(1, 'Код валюты обязателен').optional(),
   name: z.string().min(1, 'Название валюты обязательно').optional(),
+  active: z.boolean().optional(),
 });
 
 export const GetCurrenciesParamsSchema = z.object({

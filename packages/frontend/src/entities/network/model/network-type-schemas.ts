@@ -5,6 +5,7 @@ export const NetworkTypeSchema = z.object({
   networkId: z.string().uuid(),
   code: z.string(),
   name: z.string(),
+  active: z.boolean(),
   deleted: z.boolean(),
 });
 
@@ -12,12 +13,14 @@ export const CreateNetworkTypeSchema = z.object({
   networkId: z.string().uuid({ message: 'Выберите сеть' }),
   code: z.string().min(1, 'Код типа сети обязателен'),
   name: z.string().min(1, 'Название типа сети обязательно'),
+  active: z.boolean().default(true),
 });
 
 export const UpdateNetworkTypeSchema = z.object({
   networkId: z.string().uuid().optional(),
   code: z.string().min(1).optional(),
   name: z.string().min(1).optional(),
+  active: z.boolean().optional(),
 });
 
 export const GetNetworkTypesResponseSchema = z.object({

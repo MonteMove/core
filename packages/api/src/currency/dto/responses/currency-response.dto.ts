@@ -26,6 +26,12 @@ export class CurrencyResponseDto {
     public updatedById: string;
 
     @ApiProperty({
+        description: 'Активность валюты',
+        example: true,
+    })
+    public active: boolean;
+
+    @ApiProperty({
         description: 'Флаг удаления записи',
         example: false,
     })

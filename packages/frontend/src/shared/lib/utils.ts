@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { toast } from 'sonner';
 import { twMerge } from 'tailwind-merge';
 
-import { SessionResponseDto } from '@/entities/session/model/session-schemas';
+import { APP_TIMEZONE } from '@/shared/config/timezone';
 import { PHONE_RULES } from '@/shared/utils/constants/phone-rules';
 
 export function cn(...inputs: ClassValue[]) {
@@ -97,6 +97,7 @@ export function formatDate(date: Date | undefined) {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+    timeZone: APP_TIMEZONE,
   });
 }
 
@@ -120,6 +121,7 @@ export function formatDateTime(date: Date | string | undefined | null): string {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
+    timeZone: APP_TIMEZONE,
   });
 }
 
@@ -149,6 +151,7 @@ export function formatDateSafe(value?: string | null) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
+      timeZone: APP_TIMEZONE,
     });
   }
   const num = Number(value);
@@ -162,6 +165,7 @@ export function formatDateSafe(value?: string | null) {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
+        timeZone: APP_TIMEZONE,
       });
     }
   }
@@ -174,3 +178,26 @@ export function applyThemeVars(vars: Record<string, string>) {
     root.style.setProperty(`--${key}`, value);
   });
 }
+
+/**
+ * Форматирует число с пробелами в качестве разделителя тысяч
+ * @param value - число для форматирования
+ * @returns отформатированная строка
+ * @example formatNumber(1000000) => "1 000 000"
+ */
+export const formatNumber = (value: number | string): string => {
+  const num = typeof value === 'string' ? parseInt(value, 10) : value;
+  if (isNaN(num)) return '';
+  return num.toLocaleString('ru-RU').replace(/,/g, ' ');
+};
+
+/**
+ * Парсит строку с числом, удаляя пробелы и другие нечисловые символы
+ * @param value - строка для парсинга
+ * @returns число или NaN если парсинг не удался
+ * @example parseFormattedNumber("1 000 000") => 1000000
+ */
+export const parseFormattedNumber = (value: string): number => {
+  const cleaned = value.replace(/\s/g, '');
+  return parseInt(cleaned, 10);
+};

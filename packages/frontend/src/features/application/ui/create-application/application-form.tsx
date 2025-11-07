@@ -50,7 +50,7 @@ const formatTelegramUsername = (value: string): string => {
     .substring(0, 32);
 };
 
-export function CreateApplicationForm({
+export function ApplicationForm({
   initialData,
 }: { initialData?: ApplicationResponse } & React.ComponentProps<'form'>) {
   const { data: operationTypes, isLoading: operationTypesLoading } =
@@ -62,16 +62,29 @@ export function CreateApplicationForm({
 
   const form = useForm<CreateApplicationRequest>({
     resolver: zodResolver(CreateApplicationRequestSchema),
-    defaultValues: {
-      currencyId: '',
-      operationTypeId: '',
-      assigneeUserId: '',
-      description: '',
-      amount: 0,
-      telegramUsername: '',
-      phone: '',
-      meetingDate: undefined,
-    },
+    defaultValues: initialData
+      ? {
+          currencyId: initialData.currencyId ?? '',
+          operationTypeId: initialData.operationTypeId ?? '',
+          assigneeUserId: initialData.assigneeUserId ?? '',
+          description: initialData.description ?? '',
+          amount: initialData.amount ?? 0,
+          telegramUsername: initialData.telegramUsername
+            ? initialData.telegramUsername.replace('@', '')
+            : '',
+          phone: initialData.phone ?? '',
+          meetingDate: initialData.meetingDate ?? '',
+        }
+      : {
+          currencyId: '',
+          operationTypeId: '',
+          assigneeUserId: '',
+          description: '',
+          amount: 0,
+          telegramUsername: '',
+          phone: '',
+          meetingDate: undefined,
+        },
   });
 
   const onSubmit = (data: CreateApplicationRequest) => {
@@ -82,7 +95,13 @@ export function CreateApplicationForm({
         : '',
     };
 
-    createMutation.mutate(formData);
+    if (initialData) {
+      // Режим редактирования
+      updateMutation.mutate({ id: initialData.id.toString(), ...formData });
+    } else {
+      // Режим создания
+      createMutation.mutate(formData);
+    }
   };
 
   return (
@@ -305,6 +324,7 @@ export function CreateApplicationForm({
           </div>
 
           <Separator className="my-6" />
+
           <FormField
             control={form.control}
             name="description"

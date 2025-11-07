@@ -54,11 +54,13 @@ export function OperationTypeForm({
               name: initialData.name,
               description: initialData.description || '',
               isSeparateTab: initialData.isSeparateTab,
+              active: initialData.active,
             }
           : {
               name: '',
               description: '',
               isSeparateTab: false,
+              active: true,
             },
     },
   );
@@ -135,6 +137,24 @@ export function OperationTypeForm({
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="active"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
+              <div className="space-y-0.5">
+                <FormLabel>Активность</FormLabel>
+                <FormDescription>
+                  Активные типы операций доступны для выбора при создании операций и заявок
+                </FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}

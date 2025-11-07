@@ -43,16 +43,13 @@ export const useUpdateApplication = () => {
   });
 };
 export const useUpdateStatusApplication = () => {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, ...data }: { id: string } & UpdateApplicationRequest) =>
       ApplicationService.update(id, data),
-    onSuccess: (data, variables) => {
-      if (variables.status === 'done') {
-        router.push(ROUTER_MAP.OPERATIONS_CREATE);
-      } else {
-        router.push(ROUTER_MAP.APPLICATIONS);
-      }
+    onSuccess: () => {
+      // Инвалидируем кэш заявок для обновления списка
+      queryClient.invalidateQueries({ queryKey: APPLICATION_QUERY_KEY });
       toast.success('Статус заявки обновлён');
     },
     onError: () => toast.error('Ошибка при обновлении статуса'),
@@ -140,8 +137,8 @@ export const useDeleteApplication = (filters?: GetApplicationsFilters) => {
 
 export const useApplicationsList = () => {
   return useQuery({
-    queryKey: ['applications', 'list'],
-    queryFn: () => ApplicationService.getApplications({ page: 1, limit: 100 }),
+    queryKey: ['applications', 'list', 'open'],
+    queryFn: () => ApplicationService.getApplications({ page: 1, limit: 100, status: 'open' }),
   });
 };
 

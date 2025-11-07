@@ -36,6 +36,11 @@ export class OperationTypeInitService implements OnModuleInit {
                 description: 'Аванс',
                 isSeparateTab: false,
             },
+            {
+                name: 'Корректировка',
+                description: 'Корректировка баланса кошелька',
+                isSeparateTab: false,
+            },
         ];
 
         for (const typeData of operationTypes) {

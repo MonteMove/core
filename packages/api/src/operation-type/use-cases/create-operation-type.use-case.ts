@@ -12,7 +12,7 @@ export class CreateOperationTypeUseCase {
         createOperationTypeDto: CreateOperationTypeDto,
         userId: string,
     ): Promise<CreateOperationTypeResponse> {
-        const { name, description, isSeparateTab } = createOperationTypeDto;
+        const { name, description, isSeparateTab, active } = createOperationTypeDto;
 
         const operationType = await this.prisma.operationType.create({
             data: {
@@ -21,6 +21,7 @@ export class CreateOperationTypeUseCase {
                 name,
                 description,
                 isSeparateTab,
+                active: active ?? true,
             },
             select: {
                 id: true,
@@ -29,6 +30,7 @@ export class CreateOperationTypeUseCase {
                 name: true,
                 description: true,
                 isSeparateTab: true,
+                active: true,
                 createdAt: true,
                 updatedAt: true,
             },

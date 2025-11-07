@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateCurrencyDto {
     @ApiProperty({
@@ -33,4 +33,12 @@ export class UpdateCurrencyDto {
         message: 'Название валюты должно содержать максимум 100 символов',
     })
     public name?: string;
+
+    @ApiPropertyOptional({
+        description: 'Активность валюты',
+        example: true,
+    })
+    @IsOptional()
+    @IsBoolean({ message: 'Активность должна быть булевым значением' })
+    public active?: boolean;
 }

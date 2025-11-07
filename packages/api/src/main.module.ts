@@ -15,6 +15,7 @@ import { NetworkTypeModule } from './network-type/network-type.module';
 import { OperationModule } from './operation/operation.module';
 import { OperationTypeModule } from './operation-type/operation-type.module';
 import { ParserModule } from './parser/parser.module';
+import { PlatformModule } from './platform/platform.module';
 import { SessionModule } from './session/session.module';
 import { AdminInitService } from './user/admin-init.service';
 import { UserModule } from './user/user.module';
@@ -47,6 +48,7 @@ import { WalletTypeModule } from './wallet-type/wallet-type.module';
         NetworkModule,
         NetworkTypeModule,
         ParserModule,
+        PlatformModule,
     ],
     providers: [PrismaService, BcryptHasher, AdminInitService],
 })

@@ -10,6 +10,7 @@ import {
 import { DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker';
 import { ru } from 'react-day-picker/locale';
 
+import { APP_TIMEZONE } from '@/shared/config/timezone';
 import { cn } from '@/shared/lib/utils';
 import { Button, buttonVariants } from '@/shared/ui/shadcn/button';
 
@@ -40,7 +41,10 @@ function Calendar({
       captionLayout={captionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString('default', { month: 'short' }),
+          date.toLocaleString('default', {
+            month: 'short',
+            timeZone: APP_TIMEZONE,
+          }),
         ...formatters,
       }}
       classNames={{

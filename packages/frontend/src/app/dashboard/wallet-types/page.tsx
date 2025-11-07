@@ -125,6 +125,7 @@ export default function WalletTypesPage() {
                   <TableHead>Название</TableHead>
                   <TableHead>Показывать в табах</TableHead>
                   <TableHead>Порядок</TableHead>
+                  <TableHead>Статус</TableHead>
                   <TableHead className="text-right">Действия</TableHead>
                 </TableRow>
               </TableHeader>
@@ -141,6 +142,17 @@ export default function WalletTypesPage() {
                     <TableCell>{type.name}</TableCell>
                     <TableCell>{type.showInTabs ? 'Да' : 'Нет'}</TableCell>
                     <TableCell>{type.tabOrder}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          type.active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {type.active ? 'Активен' : 'Неактивен'}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         {showDeleted ? (

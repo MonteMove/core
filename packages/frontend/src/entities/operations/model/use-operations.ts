@@ -30,18 +30,20 @@ import {
 import { OperationsService } from '../api/operations-service';
 import {
   CreateOperationDto,
+  CreateOperationBackendDto,
   GetOperationsParams,
   GetOperationsParamsSchema,
   GetOperationsResponseDto,
   OperationResponseDto,
   UpdateOperationDto,
+  UpdateOperationBackendDto,
 } from './opeartions-schemas';
 
 export const useCreateOperation = () => {
   const router = useRouter();
   return useMutation({
     mutationKey: OPERATIONS_CREATE_QUERY_KEY,
-    mutationFn: (data: CreateOperationDto) => OperationsService.create(data),
+    mutationFn: (data: CreateOperationBackendDto) => OperationsService.create(data),
     onSuccess: () => {
       router.push(ROUTER_MAP.OPERATIONS);
       toast.success('Справочник успешно создан');
@@ -144,7 +146,7 @@ export const useUpdateOperation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: string } & UpdateOperationDto) =>
+    mutationFn: ({ id, ...data }: { id: string } & UpdateOperationBackendDto) =>
       OperationsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: OPERATIONS_QUERY_KEY });

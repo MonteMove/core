@@ -6,6 +6,7 @@ export const NetworkSchema = z.object({
   updatedById: z.string().uuid(),
   code: z.string(),
   name: z.string(),
+  active: z.boolean(),
   deleted: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -14,11 +15,13 @@ export const NetworkSchema = z.object({
 export const CreateNetworkSchema = z.object({
   code: z.string().min(1, 'Код сети обязателен'),
   name: z.string().min(1, 'Название сети обязательно'),
+  active: z.boolean().default(true),
 });
 
 export const UpdateNetworkSchema = z.object({
   code: z.string().min(1, 'Код сети обязателен').optional(),
   name: z.string().min(1, 'Название сети обязательно').optional(),
+  active: z.boolean().optional(),
 });
 
 export const GetNetworksResponseSchema = z.object({

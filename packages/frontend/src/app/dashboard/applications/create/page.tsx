@@ -1,6 +1,6 @@
 'use client';
 
-import { CreateApplicationForm } from '@/features/application/ui/create-application/create-application-form';
+import { ApplicationForm } from '@/features/application';
 import {
   Card,
   CardContent,
@@ -20,7 +20,7 @@ export default function CreateApplicationPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <CreateApplicationForm />
+          <ApplicationForm />
         </CardContent>
       </Card>
     </div>

@@ -18,10 +18,18 @@ export class GetOperationByIdUseCase {
                         walletId: true,
                         direction: true,
                         amount: true,
+                        before: true,
+                        after: true,
                         userId: true,
                         updatedById: true,
                         createdAt: true,
                         updatedAt: true,
+                        wallet: {
+                            select: {
+                                id: true,
+                                name: true,
+                            },
+                        },
                     },
                 },
                 type: {

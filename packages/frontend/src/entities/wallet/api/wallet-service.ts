@@ -25,13 +25,14 @@ export class WalletService {
     const validated = GetWalletsFilterSchema.parse(filters ?? {});
     const params = Object.fromEntries(
       Object.entries(validated).filter(
-        ([, v]) => v !== undefined && v !== null,
+        ([, v]) => v !== undefined && v !== null && v !== '',
       ),
     );
 
     const { data } = await axiosInstance.get(API_MAP.WALLETS.WALLETS, {
       params,
     });
+    
     return GetWalletsResponseSchema.parse(data);
   }
 
@@ -140,5 +141,18 @@ export class WalletService {
     );
     const wallet = data?.wallet ?? data;
     return WalletSchema.parse(wallet);
+  }
+
+  public static async getWalletMonthlyLimit(walletId: string): Promise<{
+    message: string;
+    limit: number | null;
+    spent: number;
+    remaining: number | null;
+    currencyCode: string;
+  }> {
+    const { data } = await axiosInstance.get(
+      `${API_MAP.WALLETS.WALLETS}/${walletId}/monthly-limit`,
+    );
+    return data;
   }
 }

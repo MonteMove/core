@@ -20,6 +20,14 @@ export class CreateApplicationUseCase {
             meetingDate,
         } = createApplicationDto;
 
+        // Определяем, является ли это авансом по типу операции
+        const operationType = await this.prisma.operationType.findUnique({
+            where: { id: operationTypeId },
+            select: { name: true },
+        });
+
+        const hasAdvance = operationType?.name === 'Аванс';
+
         const application = await this.prisma.application.create({
             data: {
                 userId,
@@ -33,6 +41,7 @@ export class CreateApplicationUseCase {
                 phone,
                 meetingDate: new Date(meetingDate),
                 status: 'open',
+                hasAdvance,
             },
             include: {
                 created_by: {
