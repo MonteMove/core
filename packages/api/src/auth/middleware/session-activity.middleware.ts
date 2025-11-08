@@ -1,8 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 
 import { JwtTokenService } from '../jwt.service';
-import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class SessionActivityMiddleware implements NestMiddleware {
@@ -10,7 +10,7 @@ export class SessionActivityMiddleware implements NestMiddleware {
 
     constructor(private readonly jwtTokenService: JwtTokenService) {}
 
-    public async use(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public use(req: Request, res: Response, next: NextFunction): void {
         const authHeader = req.headers.authorization;
 
         if (authHeader && authHeader.startsWith('Bearer ')) {

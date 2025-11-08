@@ -1,16 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
-import { CreateBankDto, BankResponseDto } from '../dto';
+import { BankResponseDto, CreateBankDto } from '../dto';
 
 @Injectable()
 export class CreateBankUseCase {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(
-        createBankDto: CreateBankDto,
-        userId: string,
-    ): Promise<BankResponseDto> {
+    public async execute(createBankDto: CreateBankDto, userId: string): Promise<BankResponseDto> {
         const { code, name, active } = createBankDto;
 
         const existingBankByCode = await this.prisma.bank.findFirst({
@@ -21,9 +18,7 @@ export class CreateBankUseCase {
         });
 
         if (existingBankByCode) {
-            throw new BadRequestException(
-                `Банк с кодом "${code}" уже существует`,
-            );
+            throw new BadRequestException(`Банк с кодом "${code}" уже существует`);
         }
 
         const bank = await this.prisma.bank.create({

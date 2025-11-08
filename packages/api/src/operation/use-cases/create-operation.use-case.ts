@@ -32,7 +32,10 @@ export class CreateOperationUseCase {
 
                 // Для корректировки: amount - это желаемый баланс, нужно вычислить разницу
                 const entry = entries[0];
-                const currentBalance = await this.walletRecalculationService.getCalculatedWalletAmount(tx, entry.walletId);
+                const currentBalance = await this.walletRecalculationService.getCalculatedWalletAmount(
+                    tx,
+                    entry.walletId,
+                );
                 const desiredBalance = entry.amount;
                 const difference = desiredBalance - currentBalance;
 
@@ -135,6 +138,7 @@ export class CreateOperationUseCase {
 
             if (applicationId) {
                 const appId = typeof applicationId === 'string' ? parseInt(applicationId, 10) : applicationId;
+
                 await tx.application.update({
                     where: { id: appId },
                     data: {

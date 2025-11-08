@@ -66,7 +66,6 @@ export const AnalyticsCharts = () => {
     },
   };
 
-
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>

@@ -6,7 +6,7 @@ export { GetWalletAnalyticsUseCase } from './get-wallet-analytics.use-case';
 export { GetWalletByIdUseCase } from './get-wallet-by-id.use-case';
 export { GetWalletMonthlyAnalyticsUseCase } from './get-wallet-monthly-analytics.use-case';
 export { GetWalletMonthlyLimitUseCase } from './get-wallet-monthly-limit.use-case';
-export { GetWalletsAggregationUseCase } from './get-wallets-aggregation.use-case';
 export { GetWalletsUseCase } from './get-wallets.use-case';
+export { GetWalletsAggregationUseCase } from './get-wallets-aggregation.use-case';
 export { ToggleWalletPinUseCase } from './toggle-wallet-pin.use-case';
 export { UpdateWalletUseCase } from './update-wallet.use-case';

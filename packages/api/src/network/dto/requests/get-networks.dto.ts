@@ -63,7 +63,7 @@ export class GetNetworksDto {
         required: false,
     })
     @IsOptional()
-    @Transform(({ value }) => {
+    @Transform(({ value }): boolean | undefined => {
         if (value === 'true') {
             return true;
         }
@@ -71,7 +71,7 @@ export class GetNetworksDto {
             return false;
         }
 
-        return value;
+        return value as boolean | undefined;
     })
     @IsBoolean({ message: 'Флаг удаления должен быть булевым значением' })
     public deleted?: boolean;

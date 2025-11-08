@@ -69,6 +69,7 @@ export class GetWalletsUseCase {
             );
 
             const searchLower = search.toLowerCase();
+
             if ('касса'.startsWith(searchLower) || searchLower.startsWith('касс')) {
                 orConditions.push({ walletKind: 'simple' });
             }
@@ -85,18 +86,12 @@ export class GetWalletsUseCase {
             (pinned === false || pinned === undefined);
 
         if (isAllTabContext) {
-            const andConditions = Array.isArray(where.AND)
-                ? where.AND
-                : where.AND
-                    ? [where.AND]
-                    : [];
+            const andConditions = Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
+
             where.AND = [
                 ...andConditions,
                 {
-                    OR: [
-                        { walletTypeId: null },
-                        { walletType: { showInTabs: false } },
-                    ],
+                    OR: [{ walletTypeId: null }, { walletType: { showInTabs: false } }],
                 },
             ];
         }

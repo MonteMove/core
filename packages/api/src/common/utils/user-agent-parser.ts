@@ -12,6 +12,7 @@ export function parseUserAgent(userAgent: string | undefined): ParsedUserAgent {
     const ua = userAgent.toLowerCase();
 
     let device: string | null = null;
+
     if (ua.includes('mobile')) {
         device = 'Mobile';
     } else if (ua.includes('tablet') || ua.includes('ipad')) {
@@ -21,6 +22,7 @@ export function parseUserAgent(userAgent: string | undefined): ParsedUserAgent {
     }
 
     let browser: string | null = null;
+
     if (ua.includes('edg/') || ua.includes('edge/')) {
         browser = 'Edge';
     } else if (ua.includes('opr/') || ua.includes('opera')) {
@@ -36,6 +38,7 @@ export function parseUserAgent(userAgent: string | undefined): ParsedUserAgent {
     }
 
     let os: string | null = null;
+
     if (ua.includes('windows')) {
         os = 'Windows';
     } else if (ua.includes('mac os x') || ua.includes('macintosh')) {

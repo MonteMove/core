@@ -17,11 +17,7 @@ import { formatWalletCopyText } from '@/shared/lib/wallet-copy-helpers';
 import { Button } from '@/shared/ui/shadcn/button';
 import { Checkbox } from '@/shared/ui/shadcn/checkbox';
 import { formatNumber } from '@/shared/lib/utils/format-number';
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-} from '@/shared/ui/shadcn/card';
+import { Card, CardDescription, CardHeader } from '@/shared/ui/shadcn/card';
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -149,58 +149,58 @@ export const AnalyticsTable = () => {
         </TableHeader>
 
         <TableBody>
-          {sortedData && sortedData.length > 0
-            ? sortedData.map((item) => (
-                <TableRow key={item.walletId}>
-                  <TableCell className="text-center text-sm">
-                    {item.walletName}
-                  </TableCell>
-                  <TableCell className="text-center text-sm font-medium">
-                    {item.walletCurrency}
-                  </TableCell>
-                  <TableCell className="text-center text-sm">
-                    {item.holder || '—'}
-                  </TableCell>
-                  <TableCell className="text-center text-sm font-medium">
-                    {formatNumber(item.currentBalance)}
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-green-600">
-                    +{formatNumber(item.coming)}
-                  </TableCell>
-                  <TableCell className="text-center text-sm text-red-600">
-                    -{formatNumber(item.expenditure)}
-                  </TableCell>
-                  <TableCell
-                    className={`text-center text-sm font-medium ${item.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                  >
-                    {item.netFlow >= 0 ? '+' : ''}
-                    {formatNumber(item.netFlow)}
-                  </TableCell>
-                  <TableCell className="text-center text-sm">
-                    {formatNumber(item.operationsCount)}
-                  </TableCell>
-                </TableRow>
-              ))
-            : (
-                <TableRow>
-                  <TableCell colSpan={8} className="p-0">
-                    <Empty>
-                      <EmptyHeader>
-                        <EmptyMedia variant="icon">
-                          <BarChart3 />
-                        </EmptyMedia>
-                        <EmptyContent>
-                          <EmptyTitle>Нет данных аналитики</EmptyTitle>
-                          <EmptyDescription>
-                            Данные аналитики отсутствуют. Попробуйте изменить
-                            фильтры или создайте кошельки и операции.
-                          </EmptyDescription>
-                        </EmptyContent>
-                      </EmptyHeader>
-                    </Empty>
-                  </TableCell>
-                </TableRow>
-              )}
+          {sortedData && sortedData.length > 0 ? (
+            sortedData.map((item) => (
+              <TableRow key={item.walletId}>
+                <TableCell className="text-center text-sm">
+                  {item.walletName}
+                </TableCell>
+                <TableCell className="text-center text-sm font-medium">
+                  {item.walletCurrency}
+                </TableCell>
+                <TableCell className="text-center text-sm">
+                  {item.holder || '—'}
+                </TableCell>
+                <TableCell className="text-center text-sm font-medium">
+                  {formatNumber(item.currentBalance)}
+                </TableCell>
+                <TableCell className="text-center text-sm text-green-600">
+                  +{formatNumber(item.coming)}
+                </TableCell>
+                <TableCell className="text-center text-sm text-red-600">
+                  -{formatNumber(item.expenditure)}
+                </TableCell>
+                <TableCell
+                  className={`text-center text-sm font-medium ${item.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                >
+                  {item.netFlow >= 0 ? '+' : ''}
+                  {formatNumber(item.netFlow)}
+                </TableCell>
+                <TableCell className="text-center text-sm">
+                  {formatNumber(item.operationsCount)}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={8} className="p-0">
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <BarChart3 />
+                    </EmptyMedia>
+                    <EmptyContent>
+                      <EmptyTitle>Нет данных аналитики</EmptyTitle>
+                      <EmptyDescription>
+                        Данные аналитики отсутствуют. Попробуйте изменить
+                        фильтры или создайте кошельки и операции.
+                      </EmptyDescription>
+                    </EmptyContent>
+                  </EmptyHeader>
+                </Empty>
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>

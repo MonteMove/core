@@ -16,7 +16,7 @@ export class GetBanksDto {
         example: true,
     })
     @IsOptional()
-    @Transform(({ value }) => {
+    @Transform(({ value }): boolean | undefined => {
         if (value === 'true') {
             return true;
         }
@@ -24,7 +24,7 @@ export class GetBanksDto {
             return false;
         }
 
-        return value;
+        return value as boolean | undefined;
     })
     @IsBoolean({ message: 'Активность должна быть булевым значением' })
     public active?: boolean;
@@ -34,7 +34,7 @@ export class GetBanksDto {
         example: false,
     })
     @IsOptional()
-    @Transform(({ value }) => {
+    @Transform(({ value }): boolean | undefined => {
         if (value === 'true') {
             return true;
         }
@@ -42,7 +42,7 @@ export class GetBanksDto {
             return false;
         }
 
-        return value;
+        return value as boolean | undefined;
     })
     @IsBoolean({ message: 'Удаление должно быть булевым значением' })
     public deleted?: boolean;

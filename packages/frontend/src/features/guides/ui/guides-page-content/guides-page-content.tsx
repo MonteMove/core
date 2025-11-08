@@ -9,11 +9,7 @@ import { Plus } from 'lucide-react';
 import { GetGuidesParamsRequest } from '@/entities/guides';
 import { GuidesFilters } from '@/features/guides/ui/guide-filters/guide-filters';
 import { Button, ROUTER_MAP } from '@/shared';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-} from '@/shared/ui/shadcn/card';
+import { Card, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 
 import { GuidesList } from '../guides-list/guides-list';
 

@@ -16,7 +16,7 @@ export class TelegramService {
     private initializeBots(): void {
         const feedbackToken = this.configService.get<string>('TELEGRAM_FEEDBACK_BOT_TOKEN');
         const feedbackChatId = this.configService.get<string>('TELEGRAM_FEEDBACK_CHAT_ID');
-        
+
         if (feedbackToken && feedbackChatId) {
             this.bots.set(TelegramBotType.FEEDBACK, {
                 token: feedbackToken,
@@ -27,36 +27,33 @@ export class TelegramService {
 
     private getBotConfig(botType: TelegramBotType): TelegramBotConfig {
         const config = this.bots.get(botType);
+
         if (!config) {
             throw new Error(`Telegram bot ${botType} не настроен`);
         }
+
         return config;
     }
 
-    public async sendMessage(
-        botType: TelegramBotType,
-        message: string,
-    ): Promise<void> {
+    public async sendMessage(botType: TelegramBotType, message: string): Promise<void> {
         const config = this.getBotConfig(botType);
 
         try {
-            const response = await fetch(
-                `https://api.telegram.org/bot${config.token}/sendMessage`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: config.chatId,
-                        text: message,
-                        parse_mode: 'HTML',
-                    }),
+            const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            );
+                body: JSON.stringify({
+                    chat_id: config.chatId,
+                    text: message,
+                    parse_mode: 'HTML',
+                }),
+            });
 
             if (!response.ok) {
                 const error = await response.text();
+
                 throw new Error(`Telegram API error: ${error}`);
             }
 
@@ -67,22 +64,13 @@ export class TelegramService {
         }
     }
 
-    public async sendFeedback(
-        username: string,
-        userId: string,
-        title: string,
-        description: string,
-    ): Promise<void> {
+    public async sendFeedback(username: string, userId: string, title: string, description: string): Promise<void> {
         const message = this.formatFeedbackMessage(username, userId, title, description);
+
         await this.sendMessage(TelegramBotType.FEEDBACK, message);
     }
 
-    private formatFeedbackMessage(
-        username: string,
-        userId: string,
-        title: string,
-        description: string,
-    ): string {
+    private formatFeedbackMessage(username: string, userId: string, title: string, description: string): string {
         return `
 🔔 <b>Новое обращение</b>
 

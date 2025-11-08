@@ -13,9 +13,9 @@ import {
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog';
 import { Button } from '@/shared/ui/shadcn/button';
-import { Loading } from '@/shared/ui/shadcn/skeleton';
 import { formatNumber } from '@/shared/lib/utils/format-number';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
+import { Loading } from '@/shared';
 
 interface OperationViewDialogProps {
   operationId: string | null;

@@ -1,2 +1,2 @@
 export { calculatePagination, createAllDataPaginationResponse, createPaginationResponse } from './pagination.helper';
-export { parseUserAgent, type ParsedUserAgent } from './user-agent-parser';
+export { type ParsedUserAgent, parseUserAgent } from './user-agent-parser';

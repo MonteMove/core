@@ -7,11 +7,7 @@ import { BankResponseDto, UpdateBankDto } from '../dto';
 export class UpdateBankUseCase {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(
-        id: string,
-        updateBankDto: UpdateBankDto,
-        userId: string,
-    ): Promise<BankResponseDto> {
+    public async execute(id: string, updateBankDto: UpdateBankDto, userId: string): Promise<BankResponseDto> {
         const existingBank = await this.prisma.bank.findUnique({
             where: { id },
         });
@@ -30,9 +26,7 @@ export class UpdateBankUseCase {
             });
 
             if (bankWithCode) {
-                throw new BadRequestException(
-                    `Банк с кодом "${updateBankDto.code}" уже существует`,
-                );
+                throw new BadRequestException(`Банк с кодом "${updateBankDto.code}" уже существует`);
             }
         }
 

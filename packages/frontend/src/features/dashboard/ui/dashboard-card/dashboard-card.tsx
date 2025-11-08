@@ -52,13 +52,7 @@ export const CardDashboard = ({
   );
 
   if (groupsWithWallets.length === 0) {
-    return (
-      <Card className="w-full">
-        <CardContent className="p-4 text-sm text-muted-foreground">
-          Нет кошельков для отображения
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
   return (

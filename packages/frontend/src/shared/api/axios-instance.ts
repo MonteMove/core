@@ -117,14 +117,15 @@ axiosInstance.interceptors.response.use(
         isRefreshing = false;
         failedRefresh = true;
         onRefreshed(null);
-        const { clearToken } = useAuthStore.getState();
-        await clearToken();
 
-        if (
-          typeof window !== 'undefined' &&
-          !window.location.pathname.includes('/login')
-        ) {
-          window.location.href = '/login';
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(env.NEXT_PUBLIC_AUTH_TOKEN_KEY);
+
+          await AuthService.Logout();
+
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
         }
 
         return Promise.reject(refreshError);

@@ -30,9 +30,7 @@ export class UpdatePlatformUseCase {
             });
 
             if (platformWithCode) {
-                throw new BadRequestException(
-                    `Платформа с кодом "${updatePlatformDto.code}" уже существует`,
-                );
+                throw new BadRequestException(`Платформа с кодом "${updatePlatformDto.code}" уже существует`);
             }
         }
 

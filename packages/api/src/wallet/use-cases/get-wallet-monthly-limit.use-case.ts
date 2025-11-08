@@ -35,7 +35,7 @@ export class GetWalletMonthlyLimitUseCase {
         // Получаем все операции за текущий месяц для данного кошелька
         const entries = await this.prisma.operationEntry.findMany({
             where: {
-                walletId: walletId,
+                walletId,
                 deleted: false,
                 createdAt: {
                     gte: startOfMonth,

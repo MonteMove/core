@@ -22,6 +22,7 @@ export class GetWalletMonthlyAnalyticsUseCase {
     public async execute(): Promise<GetWalletMonthlyAnalyticsOutput> {
         const monthsAgo = 6;
         const startDate = new Date();
+
         startDate.setMonth(startDate.getMonth() - monthsAgo);
         startDate.setDate(1);
         startDate.setHours(0, 0, 0, 0);
@@ -42,6 +43,7 @@ export class GetWalletMonthlyAnalyticsUseCase {
 
         for (let i = monthsAgo - 1; i >= 0; i--) {
             const date = new Date();
+
             date.setMonth(date.getMonth() - i);
             const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
             const monthName = date.toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' });
@@ -64,6 +66,7 @@ export class GetWalletMonthlyAnalyticsUseCase {
             }
 
             const monthData = monthlyData.get(monthKey)!;
+
             monthData.operationsCount++;
 
             operation.entries.forEach((entry) => {

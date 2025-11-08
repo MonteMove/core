@@ -9,7 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, Copy, FileText, Pencil, Trash } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
-import { useApplicationsList } from '@/entities/application';
 import {
   GetOperationsParams,
   GetOperationsParamsSchema,
@@ -18,7 +17,6 @@ import {
   useInfiniteOperations,
   useOperationTypes,
 } from '@/entities/operations';
-import { useUsers } from '@/entities/users';
 import {
   Button,
   Card,

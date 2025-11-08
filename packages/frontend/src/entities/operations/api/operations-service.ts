@@ -2,8 +2,6 @@ import { axiosInstance } from '@/shared';
 import { API_MAP } from '@/shared/utils/constants/api-map';
 
 import {
-  CreateOperationDto,
-  CreateOperationDtoSchema,
   CreateOperationBackendDto,
   CreateOperationBackendDtoSchema,
   GetOperationsParams,
@@ -12,10 +10,8 @@ import {
   GetOperationsResponseDtoSchema,
   OperationResponseDto,
   OperationResponseDtoSchema,
-  UpdateOperationDto,
   UpdateOperationBackendDto,
   UpdateOperationBackendDtoSchema,
-  UpdateOperationDtoSchema,
 } from '../model/opeartions-schemas';
 
 export class OperationsService {

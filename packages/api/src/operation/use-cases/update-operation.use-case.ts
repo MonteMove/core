@@ -51,6 +51,7 @@ export class UpdateOperationUseCase {
 
             // Получаем тип операции для проверки специальной логики
             let operationType: { name: string } | null = null;
+
             if (typeId) {
                 operationType = await tx.operationType.findUnique({
                     where: { id: typeId },
@@ -68,7 +69,10 @@ export class UpdateOperationUseCase {
 
                 // Для корректировки: amount - это желаемый баланс, нужно вычислить разницу
                 const entry = entries[0];
-                const currentBalance = await this.walletRecalculationService.getCalculatedWalletAmount(tx, entry.walletId);
+                const currentBalance = await this.walletRecalculationService.getCalculatedWalletAmount(
+                    tx,
+                    entry.walletId,
+                );
                 const desiredBalance = entry.amount;
                 const difference = desiredBalance - currentBalance;
 
@@ -88,6 +92,7 @@ export class UpdateOperationUseCase {
 
             // Проверяем смену типа операции с "Аванс" на другой
             let shouldCompleteApplication = false;
+
             if (typeId && typeId !== existingOperation.typeId) {
                 // Получаем новый тип операции
                 const newType = await tx.operationType.findUnique({
@@ -133,7 +138,7 @@ export class UpdateOperationUseCase {
                 await tx.application.update({
                     where: { id: applicationId },
                     data: {
-                        operationId: operationId,
+                        operationId,
                         updatedById,
                     },
                 });
@@ -143,7 +148,7 @@ export class UpdateOperationUseCase {
             if (shouldCompleteApplication) {
                 await tx.application.updateMany({
                     where: {
-                        operationId: operationId,
+                        operationId,
                         deleted: false,
                     },
                     data: {

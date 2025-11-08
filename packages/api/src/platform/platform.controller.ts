@@ -19,12 +19,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { ApiCrudResponses, ApiIdParam, ApiTag } from '../common';
-import {
-    CreatePlatformDto,
-    GetPlatformsResponseDto,
-    PlatformResponseDto,
-    UpdatePlatformDto,
-} from './dto';
+import { CreatePlatformDto, GetPlatformsResponseDto, PlatformResponseDto, UpdatePlatformDto } from './dto';
 import {
     CreatePlatformUseCase,
     DeletePlatformUseCase,
@@ -53,8 +48,7 @@ export class PlatformController {
     @Roles(RoleCode.admin, RoleCode.moderator)
     @ApiOperation({
         summary: 'Создать новую платформу',
-        description:
-            'Создаёт новую платформу. Доступно администраторам и модераторам.',
+        description: 'Создаёт новую платформу. Доступно администраторам и модераторам.',
     })
     @ApiBody({ type: CreatePlatformDto })
     @ApiResponse({
@@ -67,10 +61,7 @@ export class PlatformController {
         @Body() createPlatformDto: CreatePlatformDto,
         @CurrentUserId() userId: string,
     ): Promise<PlatformResponseDto> {
-        return await this.createPlatformUseCase.execute(
-            createPlatformDto,
-            userId,
-        );
+        return await this.createPlatformUseCase.execute(createPlatformDto, userId);
     }
 
     @Get()
@@ -102,9 +93,7 @@ export class PlatformController {
         type: PlatformResponseDto,
     })
     @ApiCrudResponses()
-    public async getPlatformById(
-        @Param('id') id: string,
-    ): Promise<PlatformResponseDto> {
+    public async getPlatformById(@Param('id') id: string): Promise<PlatformResponseDto> {
         return await this.getPlatformByIdUseCase.execute(id);
     }
 
@@ -114,8 +103,7 @@ export class PlatformController {
     @ApiIdParam()
     @ApiOperation({
         summary: 'Обновить платформу',
-        description:
-            'Обновляет данные платформы. Доступно администраторам и модераторам.',
+        description: 'Обновляет данные платформы. Доступно администраторам и модераторам.',
     })
     @ApiBody({ type: UpdatePlatformDto })
     @ApiResponse({
@@ -129,11 +117,7 @@ export class PlatformController {
         @Body() updatePlatformDto: UpdatePlatformDto,
         @CurrentUserId() userId: string,
     ): Promise<PlatformResponseDto> {
-        return await this.updatePlatformUseCase.execute(
-            id,
-            updatePlatformDto,
-            userId,
-        );
+        return await this.updatePlatformUseCase.execute(id, updatePlatformDto, userId);
     }
 
     @Delete(':id')
@@ -142,8 +126,7 @@ export class PlatformController {
     @ApiIdParam()
     @ApiOperation({
         summary: 'Удалить платформу',
-        description:
-            'Помечает платформу как удалённую. Доступно администраторам и модераторам.',
+        description: 'Помечает платформу как удалённую. Доступно администраторам и модераторам.',
     })
     @ApiResponse({
         status: 200,
@@ -163,8 +146,7 @@ export class PlatformController {
     @ApiIdParam()
     @ApiOperation({
         summary: 'Восстановить платформу',
-        description:
-            'Восстанавливает удалённую платформу. Доступно администраторам и модераторам.',
+        description: 'Восстанавливает удалённую платформу. Доступно администраторам и модераторам.',
     })
     @ApiResponse({
         status: 200,

@@ -8,7 +8,7 @@ export class PlatformInitService implements OnModuleInit {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async onModuleInit() {
+    public async onModuleInit() {
         await this.initializePlatforms();
     }
 
@@ -36,7 +36,6 @@ export class PlatformInitService implements OnModuleInit {
             },
         ];
 
-        // Получаем админ пользователя
         const adminUser = await this.prisma.user.findFirst({
             where: {
                 roles: {
@@ -51,6 +50,7 @@ export class PlatformInitService implements OnModuleInit {
 
         if (!adminUser) {
             this.logger.warn('Админ пользователь не найден. Пропускаем инициализацию платформ.');
+
             return;
         }
 

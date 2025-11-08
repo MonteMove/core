@@ -45,7 +45,6 @@ export function useUsersQueryParams(): Partial<GetUsersParams> {
     if (telegramId) params.telegramId = telegramId;
     return params;
   }, [
-    tab,
     search,
     sortField,
     sortOrder,

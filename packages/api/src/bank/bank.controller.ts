@@ -20,13 +20,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { ApiCrudResponses, ApiIdParam, ApiTag } from '../common';
-import {
-    CreateBankDto,
-    GetBanksDto,
-    GetBanksResponseDto,
-    BankResponseDto,
-    UpdateBankDto,
-} from './dto';
+import { BankResponseDto, CreateBankDto, GetBanksDto, GetBanksResponseDto, UpdateBankDto } from './dto';
 import {
     CreateBankUseCase,
     DeleteBankUseCase,
@@ -55,8 +49,7 @@ export class BankController {
     @Roles(RoleCode.admin, RoleCode.moderator)
     @ApiOperation({
         summary: 'Создать новый банк',
-        description:
-            'Создаёт новый банк. Доступно администраторам и модераторам.',
+        description: 'Создаёт новый банк. Доступно администраторам и модераторам.',
     })
     @ApiBody({ type: CreateBankDto })
     @ApiResponse({
@@ -84,9 +77,7 @@ export class BankController {
         type: GetBanksResponseDto,
     })
     @ApiCrudResponses()
-    public async getBanks(
-        @Query() getBanksDto: GetBanksDto,
-    ): Promise<GetBanksResponseDto> {
+    public async getBanks(@Query() getBanksDto: GetBanksDto): Promise<GetBanksResponseDto> {
         return await this.getBanksUseCase.execute(getBanksDto);
     }
 
@@ -113,8 +104,7 @@ export class BankController {
     @ApiIdParam()
     @ApiOperation({
         summary: 'Обновить банк',
-        description:
-            'Обновляет информацию о банке. Доступно администраторам и модераторам.',
+        description: 'Обновляет информацию о банке. Доступно администраторам и модераторам.',
     })
     @ApiBody({ type: UpdateBankDto })
     @ApiResponse({
@@ -145,10 +135,7 @@ export class BankController {
         type: BankResponseDto,
     })
     @ApiCrudResponses()
-    public async deleteBank(
-        @Param('id') id: string,
-        @CurrentUserId() userId: string,
-    ): Promise<BankResponseDto> {
+    public async deleteBank(@Param('id') id: string, @CurrentUserId() userId: string): Promise<BankResponseDto> {
         return await this.deleteBankUseCase.execute(id, userId);
     }
 
@@ -166,10 +153,7 @@ export class BankController {
         type: BankResponseDto,
     })
     @ApiCrudResponses()
-    public async restoreBank(
-        @Param('id') id: string,
-        @CurrentUserId() userId: string,
-    ): Promise<BankResponseDto> {
+    public async restoreBank(@Param('id') id: string, @CurrentUserId() userId: string): Promise<BankResponseDto> {
         return await this.restoreBankUseCase.execute(id, userId);
     }
 }

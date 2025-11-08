@@ -10,7 +10,8 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader, Loading,
+  CardHeader,
+  Loading,
   formatDateTime,
 } from '@/shared';
 import { formatNumber } from '@/shared/lib/utils/format-number';
@@ -54,9 +55,7 @@ export default function WalletOperationsPage() {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isWalletLoading || isOperationsLoading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   if (!wallet) {

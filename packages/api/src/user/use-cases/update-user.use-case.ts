@@ -13,7 +13,8 @@ export class UpdateUserUseCase {
     ) {}
 
     public async execute(userId: string, updateUserDto: UpdateUserDto): Promise<UpdateUserOutput> {
-        const { username, telegramId, blocked, telegramNotifications, isHolder, isCourier, password, roleIds } = updateUserDto;
+        const { username, telegramId, blocked, telegramNotifications, isHolder, isCourier, password, roleIds } =
+            updateUserDto;
 
         const existingUser = await this.prisma.user.findUnique({
             where: { id: userId },

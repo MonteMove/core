@@ -62,6 +62,7 @@ export class GetWalletsAggregationUseCase {
             );
 
             const searchLower = search.toLowerCase();
+
             if ('касса'.startsWith(searchLower) || searchLower.startsWith('касс')) {
                 orConditions.push({ walletKind: 'simple' });
             }
@@ -78,18 +79,12 @@ export class GetWalletsAggregationUseCase {
             (pinned === false || pinned === undefined);
 
         if (isAllTabContext) {
-            const andConditions = Array.isArray(where.AND)
-                ? where.AND
-                : where.AND
-                    ? [where.AND]
-                    : [];
+            const andConditions = Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : [];
+
             where.AND = [
                 ...andConditions,
                 {
-                    OR: [
-                        { walletTypeId: null },
-                        { walletType: { showInTabs: false } },
-                    ],
+                    OR: [{ walletTypeId: null }, { walletType: { showInTabs: false } }],
                 },
             ];
         }
@@ -167,6 +162,7 @@ export class GetWalletsAggregationUseCase {
             }
 
             const group = currencyMap.get(currencyId)!;
+
             group.totalAmount += wallet.amount;
             group.walletsCount += 1;
         });

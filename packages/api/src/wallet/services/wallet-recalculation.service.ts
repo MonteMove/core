@@ -65,6 +65,7 @@ export class WalletRecalculationService {
             }
 
             const walletIds = wallets.map((wallet) => wallet.id);
+
             await this.recalculateWallets(tx, walletIds);
             await this.updateBeforeAfterForWallets(tx, walletIds);
         });

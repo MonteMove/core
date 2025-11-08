@@ -8,7 +8,7 @@ export class OperationTypeInitService implements OnModuleInit {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async onModuleInit() {
+    public async onModuleInit() {
         await this.initializeOperationTypes();
     }
 
@@ -27,6 +27,7 @@ export class OperationTypeInitService implements OnModuleInit {
 
         if (!adminUser) {
             this.logger.warn('Админ пользователь не найден, пропуск инициализации типов операций');
+
             return;
         }
 

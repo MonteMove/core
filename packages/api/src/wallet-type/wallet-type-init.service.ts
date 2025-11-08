@@ -8,7 +8,7 @@ export class WalletTypeInitService implements OnModuleInit {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async onModuleInit() {
+    public async onModuleInit() {
         await this.initializeWalletTypes();
     }
 

@@ -8,7 +8,7 @@ export class CurrencyInitService implements OnModuleInit {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async onModuleInit() {
+    public async onModuleInit() {
         await this.initializeCurrencies();
     }
 
@@ -27,6 +27,7 @@ export class CurrencyInitService implements OnModuleInit {
 
         if (!adminUser) {
             this.logger.warn('Админ пользователь не найден, пропуск инициализации валют');
+
             return;
         }
 

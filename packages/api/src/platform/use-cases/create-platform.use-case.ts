@@ -7,10 +7,7 @@ import { CreatePlatformDto, PlatformResponseDto } from '../dto';
 export class CreatePlatformUseCase {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async execute(
-        createPlatformDto: CreatePlatformDto,
-        userId: string,
-    ): Promise<PlatformResponseDto> {
+    public async execute(createPlatformDto: CreatePlatformDto, userId: string): Promise<PlatformResponseDto> {
         const { code, name, active } = createPlatformDto;
 
         const existingPlatformByCode = await this.prisma.platform.findFirst({
@@ -21,9 +18,7 @@ export class CreatePlatformUseCase {
         });
 
         if (existingPlatformByCode) {
-            throw new BadRequestException(
-                `Платформа с кодом "${code}" уже существует`,
-            );
+            throw new BadRequestException(`Платформа с кодом "${code}" уже существует`);
         }
 
         const platform = await this.prisma.platform.create({

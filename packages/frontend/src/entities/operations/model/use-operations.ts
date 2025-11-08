@@ -12,12 +12,7 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import {
-  GetWalletsResponseDto,
-  WalletSortField,
-  SortOrder,
-  WalletService,
-} from '@/entities/wallet';
+import { GetWalletsResponseDto, WalletService } from '@/entities/wallet';
 import { ROUTER_MAP } from '@/shared';
 import {
   FILTERED_OPERATIONS_QUERY_KEY,
@@ -29,13 +24,11 @@ import {
 
 import { OperationsService } from '../api/operations-service';
 import {
-  CreateOperationDto,
   CreateOperationBackendDto,
   GetOperationsParams,
   GetOperationsParamsSchema,
   GetOperationsResponseDto,
   OperationResponseDto,
-  UpdateOperationDto,
   UpdateOperationBackendDto,
 } from './opeartions-schemas';
 

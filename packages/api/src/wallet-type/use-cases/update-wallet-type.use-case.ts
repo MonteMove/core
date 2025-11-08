@@ -21,11 +21,7 @@ export class UpdateWalletTypeUseCase {
             throw new NotFoundException('Тип кошелька не найден');
         }
 
-        if (
-            dto.code !== undefined &&
-            SYSTEM_WALLET_TYPE_CODES.includes(existing.code) &&
-            dto.code !== existing.code
-        ) {
+        if (dto.code !== undefined && SYSTEM_WALLET_TYPE_CODES.includes(existing.code) && dto.code !== existing.code) {
             throw new BadRequestException('Нельзя изменить код системного типа кошелька');
         }
 

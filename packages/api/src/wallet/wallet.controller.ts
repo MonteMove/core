@@ -197,7 +197,8 @@ export class WalletController {
     @Roles(RoleCode.admin)
     @ApiOperation({
         summary: 'Получить месячный лимит кошелька',
-        description: 'Возвращает информацию о месячном лимите, потраченной сумме и остатке за текущий месяц. Доступно только администраторам.',
+        description:
+            'Возвращает информацию о месячном лимите, потраченной сумме и остатке за текущий месяц. Доступно только администраторам.',
     })
     @ApiIdParam('Уникальный идентификатор кошелька')
     @ApiResponse({
@@ -309,10 +310,10 @@ export class WalletController {
     @ApiCrudResponses()
     public async patchWallet(
         @Param('id') walletId: string,
-        @Body() body: { balanceStatus?: string },
+        @Body() body: UpdateWalletDto,
         @CurrentUserId() userId: string,
     ): Promise<UpdateWalletResponseDto> {
-        const result = await this.updateWalletUseCase.execute(walletId, body as any, userId);
+        const result = await this.updateWalletUseCase.execute(walletId, body, userId);
 
         return {
             message: result.message,

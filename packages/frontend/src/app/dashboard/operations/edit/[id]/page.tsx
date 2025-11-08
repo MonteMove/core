@@ -9,7 +9,8 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle, Loading,
+  CardTitle,
+  Loading,
 } from '@/shared';
 
 export default function EditOperationPage() {

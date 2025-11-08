@@ -8,7 +8,7 @@ export class NetworkInitService implements OnModuleInit {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async onModuleInit() {
+    public async onModuleInit() {
         await this.initializeNetworks();
     }
 
@@ -34,6 +34,7 @@ export class NetworkInitService implements OnModuleInit {
 
         if (!adminUser) {
             this.logger.warn('Админ пользователь не найден. Пропускаем инициализацию сетей.');
+
             return;
         }
 

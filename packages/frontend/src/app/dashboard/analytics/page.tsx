@@ -4,11 +4,7 @@ import { AnalyticsCharts } from '@/features/analytics/ui/analytics-chart/analyti
 import { AnalyticsFilters } from '@/features/analytics/ui/analytics-filters/analytics-filters';
 import { AnalyticsSummary } from '@/features/analytics/ui/analytics-summary/analytics-summary';
 import { AnalyticsTable } from '@/features/analytics/ui/analytics-table/analytics-table';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-} from '@/shared/ui/shadcn/card';
+import { Card, CardHeader, CardTitle } from '@/shared/ui/shadcn/card';
 
 export const metadata: Metadata = {
   title: 'Аналитика',

@@ -8,16 +8,14 @@ export class NetworkTypeInitService implements OnModuleInit {
 
     constructor(private readonly prisma: PrismaService) {}
 
-    async onModuleInit() {
+    public onModuleInit() {
         setTimeout(() => {
-            this.initializeNetworkTypes();
+            void this.initializeNetworkTypes();
         }, 1000);
     }
 
     private async initializeNetworkTypes() {
-        const networkTypes = [
-            { networkCode: 'tron', code: 'trc-20', name: 'TRC-20' },
-        ];
+        const networkTypes = [{ networkCode: 'tron', code: 'trc-20', name: 'TRC-20' }];
 
         const adminUser = await this.prisma.user.findFirst({
             where: {
@@ -33,6 +31,7 @@ export class NetworkTypeInitService implements OnModuleInit {
 
         if (!adminUser) {
             this.logger.warn('Админ пользователь не найден. Пропускаем инициализацию типов сетей.');
+
             return;
         }
 

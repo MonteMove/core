@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { JwtTokenService } from '../jwt.service';
 import { SessionInfo, TokenPair } from '../types';
@@ -9,13 +9,13 @@ export class RefreshTokensUseCase {
 
     public async execute(accessToken: string, refreshToken: string, sessionInfo: SessionInfo): Promise<TokenPair> {
         if (!refreshToken || refreshToken.trim() === '') {
-            throw new UnauthorizedException('Refresh token не найден');
+            throw new NotFoundException('Refresh token не найден');
         }
 
         const tokens = await this.jwtTokenService.refreshTokens(accessToken, refreshToken, sessionInfo);
 
         if (!tokens) {
-            throw new UnauthorizedException('Недействительные токены');
+            throw new BadRequestException('Недействительные токены');
         }
 
         return tokens;
