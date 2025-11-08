@@ -24,7 +24,6 @@ import { useWalletTypes } from '@/entities/wallet-type';
 import {
   Button,
   Card,
-  CardContent,
   CardHeader,
   CardTitle,
   Empty,
@@ -42,6 +41,8 @@ import {
 
 import { WalletsFiltersSheet } from '../../../features/wallets/ui/wallet-filters/wallets-filters-sheet';
 import { WalletsAggregationSwiper } from '../../../features/wallets/ui/wallets-aggregation-swiper/wallets-aggregation-swiper';
+import { BulkActionsBar } from '../../../features/wallets/ui/bulk-actions-bar';
+import { useBulkWalletActions } from '../../../features/wallets/hooks/use-bulk-wallet-actions';
 
 const baseFilters: GetWalletsFilter = {
   search: '',
@@ -53,7 +54,7 @@ const baseFilters: GetWalletsFilter = {
   currencyId: undefined,
   userId: undefined,
   active: undefined,
-  pinned: false,
+  pinned: true,
   visible: true,
   deleted: false,
   sortField: WalletSortField.CREATED_AT,
@@ -77,6 +78,19 @@ export default function WalletsPage() {
   });
 
   const [isInitialized, setIsInitialized] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedWallets, setSelectedWallets] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const {
+    bulkToggleVisible,
+    bulkToggleActive,
+    bulkTogglePinned,
+    bulkTogglePinOnMain,
+    bulkDelete,
+    bulkBalanceStatusChange,
+  } = useBulkWalletActions();
 
   useEffect(() => {
     const params: Partial<GetWalletsFilter> = {};
@@ -184,20 +198,75 @@ export default function WalletsPage() {
   const { data, isLoading, isFetching } = useWallets(filteredValues);
   const showSkeleton = isLoading || isFetching;
 
+  const handleToggleSelection = (walletId: string) => {
+    setSelectedWallets((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(walletId)) {
+        newSet.delete(walletId);
+      } else {
+        newSet.add(walletId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleEnterSelectionMode = () => {
+    setSelectionMode(true);
+  };
+
+  const handleCancelSelection = () => {
+    setSelectionMode(false);
+    setSelectedWallets(new Set());
+  };
+
+  const handleBulkAction = (
+    action: (ids: string[], value: boolean) => void,
+    value: boolean,
+  ) => {
+    const ids = Array.from(selectedWallets);
+    action(ids, value);
+    handleCancelSelection();
+  };
+
+  const handleBulkDelete = () => {
+    const ids = Array.from(selectedWallets);
+    bulkDelete(ids);
+    handleCancelSelection();
+  };
+
+  const handleBulkBalanceStatusChange = (status: string) => {
+    const ids = Array.from(selectedWallets);
+    bulkBalanceStatusChange(ids, status);
+    handleCancelSelection();
+  };
+
   const renderWalletCard = (wallet: Wallet) => {
+    const commonProps = {
+      selectionMode,
+      isSelected: selectedWallets.has(wallet.id),
+      onSelect: handleToggleSelection,
+      onEnterSelectionMode: handleEnterSelectionMode,
+    };
+
     switch (wallet.walletKind) {
       case 'crypto':
-        return <CryptoWalletCard key={wallet.id} wallet={wallet} />;
+        return (
+          <CryptoWalletCard key={wallet.id} wallet={wallet} {...commonProps} />
+        );
       case 'bank':
-        return <BankWalletCard key={wallet.id} wallet={wallet} />;
+        return (
+          <BankWalletCard key={wallet.id} wallet={wallet} {...commonProps} />
+        );
       case 'simple':
       default:
-        return <SimpleWalletCard key={wallet.id} wallet={wallet} />;
+        return (
+          <SimpleWalletCard key={wallet.id} wallet={wallet} {...commonProps} />
+        );
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 pb-24">
       <Card>
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <CardTitle className="text-2xl">Список кошельков</CardTitle>
@@ -248,11 +317,26 @@ export default function WalletsPage() {
               deleted: false,
             });
           } else if (val === 'deleted') {
-            form.reset({ ...baseFilters, deleted: true, visible: true, pinned: false });
+            form.reset({
+              ...baseFilters,
+              deleted: true,
+              visible: true,
+              pinned: false,
+            });
           } else if (val === 'hidden') {
-            form.reset({ ...baseFilters, visible: false, deleted: false, pinned: false });
+            form.reset({
+              ...baseFilters,
+              visible: false,
+              deleted: false,
+              pinned: false,
+            });
           } else if (val === 'pinned') {
-            form.reset({ ...baseFilters, pinned: true, visible: true, deleted: false });
+            form.reset({
+              ...baseFilters,
+              pinned: true,
+              visible: true,
+              deleted: false,
+            });
           } else {
             form.reset({
               ...baseFilters,
@@ -316,6 +400,21 @@ export default function WalletsPage() {
         )}
         {!showSkeleton && data?.wallets.map(renderWalletCard)}
       </div>
+
+      <BulkActionsBar
+        selectedCount={selectedWallets.size}
+        onCancel={handleCancelSelection}
+        onToggleVisible={(visible) =>
+          handleBulkAction(bulkToggleVisible, visible)
+        }
+        onToggleActive={(active) => handleBulkAction(bulkToggleActive, active)}
+        onTogglePinned={(pinned) => handleBulkAction(bulkTogglePinned, pinned)}
+        onTogglePinOnMain={(pinOnMain) =>
+          handleBulkAction(bulkTogglePinOnMain, pinOnMain)
+        }
+        onDelete={handleBulkDelete}
+        onBalanceStatusChange={handleBulkBalanceStatusChange}
+      />
     </div>
   );
 }

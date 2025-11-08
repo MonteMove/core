@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from '@/shared/ui/shadcn/dialog';
 import { Button } from '@/shared/ui/shadcn/button';
-import { Skeleton } from '@/shared/ui/shadcn/skeleton';
+import { Loading } from '@/shared/ui/shadcn/skeleton';
 import { formatNumber } from '@/shared/lib/utils/format-number';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
@@ -46,11 +46,7 @@ export function OperationViewDialog({
         </DialogHeader>
 
         {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-20 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </div>
+          <Loading />
         ) : operation ? (
           <div className="space-y-6">
             {/* Основная информация */}
@@ -63,9 +59,13 @@ export function OperationViewDialog({
                 <div>
                   <p className="text-sm text-muted-foreground">Дата создания</p>
                   <p className="font-medium">
-                    {format(new Date(operation.createdAt), 'dd MMMM yyyy, HH:mm', {
-                      locale: ru,
-                    })}
+                    {format(
+                      new Date(operation.createdAt),
+                      'dd MMMM yyyy, HH:mm',
+                      {
+                        locale: ru,
+                      },
+                    )}
                   </p>
                 </div>
               </div>
@@ -81,13 +81,17 @@ export function OperationViewDialog({
                 {operation.created_by && (
                   <div>
                     <p className="text-sm text-muted-foreground">Создал</p>
-                    <p className="font-medium">{operation.created_by.username}</p>
+                    <p className="font-medium">
+                      {operation.created_by.username}
+                    </p>
                   </div>
                 )}
                 {operation.updated_by && (
                   <div>
                     <p className="text-sm text-muted-foreground">Обновил</p>
-                    <p className="font-medium">{operation.updated_by.username}</p>
+                    <p className="font-medium">
+                      {operation.updated_by.username}
+                    </p>
                   </div>
                 )}
               </div>
@@ -113,10 +117,8 @@ export function OperationViewDialog({
                         <p className="text-sm">
                           <span className="text-muted-foreground">
                             {formatNumber(entry.before ?? 0)}
-                          </span>
-                          {' '}
-                          {entry.direction === 'credit' ? '+' : '-'}
-                          {' '}
+                          </span>{' '}
+                          {entry.direction === 'credit' ? '+' : '-'}{' '}
                           <span
                             className={
                               entry.direction === 'credit'
@@ -141,10 +143,7 @@ export function OperationViewDialog({
             {/* Кнопка редактирования */}
             {operationId && (
               <div className="flex justify-end pt-4 border-t">
-                <Button
-                  onClick={handleEdit}
-                  className="gap-2"
-                >
+                <Button onClick={handleEdit} className="gap-2">
                   <Pencil className="h-4 w-4" />
                   Редактировать операцию
                 </Button>
@@ -152,7 +151,9 @@ export function OperationViewDialog({
             )}
           </div>
         ) : (
-          <p className="text-center text-muted-foreground">Операция не найдена</p>
+          <p className="text-center text-muted-foreground">
+            Операция не найдена
+          </p>
         )}
       </DialogContent>
     </Dialog>

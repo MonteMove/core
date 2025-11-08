@@ -4,6 +4,8 @@ import { PrismaService } from '../../common/services/prisma.service';
 import { UpdateNetworkDto } from '../dto';
 import { UpdateNetworkResponse } from '../types';
 
+const SYSTEM_NETWORK_CODES = ['tron'];
+
 @Injectable()
 export class UpdateNetworkUseCase {
     constructor(private readonly prisma: PrismaService) {}
@@ -21,6 +23,14 @@ export class UpdateNetworkUseCase {
 
         if (!existingNetwork || existingNetwork.deleted) {
             throw new NotFoundException('Сеть не найдена');
+        }
+
+        if (
+            code !== undefined &&
+            SYSTEM_NETWORK_CODES.includes(existingNetwork.code) &&
+            code !== existingNetwork.code
+        ) {
+            throw new BadRequestException('Нельзя изменить код системной сети');
         }
 
         if (code !== undefined && code !== existingNetwork.code) {

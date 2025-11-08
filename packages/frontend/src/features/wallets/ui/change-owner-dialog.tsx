@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { isAxiosError } from 'axios';
 
 import { UserService } from '@/entities/users/api/users-service';
 import type { UserType } from '@/entities/users/model/user-schemas';
@@ -70,12 +69,6 @@ export const ChangeOwnerDialog = ({
       toast.success('Держатель кошелька успешно изменен');
       onConfirm?.(selectedOwnerId);
       onOpenChange(false);
-    },
-    onError: (error) => {
-      const message = isAxiosError(error)
-        ? error.response?.data?.message || 'Ошибка при смене держателя'
-        : 'Ошибка при смене держателя';
-      toast.error(message);
     },
   });
 

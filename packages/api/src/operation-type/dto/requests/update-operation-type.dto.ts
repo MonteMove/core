@@ -3,6 +3,20 @@ import { IsBoolean, IsOptional, IsString, Length, MaxLength } from 'class-valida
 
 export class UpdateOperationTypeDto {
     @ApiProperty({
+        description: 'Новый код типа операции',
+        example: 'deposit',
+        minLength: 2,
+        maxLength: 50,
+        required: false,
+    })
+    @IsOptional()
+    @IsString({ message: 'Код типа операции должен быть строкой' })
+    @Length(2, 50, {
+        message: 'Код типа операции должен содержать от 2 до 50 символов',
+    })
+    public code?: string;
+
+    @ApiProperty({
         description: 'Новое название типа операции',
         example: 'Пополнение',
         minLength: 2,

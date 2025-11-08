@@ -6,7 +6,6 @@ import { AnalyticsSummary } from '@/features/analytics/ui/analytics-summary/anal
 import { AnalyticsTable } from '@/features/analytics/ui/analytics-table/analytics-table';
 import {
   Card,
-  CardContent,
   CardHeader,
   CardTitle,
 } from '@/shared/ui/shadcn/card';

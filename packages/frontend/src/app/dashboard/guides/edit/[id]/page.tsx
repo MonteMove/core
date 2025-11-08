@@ -10,19 +10,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
+  Loading,
+} from '@/shared';
 
 export default function EditGuidePage() {
   const { id } = useParams<{ id: string }>();
   const { data: guide, isLoading } = useGuide(id);
-  if (isLoading)
-    return (
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Загрузка...</p>
-        </div>
-      </div>
-    );
+  if (isLoading) return <Loading variant="page" />;
   if (!guide)
     return (
       <div className="max-w-5xl mx-auto">

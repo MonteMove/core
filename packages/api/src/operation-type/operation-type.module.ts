@@ -10,6 +10,7 @@ import {
     DeleteOperationTypeUseCase,
     GetOperationTypeByIdUseCase,
     GetOperationTypesUseCase,
+    RestoreOperationTypeUseCase,
     UpdateOperationTypeUseCase,
 } from './use-cases';
 
@@ -21,6 +22,7 @@ import {
         GetOperationTypesUseCase,
         UpdateOperationTypeUseCase,
         DeleteOperationTypeUseCase,
+        RestoreOperationTypeUseCase,
         PrismaService,
         JwtAuthGuard,
         RolesGuard,
@@ -32,6 +34,7 @@ import {
         GetOperationTypesUseCase,
         UpdateOperationTypeUseCase,
         DeleteOperationTypeUseCase,
+        RestoreOperationTypeUseCase,
         PrismaService,
     ],
 })

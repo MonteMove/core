@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string(),
+});
+
 export const NetworkSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
@@ -10,6 +15,8 @@ export const NetworkSchema = z.object({
   deleted: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  created_by: UserSchema,
+  updated_by: UserSchema,
 });
 
 export const CreateNetworkSchema = z.object({
@@ -28,9 +35,8 @@ export const GetNetworksResponseSchema = z.object({
   networks: z.array(NetworkSchema),
 });
 
-export const GetNetworkResponseSchema = z.object({
-  network: NetworkSchema,
-});
+// Backend возвращает прямой объект сети, а не обёрнутый
+export const GetNetworkResponseSchema = NetworkSchema;
 
 export const CreateNetworkResponseSchema = z.object({
   message: z.string(),

@@ -30,6 +30,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   ROUTER_MAP,
   Table,
   TableBody,
@@ -99,9 +100,7 @@ export default function NetworksPage() {
             </TabsList>
           </Tabs>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
+            <Loading />
           ) : data?.networks.length === 0 ? (
             <Empty>
               <EmptyHeader>
@@ -212,7 +211,7 @@ export default function NetworksPage() {
             <AlertDialogTitle>Удалить сеть?</AlertDialogTitle>
             <AlertDialogDescription>
               Сеть будет перемещена в удаленные. Вы сможете восстановить её
-              позже из вкладки "Удалённые".
+              позже из вкладки &quot;Удалённые&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

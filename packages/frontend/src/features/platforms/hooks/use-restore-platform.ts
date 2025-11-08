@@ -15,10 +15,5 @@ export const useRestorePlatform = () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
       toast.success('Платформа успешно восстановлена');
     },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.message || 'Не удалось восстановить платформу';
-      toast.error(message);
-    },
   });
 };

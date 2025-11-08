@@ -21,11 +21,5 @@ export const useCreateHelp = () => {
       queryClient.invalidateQueries({ queryKey: ['help'] });
       router.push(ROUTER_MAP.HELP);
     },
-    onError: (error) => {
-      console.error('Ошибка при создании обращения:', error);
-      toast.error('НЕ удалось создать обращение', {
-        description: 'Проверьте введенные данные и попробуйте снова.',
-      });
-    },
   });
 };

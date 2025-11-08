@@ -11,7 +11,6 @@ import { Button } from '@/shared/ui/shadcn/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
 } from '@/shared/ui/shadcn/card';

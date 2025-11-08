@@ -60,6 +60,8 @@ export class CreateWalletUseCase {
                             exchangeUid: details?.exchangeUid ?? null,
                             networkId: details?.networkId ?? null,
                             networkTypeId: details?.networkTypeId ?? null,
+                            platformId: details?.platformId ?? null,
+                            bankId: details?.bankId ?? null,
                         },
                     },
                 }),
@@ -118,6 +120,20 @@ export class CreateWalletUseCase {
                             },
                         },
                         networkType: {
+                            select: {
+                                id: true,
+                                code: true,
+                                name: true,
+                            },
+                        },
+                        platform: {
+                            select: {
+                                id: true,
+                                code: true,
+                                name: true,
+                            },
+                        },
+                        bank: {
                             select: {
                                 id: true,
                                 code: true,

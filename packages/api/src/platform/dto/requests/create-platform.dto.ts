@@ -4,10 +4,8 @@ import {
     IsNotEmpty,
     IsOptional,
     IsString,
-    IsUrl,
     MaxLength,
     MinLength,
-    ValidateIf,
 } from 'class-validator';
 
 export class CreatePlatformDto {
@@ -29,7 +27,7 @@ export class CreatePlatformDto {
 
     @ApiProperty({
         description: 'Код платформы',
-        example: 'BYBIT',
+        example: 'bybit',
         minLength: 2,
         maxLength: 20,
     })
@@ -40,36 +38,6 @@ export class CreatePlatformDto {
         message: 'Код платформы должен содержать максимум 20 символов',
     })
     public code: string;
-
-    @ApiPropertyOptional({
-        description: 'Описание платформы',
-        example: 'Криптовалютная биржа',
-        maxLength: 500,
-    })
-    @IsOptional()
-    @IsString({ message: 'Описание должно быть строкой' })
-    @MaxLength(500, {
-        message: 'Описание должно содержать максимум 500 символов',
-    })
-    public description?: string;
-
-    @ApiPropertyOptional({
-        description: 'URL иконки платформы',
-        example: 'https://example.com/icon.png',
-    })
-    @IsOptional()
-    @ValidateIf((o) => o.icon && o.icon.length > 0)
-    @IsUrl({}, { message: 'Некорректный URL иконки' })
-    public icon?: string;
-
-    @ApiPropertyOptional({
-        description: 'URL сайта платформы',
-        example: 'https://www.bybit.com',
-    })
-    @IsOptional()
-    @ValidateIf((o) => o.url && o.url.length > 0)
-    @IsUrl({}, { message: 'Некорректный URL сайта' })
-    public url?: string;
 
     @ApiPropertyOptional({
         description: 'Активность платформы',

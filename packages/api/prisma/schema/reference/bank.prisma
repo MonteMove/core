@@ -1,0 +1,23 @@
+model Bank {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  updatedById String   @map("updated_by_id") @db.Uuid
+  name        String
+  code        String   @unique
+  active      Boolean  @default(true)
+  deleted     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  created_by    User           @relation("banks_created_by", fields: [userId], references: [id])
+  updated_by    User           @relation("banks_updated_by", fields: [updatedById], references: [id])
+  walletDetails WalletDetail[]
+
+  @@index([userId], map: "banks_user_idx")
+  @@index([updatedById], map: "banks_updated_by_idx")
+  @@index([code], map: "banks_code_idx")
+  @@index([active], map: "banks_active_idx")
+  @@index([deleted], map: "banks_deleted_idx")
+  @@index([createdAt], map: "banks_created_at_idx")
+  @@map("banks")
+}

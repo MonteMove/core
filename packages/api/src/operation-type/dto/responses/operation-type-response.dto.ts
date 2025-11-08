@@ -8,6 +8,12 @@ export class OperationTypeResponseDto {
     public id: string;
 
     @ApiProperty({
+        description: 'Уникальный код типа операции',
+        example: 'withdrawal',
+    })
+    public code: string;
+
+    @ApiProperty({
         description: 'Название типа операции',
         example: 'Вывод средств',
     })

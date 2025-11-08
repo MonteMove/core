@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { PrismaService } from '../common/services/prisma.service';
 import { PlatformController } from './platform.controller';
+import { PlatformInitService } from './platform-init.service';
 import {
     CreatePlatformUseCase,
     DeletePlatformUseCase,
@@ -15,6 +16,7 @@ import {
     controllers: [PlatformController],
     providers: [
         PrismaService,
+        PlatformInitService,
         CreatePlatformUseCase,
         GetPlatformsUseCase,
         GetPlatformByIdUseCase,

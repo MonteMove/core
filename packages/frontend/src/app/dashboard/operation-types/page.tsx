@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import { ListChecks, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ListChecks, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
 
 import { useOperationTypes } from '@/entities/operations/model/use-operation-type';
 import { useDeleteOperationType } from '@/features/operation-types/hooks/use-delete-operation-type';
+import { useRestoreOperationType } from '@/features/operation-types/hooks/use-restore-operation-type';
+
+const SYSTEM_OPERATION_TYPE_CODES = ['avans', 'correction'];
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +32,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   ROUTER_MAP,
   Table,
   TableBody,
@@ -36,17 +40,32 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tabs,
+  TabsList,
+  TabsTrigger,
 } from '@/shared';
 
 export default function OperationTypesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [operationTypeToDelete, setOperationTypeToDelete] = useState<
     string | null
   >(null);
 
-  const { data: operationTypes, isLoading } = useOperationTypes();
+  const tab = searchParams.get('tab') || 'all';
+  const showDeleted = tab === 'deleted' ? true : undefined;
+
+  const { data: operationTypes, isLoading } = useOperationTypes(showDeleted);
   const deleteMutation = useDeleteOperationType();
+  const restoreMutation = useRestoreOperationType();
+
+  const handleTabChange = useCallback(
+    (value: string) => {
+      router.push(`${ROUTER_MAP.OPERATION_TYPES}?tab=${value}`);
+    },
+    [router],
+  );
 
   const handleDeleteClick = (id: string) => {
     setOperationTypeToDelete(id);
@@ -59,6 +78,10 @@ export default function OperationTypesPage() {
       setDeleteDialogOpen(false);
       setOperationTypeToDelete(null);
     }
+  };
+
+  const handleRestore = async (id: string) => {
+    await restoreMutation.mutateAsync(id);
   };
 
   return (
@@ -74,10 +97,14 @@ export default function OperationTypesPage() {
           </Button>
         </CardHeader>
         <CardContent className="space-y-4">
+          <Tabs value={tab} onValueChange={handleTabChange}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="all">Все</TabsTrigger>
+              <TabsTrigger value="deleted">Удалённые</TabsTrigger>
+            </TabsList>
+          </Tabs>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
+            <Loading />
           ) : !operationTypes || operationTypes.length === 0 ? (
             <Empty>
               <EmptyHeader>
@@ -97,6 +124,7 @@ export default function OperationTypesPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Код</TableHead>
                     <TableHead>Название</TableHead>
                     <TableHead>Описание</TableHead>
                     <TableHead>Отдельный таб</TableHead>
@@ -116,8 +144,9 @@ export default function OperationTypesPage() {
                       }
                     >
                       <TableCell className="font-medium">
-                        {operationType.name}
+                        {operationType.code}
                       </TableCell>
+                      <TableCell>{operationType.name}</TableCell>
                       <TableCell>
                         {operationType.description || 'Не указано'}
                       </TableCell>
@@ -137,28 +166,47 @@ export default function OperationTypesPage() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(
-                                `${ROUTER_MAP.OPERATION_TYPES_EDIT}/${operationType.id}`,
-                              );
-                            }}
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteClick(operationType.id);
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          {showDeleted ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRestore(operationType.id);
+                              }}
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </Button>
+                          ) : (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  router.push(
+                                    `${ROUTER_MAP.OPERATION_TYPES_EDIT}/${operationType.id}`,
+                                  );
+                                }}
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
+                              {!SYSTEM_OPERATION_TYPE_CODES.includes(
+                                operationType.code,
+                              ) && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteClick(operationType.id);
+                                  }}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>

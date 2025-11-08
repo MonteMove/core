@@ -40,7 +40,7 @@ import {
   SelectValue,
 } from '@/shared';
 import { Separator } from '@/shared';
-import { Skeleton } from '@/shared';
+import { Loading } from '@/shared';
 import { Textarea } from '@/shared';
 
 const formatTelegramUsername = (value: string): string => {

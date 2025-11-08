@@ -9,11 +9,11 @@ import { OperationTypeService } from '@/entities/operations/api/operation-type-s
 import { OperationType } from '@/entities/operations/model/operation-type-schemas';
 import { OPERATION_TYPES_QUERY_KEY } from '@/shared/utils/constants/operation-types-query-key';
 
-export const useOperationTypes = () => {
+export const useOperationTypes = (deleted?: boolean) => {
   const queryResult = useQuery<OperationType[]>({
-    queryKey: [OPERATION_TYPES_QUERY_KEY],
+    queryKey: [OPERATION_TYPES_QUERY_KEY, deleted],
     queryFn: (): Promise<OperationType[]> =>
-      OperationTypeService.getOperationTypes(),
+      OperationTypeService.getOperationTypes(deleted),
   });
 
   useEffect(() => {

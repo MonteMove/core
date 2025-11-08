@@ -25,21 +25,13 @@ export const useLogin = () => {
     onSuccess: (data) => {
       setToken(data.accessToken);
       setUser(data.user);
-      
-      if (process.env.NODE_ENV === 'development') {
-        document.cookie = `dev_auth_token=${data.accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
-      }
-      
+
       toast.success('Вход выполнен успешно');
 
       const nextPath = searchParams.get('next');
       const redirectPath = nextPath || ROUTER_MAP.DASHBOARD;
 
       navigate.push(redirectPath);
-    },
-    onError: (error) => {
-      console.log('Error: ', error);
-      toast.error('Ошибка входа. Проверьте имя пользователя или пароль.');
     },
   });
 };

@@ -37,7 +37,7 @@ export function DynamicBreadcrumb() {
         ROUTER_MAP.DASHBOARD,
         ...subSegments.filter((s) => !isUUID(s)).slice(0, index + 1),
       ].join('/');
-      let title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
+      const title = ROUTER_TITLES[href] ?? decodeURIComponent(segment);
 
       const isLast = index === subSegments.filter((s) => !isUUID(s)).length - 1;
 

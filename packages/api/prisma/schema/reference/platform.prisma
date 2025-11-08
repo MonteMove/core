@@ -4,9 +4,6 @@ model Platform {
   updatedById String   @map("updated_by_id") @db.Uuid
   name        String
   code        String   @unique
-  description String?
-  icon        String?
-  url         String?
   active      Boolean  @default(true)
   deleted     Boolean  @default(false)
   createdAt   DateTime @default(now()) @map("created_at")

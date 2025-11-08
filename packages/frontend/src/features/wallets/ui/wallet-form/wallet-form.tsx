@@ -9,6 +9,7 @@ import { useCurrency } from '@/entities/currency/model/use-currency';
 import { useNetworkTypes } from '@/entities/network/model/use-network-types';
 import { useNetworks } from '@/entities/network/model/use-networks';
 import { usePlatforms } from '@/entities/platform';
+import { useBanks } from '@/entities/bank';
 import {
   CreateWalletFormValues,
   CreateWalletRequest,
@@ -69,8 +70,8 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
   const { data: networksData, isLoading: isNetworksLoading } = useNetworks();
   const { data: walletTypesData, isLoading: isWalletTypesLoading } =
     useWalletTypes();
-  const { data: platformsData, isLoading: isPlatformsLoading } =
-    usePlatforms();
+  const { data: platformsData, isLoading: isPlatformsLoading } = usePlatforms();
+  const { data: banksData, isLoading: isBanksLoading } = useBanks();
 
   const form = useForm<CreateWalletFormValues>({
     resolver: zodResolver(CreateWalletSchema),
@@ -97,6 +98,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
             networkId: initialData.details?.network?.id || '',
             networkTypeId: initialData.details?.networkType?.id || '',
             platformId: initialData.details?.platform?.id || '',
+            bankId: initialData.details?.bank?.id || '',
           },
         }
       : {
@@ -121,6 +123,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
             networkId: '',
             networkTypeId: '',
             platformId: '',
+            bankId: '',
           },
         },
   });
@@ -149,6 +152,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
     () => platformsData?.platforms ?? [],
     [platformsData],
   );
+  const banks = useMemo(() => banksData?.banks ?? [], [banksData]);
 
   type WalletDetailsKeys = keyof NonNullable<CreateWalletRequest['details']>;
 
@@ -170,10 +174,12 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
         'ownerFullName',
         'card',
         'phone',
+        'bankId',
         'address',
         'exchangeUid',
         'networkId',
         'networkTypeId',
+        'platformId',
       ]);
       return;
     }
@@ -184,36 +190,15 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
         'exchangeUid',
         'networkId',
         'networkTypeId',
+        'platformId',
       ]);
       return;
     }
 
     if (walletKind === WalletKind.crypto) {
-      clearDetailFields(['ownerFullName', 'card', 'phone']);
+      clearDetailFields(['ownerFullName', 'card', 'phone', 'bankId']);
     }
   }, [walletKind, clearDetailFields]);
-
-  // Автоматическое добавление префикса кода типа кошелька к названию
-  useEffect(() => {
-    if (isEditMode) return; // Не меняем название при редактировании
-    
-    const currentName = form.getValues('name');
-    const selectedWalletTypeId = form.getValues('walletTypeId');
-    
-    // Убираем старый префикс (если был)
-    const nameWithoutPrefix = currentName.replace(/^\[[\w-]+\]\s*/, '');
-    
-    if (selectedWalletTypeId) {
-      const selectedType = walletTypes.find((t) => t.id === selectedWalletTypeId);
-      if (selectedType) {
-        const newName = `[${selectedType.code}] ${nameWithoutPrefix}`;
-        form.setValue('name', newName, { shouldValidate: false });
-      }
-    } else if (currentName.startsWith('[')) {
-      // Если тип не выбран, убираем префикс
-      form.setValue('name', nameWithoutPrefix, { shouldValidate: false });
-    }
-  }, [form.watch('walletTypeId'), walletTypes, isEditMode, form]);
 
   const isCrypto = walletKind === WalletKind.crypto;
   const isBank = walletKind === WalletKind.bank;
@@ -307,7 +292,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           name="monthlyLimit"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Месячный лимит (опционально)</FormLabel>
+              <FormLabel>Месячный лимит</FormLabel>
               <FormControl>
                 <Input
                   value={
@@ -329,7 +314,8 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
                 />
               </FormControl>
               <FormDescription>
-                Лимит на сумму всех операций за месяц. Остаток будет рассчитываться автоматически.
+                Лимит на сумму всех операций за месяц. Остаток будет
+                рассчитываться автоматически.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -443,9 +429,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
               name="details.ownerFullName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Владелец карты <span className="text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel>Владелец карты</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="ФИО владельца"
@@ -463,9 +447,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
               name="details.card"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Номер карты <span className="text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel>Номер карты</FormLabel>
                   <FormControl>
                     <Input
                       value={formatCardNumber(field.value)}
@@ -509,6 +491,42 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
                   </FormItem>
                 );
               }}
+            />
+
+            <FormField
+              control={form.control}
+              name="details.bankId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Банк</FormLabel>
+                  <Select
+                    onValueChange={(value) =>
+                      field.onChange(value === 'none' ? undefined : value)
+                    }
+                    value={field.value || 'none'}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Выберите банк" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="none">Не выбрано</SelectItem>
+                      {isBanksLoading && (
+                        <SelectItem value="loading" disabled>
+                          Загрузка...
+                        </SelectItem>
+                      )}
+                      {banks.map((bank) => (
+                        <SelectItem key={bank.id} value={bank.id}>
+                          {bank.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
         )}

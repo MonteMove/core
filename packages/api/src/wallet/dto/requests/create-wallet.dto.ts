@@ -107,6 +107,24 @@ class WalletDetailsDto {
     @IsOptional()
     @IsUUID('4', { message: 'ID типа сети должен быть валидным UUID' })
     public networkTypeId?: string;
+
+    @ApiProperty({
+        description: 'ID платформы',
+        example: '123e4567-e89b-12d3-a456-426614174002',
+        required: false,
+    })
+    @IsOptional()
+    @IsUUID('4', { message: 'ID платформы должен быть валидным UUID' })
+    public platformId?: string;
+
+    @ApiProperty({
+        description: 'ID банка',
+        example: '123e4567-e89b-12d3-a456-426614174003',
+        required: false,
+    })
+    @IsOptional()
+    @IsUUID('4', { message: 'ID банка должен быть валидным UUID' })
+    public bankId?: string;
 }
 
 export class CreateWalletDto {

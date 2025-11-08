@@ -76,8 +76,15 @@ export function WalletsFiltersSheet({
   };
 
   const resetFilters = () => {
+    const currentValues = form.getValues();
     setLocalFilters({});
-    form.reset(baseFilters);
+    form.reset({
+      ...baseFilters,
+      visible: currentValues.visible,
+      deleted: currentValues.deleted,
+      pinned: currentValues.pinned,
+      walletTypeId: currentValues.walletTypeId,
+    });
     setSheetOpen(false);
   };
 

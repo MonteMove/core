@@ -4,9 +4,6 @@ export const PlatformSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   code: z.string(),
-  description: z.string().nullable().optional(),
-  icon: z.string().nullable().optional(),
-  url: z.string().nullable().optional(),
   active: z.boolean(),
   deleted: z.boolean(),
   createdAt: z.coerce.date(),
@@ -26,12 +23,6 @@ export const CreatePlatformSchema = z.object({
     .string({ message: 'Код обязателен' })
     .min(2, 'Код должен содержать минимум 2 символа')
     .max(20, 'Код не должен превышать 20 символов'),
-  description: z
-    .string()
-    .max(500, 'Описание не должно превышать 500 символов')
-    .optional(),
-  icon: z.string().url('Некорректный URL иконки').optional().or(z.literal('')),
-  url: z.string().url('Некорректный URL сайта').optional().or(z.literal('')),
   active: z.boolean().default(true),
 });
 

@@ -9,8 +9,7 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-  Skeleton,
+  CardTitle, Loading,
 } from '@/shared';
 
 export default function EditOperationPage() {
@@ -20,21 +19,7 @@ export default function EditOperationPage() {
   const { data: operation, isLoading, isError } = useOperation(id);
 
   if (isLoading) {
-    return (
-      <div className="max-w-5xl mx-auto">
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-8 w-64" />
-            <Skeleton className="h-4 w-96" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-32 w-full" />
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <Loading variant="page" />;
   }
 
   if (isError || !operation) {

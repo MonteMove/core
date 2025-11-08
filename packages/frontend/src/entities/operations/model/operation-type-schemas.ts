@@ -6,6 +6,7 @@ export const OperationTypeSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   updatedById: z.string().uuid(),
+  code: z.string(),
   name: z.string(),
   description: z.string().nullable(),
   isSeparateTab: z.boolean(),
@@ -35,6 +36,10 @@ export const GetOperationTypesParamsSchema = z.object({
 });
 
 export const CreateOperationTypeSchema = z.object({
+  code: z
+    .string()
+    .min(2, 'Код должен содержать минимум 2 символа')
+    .max(50, 'Код не должен превышать 50 символов'),
   name: z
     .string()
     .min(2, 'Название должно содержать минимум 2 символа')
@@ -49,6 +54,11 @@ export const CreateOperationTypeSchema = z.object({
 });
 
 export const UpdateOperationTypeSchema = z.object({
+  code: z
+    .string()
+    .min(2, 'Код должен содержать минимум 2 символа')
+    .max(50, 'Код не должен превышать 50 символов')
+    .optional(),
   name: z
     .string()
     .min(2, 'Название должно содержать минимум 2 символа')

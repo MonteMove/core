@@ -15,10 +15,5 @@ export const useDeletePlatform = () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
       toast.success('Платформа успешно удалена');
     },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.message || 'Не удалось удалить платформу';
-      toast.error(message);
-    },
   });
 };

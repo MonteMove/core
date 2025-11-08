@@ -32,7 +32,7 @@ export class WalletService {
     const { data } = await axiosInstance.get(API_MAP.WALLETS.WALLETS, {
       params,
     });
-    
+
     return GetWalletsResponseSchema.parse(data);
   }
 
@@ -138,6 +138,18 @@ export class WalletService {
     const { data } = await axiosInstance.patch(
       `${API_MAP.WALLETS.WALLETS}/${walletId}`,
       { active },
+    );
+    const wallet = data?.wallet ?? data;
+    return WalletSchema.parse(wallet);
+  }
+
+  public static async toggleVisible(
+    walletId: string,
+    visible: boolean,
+  ): Promise<Wallet> {
+    const { data } = await axiosInstance.patch(
+      `${API_MAP.WALLETS.WALLETS}/${walletId}`,
+      { visible },
     );
     const wallet = data?.wallet ?? data;
     return WalletSchema.parse(wallet);

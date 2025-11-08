@@ -115,6 +115,20 @@ export class UpdateWalletUseCase {
                                 name: true,
                             },
                         },
+                        platform: {
+                            select: {
+                                id: true,
+                                code: true,
+                                name: true,
+                            },
+                        },
+                        bank: {
+                            select: {
+                                id: true,
+                                code: true,
+                                name: true,
+                            },
+                        },
                     },
                 },
             },

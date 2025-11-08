@@ -19,8 +19,5 @@ export function useUpdateUserRole() {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('Роль пользователя обновлена');
     },
-    onError: () => {
-      toast.error('Не удалось обновить роль пользователя');
-    },
   });
 }

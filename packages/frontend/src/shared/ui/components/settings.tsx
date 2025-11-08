@@ -14,6 +14,7 @@ import {
 } from '@/entities/session/model/use-session';
 import { applyThemeVars, formatDateSafe } from '@/shared/lib/utils';
 import { ColorField } from '@/shared/ui/components/color-field';
+import { Loading } from '@/shared/ui/components/loading';
 import { Button } from '@/shared/ui/shadcn/button';
 import {
   Card,
@@ -123,7 +124,7 @@ export function Settings() {
           </CardHeader>
         </Card>
         <div>
-          {isLoading && <p>Загрузка...</p>}
+          {isLoading && <Loading />}
 
           {sessionsData?.sessions && sessionsData.sessions.length > 0 ? (
             <div>

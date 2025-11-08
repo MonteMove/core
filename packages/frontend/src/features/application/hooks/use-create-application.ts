@@ -23,11 +23,5 @@ export const useCreateApplication = () => {
       queryClient.invalidateQueries({ queryKey: [APPLICATION_QUERY_KEY] });
       router.push(ROUTER_MAP.APPLICATIONS);
     },
-    onError: (error) => {
-      console.error('Ошибка при создании заявки:', error);
-      toast.error('Не удалось создать заявку', {
-        description: 'Проверьте введенные данные и попробуйте снова.',
-      });
-    },
   });
 };

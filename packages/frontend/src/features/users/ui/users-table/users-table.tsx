@@ -11,7 +11,7 @@ import { useUpdateUserFlags } from '@/features/users/hooks/use-update-user-flags
 import { useUpdateUserRole } from '@/features/users/hooks/use-update-user-role';
 import { useUsersQueryParams } from '@/features/users/hooks/use-users-query-param';
 import { useLastItemObserver } from '@/shared/lib/hooks/use-last-Item-observer';
-import { cn, formatDateTime } from '@/shared/lib/utils';
+import { formatDateTime } from '@/shared/lib/utils';
 import {
   Button,
   Empty,
@@ -20,10 +20,10 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -83,6 +83,10 @@ export const UsersTable = ({ showDeleted = false }: UsersTableProps) => {
     hasNextPage,
   );
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <Fragment>
       <div className="overflow-x-auto">
@@ -90,24 +94,12 @@ export const UsersTable = ({ showDeleted = false }: UsersTableProps) => {
           <TableHeader>
             <TableRow>
               {tableRow.map((h) => (
-                <TableHead key={h}>
-                  {isLoading ? <Skeleton className="h-6 w-24" /> : h}
-                </TableHead>
+                <TableHead key={h}>{h}</TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              [...Array(5)].map((_, i) => (
-                <TableRow key={i}>
-                  {[...Array(7)].map((_, j) => (
-                    <TableCell key={j}>
-                      <Skeleton className="h-4 w-full" />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : users.length === 0 ? (
+            {users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="p-0">
                   <Empty>
@@ -193,21 +185,15 @@ export const UsersTable = ({ showDeleted = false }: UsersTableProps) => {
                             : '-'}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            {user.blocked ? (
-                              <>
-                                <XCircle className="h-4 w-4 text-destructive" />
-                                <span className="text-destructive">
-                                  Заблокирован
-                                </span>
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                                <span className="text-green-600">Активен</span>
-                              </>
-                            )}
-                          </div>
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              user.blocked
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-green-100 text-green-800'
+                            }`}
+                          >
+                            {user.blocked ? 'Заблокирован' : 'Активен'}
+                          </span>
                         </TableCell>
                         <TableCell>
                           {user.lastLogin

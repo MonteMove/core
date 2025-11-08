@@ -27,16 +27,17 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  ROUTER_MAP,
-  Skeleton,
+  ROUTER_MAP, Loading,
 } from '@/shared';
 import { useLastItemObserver } from '@/shared/lib/hooks/use-last-Item-observer';
 
 export const InfiniteApplicationsList = () => {
   const router = useRouter();
   const params = useApplicationsQueryParams();
-  const [selectedOperationId, setSelectedOperationId] = useState<string | null>(null);
-  
+  const [selectedOperationId, setSelectedOperationId] = useState<string | null>(
+    null,
+  );
+
   const {
     data: infiniteData,
     isLoading,
@@ -111,10 +112,16 @@ export const InfiniteApplicationsList = () => {
                       // Завершить заявку
                       // Если заявка с авансом и НЕТ операции - открываем создание операции
                       if (app.hasAdvance && !app.operationId) {
-                        router.push(ROUTER_MAP.OPERATIONS_CREATE + '?applicationId=' + app.id);
+                        router.push(
+                          ROUTER_MAP.OPERATIONS_CREATE +
+                            '?applicationId=' +
+                            app.id,
+                        );
                       } else if (app.hasAdvance && app.operationId) {
                         // Если заявка с авансом и ЕСТЬ операция - открываем редактирование операции
-                        router.push(ROUTER_MAP.OPERATIONS_EDIT + '/' + app.operationId);
+                        router.push(
+                          ROUTER_MAP.OPERATIONS_EDIT + '/' + app.operationId,
+                        );
                       } else {
                         // Обычная заявка - просто меняем статус
                         updateStatuseApplicationMutation({
@@ -161,7 +168,7 @@ export const InfiniteApplicationsList = () => {
           );
         })
       )}
-      
+
       <OperationViewDialog
         operationId={selectedOperationId}
         open={!!selectedOperationId}

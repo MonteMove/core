@@ -10,6 +10,8 @@ import { FolderOpen, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { useWalletTypes } from '@/entities/wallet-type';
 import { useDeleteWalletType } from '@/features/wallet-types/hooks/use-delete-wallet-type';
 import { useRestoreWalletType } from '@/features/wallet-types/hooks/use-restore-wallet-type';
+
+const SYSTEM_WALLET_TYPE_CODES = ['inskech', 'bet11', 'vnj'];
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +32,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   ROUTER_MAP,
   Table,
   TableBody,
@@ -99,9 +102,7 @@ export default function WalletTypesPage() {
             </TabsList>
           </Tabs>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
+            <Loading />
           ) : (data?.walletTypes?.length ?? 0) === 0 ? (
             <Empty>
               <EmptyHeader>
@@ -180,16 +181,18 @@ export default function WalletTypesPage() {
                             >
                               <Pencil className="w-4 h-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteClick(type.id);
-                              }}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {!SYSTEM_WALLET_TYPE_CODES.includes(type.code) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteClick(type.id);
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </>
                         )}
                       </div>
@@ -208,7 +211,7 @@ export default function WalletTypesPage() {
             <AlertDialogTitle>Удалить тип кошелька?</AlertDialogTitle>
             <AlertDialogDescription>
               Тип кошелька будет перемещен в удаленные. Вы сможете восстановить
-              его позже из вкладки "Удалённые".
+              его позже из вкладки &quot;Удалённые&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -29,8 +29,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
-  Skeleton,
+  SheetTrigger, Loading,
 } from '@/shared';
 
 export function OperationsFiltersSheet({
@@ -55,7 +54,10 @@ export function OperationsFiltersSheet({
 
   const handleApplyFilters = () => {
     Object.entries(localFilters).forEach(([key, value]) => {
-      form.setValue(key as keyof GetOperationsParams, value as any);
+      form.setValue(
+        key as keyof GetOperationsParams,
+        value as GetOperationsParams[keyof GetOperationsParams],
+      );
     });
     setSheetOpen(false);
   };

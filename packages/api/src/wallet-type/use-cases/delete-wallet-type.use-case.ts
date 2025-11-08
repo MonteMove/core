@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+
+const SYSTEM_WALLET_TYPE_CODES = ['inskech', 'bet11', 'vnj'];
 
 @Injectable()
 export class DeleteWalletTypeUseCase {
@@ -13,6 +15,10 @@ export class DeleteWalletTypeUseCase {
 
         if (!existing || existing.deleted) {
             throw new NotFoundException('Тип кошелька не найден');
+        }
+
+        if (SYSTEM_WALLET_TYPE_CODES.includes(existing.code)) {
+            throw new BadRequestException('Системный тип кошелька нельзя удалить');
         }
 
         await this.prisma.walletType.update({

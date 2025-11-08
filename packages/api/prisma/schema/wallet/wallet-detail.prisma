@@ -9,6 +9,7 @@ model WalletDetail {
   networkId     String?  @map("network_id") @db.Uuid
   networkTypeId String?  @map("network_type_id") @db.Uuid
   platformId    String?  @map("platform_id") @db.Uuid
+  bankId        String?  @map("bank_id") @db.Uuid
   address       String?
   accountId     String?  @map("account_id")
   username      String?
@@ -22,6 +23,7 @@ model WalletDetail {
   network      Network?        @relation(fields: [networkId], references: [id])
   networkType  NetworkType?    @relation(fields: [networkTypeId], references: [id])
   platform     Platform?       @relation(fields: [platformId], references: [id])
+  bank         Bank?           @relation(fields: [bankId], references: [id])
 
   @@unique([walletId], map: "wallet_details_wallet_unique")
   @@index([userId], map: "wallet_details_user_idx")
@@ -30,6 +32,7 @@ model WalletDetail {
   @@index([networkId], map: "wallet_details_network_idx")
   @@index([networkTypeId], map: "wallet_details_network_type_idx")
   @@index([platformId], map: "wallet_details_platform_idx")
+  @@index([bankId], map: "wallet_details_bank_idx")
   @@index([phone], map: "wallet_details_phone_idx")
   @@index([address], map: "wallet_details_address_idx")
   @@index([accountId], map: "wallet_details_account_id_idx")

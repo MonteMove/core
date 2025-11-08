@@ -11,7 +11,6 @@ import { GuidesFilters } from '@/features/guides/ui/guide-filters/guide-filters'
 import { Button, ROUTER_MAP } from '@/shared';
 import {
   Card,
-  CardContent,
   CardHeader,
   CardTitle,
 } from '@/shared/ui/shadcn/card';

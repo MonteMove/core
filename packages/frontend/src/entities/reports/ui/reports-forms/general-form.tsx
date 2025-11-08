@@ -13,12 +13,12 @@ import { useWalletTypes } from '@/entities/wallet-type';
 import { useGeneralReport } from '@/entities/reports';
 import { usePopapStore } from '@/entities/reports';
 import {
-  Badge,
   Button,
   Calendar,
   Checkbox,
   cn,
   formatDate,
+  Loading,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -356,7 +356,7 @@ export function ReportGeneralForm() {
           />
           <Button type="submit">
             {' '}
-            {isPending ? 'Загрузка...' : 'Получить отчет'}
+            {isPending ? <Loading /> : 'Получить отчет'}
           </Button>
         </form>
       </Form>

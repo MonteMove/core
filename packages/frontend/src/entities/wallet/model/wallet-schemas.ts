@@ -47,6 +47,7 @@ export const WalletDetailsSchema = z
     network: WalletDetailsSimpleEntitySchema.nullable().optional(),
     networkType: WalletDetailsSimpleEntitySchema.nullable().optional(),
     platform: WalletDetailsSimpleEntitySchema.nullable().optional(),
+    bank: WalletDetailsSimpleEntitySchema.nullable().optional(),
   })
   .partial({
     phone: true,
@@ -60,6 +61,7 @@ export const WalletDetailsSchema = z
     network: true,
     networkType: true,
     platform: true,
+    bank: true,
   });
 
 export const WalletCurrencySchema = z.object({
@@ -206,6 +208,7 @@ const WalletDetailsCreateSchema = z
     networkId: optionalUuid('Укажите корректный UUID сети'),
     networkTypeId: optionalUuid('Укажите корректный UUID типа сети'),
     platformId: optionalUuid('Укажите корректный UUID платформы'),
+    bankId: optionalUuid('Укажите корректный UUID банка'),
   })
   .transform((details) => {
     const entries = Object.entries(details).filter(
@@ -249,11 +252,9 @@ export const CreateWalletSchema = z
       .optional()
       .or(z.literal('')),
     currencyId: z
-      .string({ message: 'Выберите валюту' })
-      .uuid('Укажите корректный UUID')
-      .refine((val) => val && val.length > 0, {
-        message: 'Выберите валюту',
-      }),
+      .string({ message: 'Валюта обязательна' })
+      .min(1, 'Валюта обязательна')
+      .uuid('Укажите корректный UUID'),
     active: z.boolean().default(true),
     pinOnMain: z.boolean().default(false),
     pinned: z.boolean().default(false),
@@ -269,16 +270,6 @@ export const CreateWalletSchema = z
   })
   .superRefine((data, ctx) => {
     const details = data.details ?? {};
-
-    if (data.walletKind === WalletKind.bank) {
-      if (!details.ownerFullName) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['details', 'ownerFullName'],
-          message: 'Укажите владельца карты',
-        });
-      }
-    }
 
     if (data.walletKind === WalletKind.crypto) {
       if (!details.address) {

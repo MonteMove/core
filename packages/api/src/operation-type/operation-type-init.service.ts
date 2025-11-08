@@ -32,11 +32,13 @@ export class OperationTypeInitService implements OnModuleInit {
 
         const operationTypes = [
             {
+                code: 'avans',
                 name: 'Аванс',
                 description: 'Аванс',
-                isSeparateTab: false,
+                isSeparateTab: true,
             },
             {
+                code: 'correction',
                 name: 'Корректировка',
                 description: 'Корректировка баланса кошелька',
                 isSeparateTab: false,
@@ -44,10 +46,9 @@ export class OperationTypeInitService implements OnModuleInit {
         ];
 
         for (const typeData of operationTypes) {
-            const existing = await this.prisma.operationType.findFirst({
+            const existing = await this.prisma.operationType.findUnique({
                 where: {
-                    name: typeData.name,
-                    deleted: false,
+                    code: typeData.code,
                 },
             });
 
@@ -60,6 +61,15 @@ export class OperationTypeInitService implements OnModuleInit {
                     },
                 });
                 this.logger.log(`Создан тип операции: ${typeData.name}`);
+            } else if (existing.isSeparateTab !== typeData.isSeparateTab) {
+                await this.prisma.operationType.update({
+                    where: { id: existing.id },
+                    data: {
+                        isSeparateTab: typeData.isSeparateTab,
+                        updatedById: adminUser.id,
+                    },
+                });
+                this.logger.log(`Обновлен тип операции: ${typeData.name} (isSeparateTab: ${typeData.isSeparateTab})`);
             }
         }
     }

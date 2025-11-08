@@ -117,11 +117,15 @@ export function CurrencyForm({
               <div className="space-y-0.5">
                 <FormLabel>Активность</FormLabel>
                 <FormDescription>
-                  Активные валюты доступны для выбора при создании кошельков и заявок
+                  Активные валюты доступны для выбора при создании кошельков и
+                  заявок
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}

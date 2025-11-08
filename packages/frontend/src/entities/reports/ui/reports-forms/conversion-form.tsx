@@ -16,6 +16,7 @@ import {
   Calendar,
   cn,
   formatDate,
+  Loading,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -267,7 +268,7 @@ export function ReportsConversionForm() {
 
           <Button type="submit">
             {' '}
-            {isPending ? 'Загрузка...' : 'Получить отчет'}
+            {isPending ? <Loading /> : 'Получить отчет'}
           </Button>
         </form>
       </Form>

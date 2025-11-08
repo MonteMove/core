@@ -30,6 +30,8 @@ import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { useCreateWalletType } from '../hooks/use-create-wallet-type';
 import { useUpdateWalletType } from '../hooks/use-update-wallet-type';
 
+const SYSTEM_WALLET_TYPE_CODES = ['inskech', 'bet11', 'vnj'];
+
 interface WalletTypeFormProps {
   isEdit?: boolean;
   initialData?: WalletType;
@@ -79,6 +81,10 @@ export function WalletTypeForm({
   };
 
   const mutation = isEdit ? updateMutation : createMutation;
+  const isSystemType =
+    isEdit &&
+    initialData &&
+    SYSTEM_WALLET_TYPE_CODES.includes(initialData.code);
 
   return (
     <Form {...form}>
@@ -92,8 +98,17 @@ export function WalletTypeForm({
                 Код <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="inskech" {...field} />
+                <Input
+                  placeholder="inskech"
+                  {...field}
+                  disabled={isSystemType}
+                />
               </FormControl>
+              {isSystemType && (
+                <FormDescription>
+                  Код системного типа кошелька нельзя изменить
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -182,11 +197,15 @@ export function WalletTypeForm({
               <div className="space-y-0.5">
                 <FormLabel>Активность</FormLabel>
                 <FormDescription>
-                  Активные типы кошельков доступны для выбора при создании кошельков
+                  Активные типы кошельков доступны для выбора при создании
+                  кошельков
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}

@@ -41,6 +41,10 @@ export const API_MAP = {
     PLATFORMS: '/platforms',
     PLATFORM_BY_ID: (id: string) => `/platforms/${id}`,
   },
+  BANKS: {
+    BANKS: '/banks',
+    BANK_BY_ID: (id: string) => `/banks/${id}`,
+  },
   SESSIONS: {
     SESSIONS: '/sessions',
     MY_SESSIONS: '/sessions/my',

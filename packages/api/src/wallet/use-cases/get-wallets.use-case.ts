@@ -78,6 +78,29 @@ export class GetWalletsUseCase {
             where.OR = orConditions;
         }
 
+        const isAllTabContext =
+            walletTypeId === undefined &&
+            (visible === true || visible === undefined) &&
+            (deleted === false || deleted === undefined) &&
+            (pinned === false || pinned === undefined);
+
+        if (isAllTabContext) {
+            const andConditions = Array.isArray(where.AND)
+                ? where.AND
+                : where.AND
+                    ? [where.AND]
+                    : [];
+            where.AND = [
+                ...andConditions,
+                {
+                    OR: [
+                        { walletTypeId: null },
+                        { walletType: { showInTabs: false } },
+                    ],
+                },
+            ];
+        }
+
         if (balanceStatus !== undefined) {
             where.balanceStatus = balanceStatus;
         }
@@ -177,6 +200,20 @@ export class GetWalletsUseCase {
                             },
                         },
                         networkType: {
+                            select: {
+                                id: true,
+                                code: true,
+                                name: true,
+                            },
+                        },
+                        platform: {
+                            select: {
+                                id: true,
+                                code: true,
+                                name: true,
+                            },
+                        },
+                        bank: {
                             select: {
                                 id: true,
                                 code: true,

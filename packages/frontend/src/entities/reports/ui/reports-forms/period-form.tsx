@@ -8,7 +8,7 @@ import { ReportsPeriodSchema } from '@/entities/reports';
 import { usePeriodReport } from '@/entities/reports';
 import { usePopapStore } from '@/entities/reports';
 import { useWalletTypes } from '@/entities/wallet-type';
-import { Button, Checkbox } from '@/shared';
+import { Button, Checkbox, Loading } from '@/shared';
 import {
   Form,
   FormControl,
@@ -20,13 +20,6 @@ import {
   PopoverContent,
   PopoverTrigger,
   cn,
-} from '@/shared';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from '@/shared';
 import { Skeleton } from '@/shared';
 
@@ -117,7 +110,7 @@ export function ReportsPeriodForm() {
 
           <Button type="submit">
             {' '}
-            {isPending ? 'Загрузка...' : 'Получить отчет'}
+            {isPending ? <Loading /> : 'Получить отчет'}
           </Button>
         </form>
       </Form>

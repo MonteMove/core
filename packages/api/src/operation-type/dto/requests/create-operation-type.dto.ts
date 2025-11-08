@@ -3,6 +3,19 @@ import { IsBoolean, IsNotEmpty, IsOptional, IsString, Length, MaxLength } from '
 
 export class CreateOperationTypeDto {
     @ApiProperty({
+        description: 'Уникальный код типа операции',
+        example: 'withdrawal',
+        minLength: 2,
+        maxLength: 50,
+    })
+    @IsNotEmpty({ message: 'Код типа операции обязателен для заполнения' })
+    @IsString({ message: 'Код типа операции должен быть строкой' })
+    @Length(2, 50, {
+        message: 'Код типа операции должен содержать от 2 до 50 символов',
+    })
+    public code: string;
+
+    @ApiProperty({
         description: 'Название типа операции',
         example: 'Вывод средств',
         minLength: 2,

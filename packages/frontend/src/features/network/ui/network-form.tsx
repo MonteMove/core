@@ -29,6 +29,8 @@ import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { useCreateNetwork } from '../hooks/use-create-network';
 import { useUpdateNetwork } from '../hooks/use-update-network';
 
+const SYSTEM_NETWORK_CODES = ['tron'];
+
 interface NetworkFormProps {
   isEdit?: boolean;
   initialData?: Network;
@@ -70,6 +72,8 @@ export function NetworkForm({ isEdit = false, initialData }: NetworkFormProps) {
   };
 
   const mutation = isEdit ? updateMutation : createMutation;
+  const isSystemNetwork =
+    isEdit && initialData && SYSTEM_NETWORK_CODES.includes(initialData.code);
 
   return (
     <Form {...form}>
@@ -83,8 +87,17 @@ export function NetworkForm({ isEdit = false, initialData }: NetworkFormProps) {
                 Код сети <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="BTC" {...field} />
+                <Input
+                  placeholder="BTC"
+                  {...field}
+                  disabled={isSystemNetwork}
+                />
               </FormControl>
+              {isSystemNetwork && (
+                <FormDescription>
+                  Код системной сети нельзя изменить
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -118,7 +131,10 @@ export function NetworkForm({ isEdit = false, initialData }: NetworkFormProps) {
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}

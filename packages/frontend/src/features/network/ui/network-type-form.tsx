@@ -37,6 +37,8 @@ import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { useCreateNetworkType } from '../hooks/use-create-network-type';
 import { useUpdateNetworkType } from '../hooks/use-update-network-type';
 
+const SYSTEM_NETWORK_TYPE_CODES = ['trc-20'];
+
 interface NetworkTypeFormProps {
   isEdit?: boolean;
   initialData?: NetworkType;
@@ -86,6 +88,10 @@ export function NetworkTypeForm({
   };
 
   const mutation = isEdit ? updateMutation : createMutation;
+  const isSystemNetworkType =
+    isEdit &&
+    initialData &&
+    SYSTEM_NETWORK_TYPE_CODES.includes(initialData.code);
 
   return (
     <Form {...form}>
@@ -131,8 +137,17 @@ export function NetworkTypeForm({
                 Код типа <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <Input placeholder="ERC-20" {...field} />
+                <Input
+                  placeholder="ERC-20"
+                  {...field}
+                  disabled={isSystemNetworkType}
+                />
               </FormControl>
+              {isSystemNetworkType && (
+                <FormDescription>
+                  Код системного типа сети нельзя изменить
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}
@@ -166,7 +181,10 @@ export function NetworkTypeForm({
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}

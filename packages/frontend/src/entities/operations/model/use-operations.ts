@@ -43,13 +43,11 @@ export const useCreateOperation = () => {
   const router = useRouter();
   return useMutation({
     mutationKey: OPERATIONS_CREATE_QUERY_KEY,
-    mutationFn: (data: CreateOperationBackendDto) => OperationsService.create(data),
+    mutationFn: (data: CreateOperationBackendDto) =>
+      OperationsService.create(data),
     onSuccess: () => {
       router.push(ROUTER_MAP.OPERATIONS);
       toast.success('Справочник успешно создан');
-    },
-    onError: () => {
-      toast.error('Произошла неизвестная ошибка. Попробуйте снова.');
     },
   });
 };
@@ -153,7 +151,6 @@ export const useUpdateOperation = () => {
       router.push(ROUTER_MAP.OPERATIONS);
       toast.success('Операция обновлена');
     },
-    onError: () => toast.error('Ошибка при обновлении'),
   });
 };
 
@@ -170,10 +167,6 @@ export const useDeleteOperation = (filters?: GetOperationsParams) => {
       queryClient.invalidateQueries({
         queryKey: OPERATIONS_WITH_FILTERS_KEY(filters) as readonly unknown[],
       });
-    },
-
-    onError: () => {
-      toast.error('Ошибка при удалении');
     },
   });
 };

@@ -31,9 +31,6 @@ export const useDeactivateMySession = () => {
       queryClient.invalidateQueries({ queryKey: SESSIONS_QUERY_KEY });
       router.refresh?.();
     },
-    onError: () => {
-      toast.error('Ошибка при деактивации сессии');
-    },
   });
 };
 
@@ -49,9 +46,6 @@ export const useDeactivateSessions = () => {
       toast.success(`Деактивировано сессий: ${data.deactivatedCount}`);
       queryClient.invalidateQueries({ queryKey: SESSIONS_QUERY_KEY });
       router.refresh?.();
-    },
-    onError: () => {
-      toast.error('Ошибка при деактивации сессий');
     },
   });
 };

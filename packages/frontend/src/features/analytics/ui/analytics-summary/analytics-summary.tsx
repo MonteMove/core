@@ -5,23 +5,14 @@ import React from 'react';
 import { useWalletAnalytics } from '@/entities/analytics';
 import { useAnalyticsFilters } from '@/features/analytics/hook/use-analytics-filters';
 import { formatNumber } from '@/shared/lib/utils/format-number';
-import { Card, Skeleton } from '@/shared';
+import { Card, Loading } from '@/shared';
 
 export const AnalyticsSummary = () => {
   const { filters } = useAnalyticsFilters();
   const { data: analyticsData, isLoading } = useWalletAnalytics(filters);
 
   if (isLoading) {
-    return (
-      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
-        {[...Array(6)].map((_, i) => (
-          <Card key={i} className="p-3">
-            <Skeleton className="h-3 w-16 mb-1" />
-            <Skeleton className="h-5 w-20" />
-          </Card>
-        ))}
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!analyticsData?.summary) {

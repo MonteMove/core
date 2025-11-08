@@ -28,9 +28,9 @@ import {
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
+  Loading,
   EmptyTitle,
   ROUTER_MAP,
-  Skeleton,
 } from '@/shared';
 
 export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
@@ -63,13 +63,7 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
     <div className={'flex flex-col gap-2'}>
       <div className="m-0 p-0 mt-4">
         {isLoading ? (
-          <div className="flex flex-col gap-2">
-            {new Array(5).fill(null).map((_, i) => (
-              <Card key={i} className="h-[176] w-full p-0">
-                <Skeleton className="h-[176] w-full"></Skeleton>
-              </Card>
-            ))}
-          </div>
+          <Loading />
         ) : error ? (
           <div className="justify-items-center">
             <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
@@ -245,9 +239,7 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
         )}
       </div>
 
-      {isFetching && hasNextPage && (
-        <p className="text-center py-4">Загрузка...</p>
-      )}
+      {isFetching && hasNextPage && <Loading className="py-4" />}
     </div>
   );
 }

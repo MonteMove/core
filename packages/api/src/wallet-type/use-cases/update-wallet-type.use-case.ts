@@ -1,7 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
 import { UpdateWalletTypeDto, WalletTypeResponseDto } from '../dto';
+
+const SYSTEM_WALLET_TYPE_CODES = ['inskech', 'bet11', 'vnj'];
 
 @Injectable()
 export class UpdateWalletTypeUseCase {
@@ -17,6 +19,14 @@ export class UpdateWalletTypeUseCase {
 
         if (!existing || existing.deleted) {
             throw new NotFoundException('Тип кошелька не найден');
+        }
+
+        if (
+            dto.code !== undefined &&
+            SYSTEM_WALLET_TYPE_CODES.includes(existing.code) &&
+            dto.code !== existing.code
+        ) {
+            throw new BadRequestException('Нельзя изменить код системного типа кошелька');
         }
 
         if (dto.code && dto.code !== existing.code) {

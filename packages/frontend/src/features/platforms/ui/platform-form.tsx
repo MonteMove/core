@@ -24,7 +24,6 @@ import {
 } from '@/shared/ui/shadcn/form';
 import { Input } from '@/shared/ui/shadcn/input';
 import { Switch } from '@/shared/ui/shadcn/switch';
-import { Textarea } from '@/shared/ui/shadcn/textarea';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 import { useCreatePlatform } from '../hooks/use-create-platform';
@@ -44,25 +43,17 @@ export function PlatformForm({
   const updateMutation = useUpdatePlatform();
 
   const form = useForm<CreatePlatformRequest | UpdatePlatformRequest>({
-    resolver: zodResolver(
-      isEdit ? UpdatePlatformSchema : CreatePlatformSchema,
-    ),
+    resolver: zodResolver(isEdit ? UpdatePlatformSchema : CreatePlatformSchema),
     defaultValues:
       isEdit && initialData
         ? {
             code: initialData.code,
             name: initialData.name,
-            description: initialData.description || '',
-            icon: initialData.icon || '',
-            url: initialData.url || '',
             active: initialData.active,
           }
         : {
             code: '',
             name: '',
-            description: '',
-            icon: '',
-            url: '',
             active: true,
           },
   });
@@ -122,60 +113,6 @@ export function PlatformForm({
 
         <FormField
           control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Описание</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Криптовалютная биржа"
-                  {...field}
-                  rows={3}
-                />
-              </FormControl>
-              <FormDescription>
-                Краткое описание платформы (до 500 символов)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid gap-6 md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="icon"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL иконки</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="https://example.com/icon.png"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="url"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>URL сайта</FormLabel>
-                <FormControl>
-                  <Input placeholder="https://www.bybit.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <FormField
-          control={form.control}
           name="active"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-md border p-4">
@@ -186,7 +123,10 @@ export function PlatformForm({
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}

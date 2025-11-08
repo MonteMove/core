@@ -9,7 +9,6 @@ import { GetUsersParamsSchema } from '@/entities/users';
 import {
   Badge,
   Button,
-  Input,
   Label,
   Select,
   SelectContent,
@@ -28,19 +27,6 @@ import {
 import { useSetQueryParam } from '../../hooks/use-set-query-param';
 
 type UsersFiltersState = z.infer<typeof GetUsersParamsSchema>;
-
-const SORT_FIELDS: { value: UsersFiltersState['sortField']; label: string }[] =
-  [
-    { value: 'createdAt', label: 'Дате создания' },
-    { value: 'username', label: 'Имени' },
-    { value: 'lastLogin', label: 'Последнему входу' },
-  ];
-
-const SORT_ORDERS: { value: UsersFiltersState['sortOrder']; label: string }[] =
-  [
-    { value: 'asc', label: 'Возрастанию' },
-    { value: 'desc', label: 'Убыванию' },
-  ];
 
 const USER_ROLES: {
   value: NonNullable<UsersFiltersState['roleCode']>;

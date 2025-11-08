@@ -7,7 +7,10 @@ import { CalendarIcon, Trash2 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 
-import { ApplicationService, useApplicationsList } from '@/entities/application';
+import {
+  ApplicationService,
+  useApplicationsList,
+} from '@/entities/application';
 import {
   CreateOperationBackendDto,
   CreateOperationDto,
@@ -37,13 +40,15 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-  Skeleton,
+  SelectValue, Loading,
   Textarea,
   cn,
   formatDate,
 } from '@/shared';
-import { formatNumber, parseFormattedNumber } from '@/shared/lib/utils/format-number';
+import {
+  formatNumber,
+  parseFormattedNumber,
+} from '@/shared/lib/utils/format-number';
 
 export function OperationForm({
   initialData,
@@ -77,12 +82,15 @@ export function OperationForm({
   // Объединяем открытые заявки и текущую заявку (если она завершена)
   const availableApplications = React.useMemo(() => {
     const openApps = applications?.applications || [];
-    
+
     // Если есть текущая заявка и её нет в списке открытых, добавляем её
-    if (currentApplication && !openApps.find(app => app.id === currentApplication.id)) {
+    if (
+      currentApplication &&
+      !openApps.find((app) => app.id === currentApplication.id)
+    ) {
       return [currentApplication, ...openApps];
     }
-    
+
     return openApps;
   }, [applications, currentApplication]);
 
@@ -117,7 +125,7 @@ export function OperationForm({
   // Проверяем, является ли выбранный тип операции "Корректировкой"
   const selectedTypeId = form.watch('typeId');
   const selectedOperationType = operationTypes?.find(
-    (type) => type.id === selectedTypeId
+    (type) => type.id === selectedTypeId,
   );
   const isCorrection = selectedOperationType?.name === 'Корректировка';
 
@@ -153,7 +161,8 @@ export function OperationForm({
 
     const payload: CreateOperationBackendDto = {
       typeId: data.typeId,
-      ...(data.applicationId && data.applicationId > 0 && { applicationId: data.applicationId }),
+      ...(data.applicationId &&
+        data.applicationId > 0 && { applicationId: data.applicationId }),
       description: data.description ?? null,
       entries: transformedEntries,
       creatureDate: data.creatureDate,
@@ -185,7 +194,8 @@ export function OperationForm({
       const updatePayload: { id: string } & UpdateOperationBackendDto = {
         id: initialData.id,
         typeId: data.typeId,
-        ...(data.applicationId && data.applicationId > 0 && { applicationId: data.applicationId }),
+        ...(data.applicationId &&
+          data.applicationId > 0 && { applicationId: data.applicationId }),
         creatureDate: data.creatureDate,
         description: data.description ?? null,
         entries: mergedEntries,
@@ -253,7 +263,9 @@ export function OperationForm({
                   <Skeleton className="h-8" />
                 ) : (
                   <Select
-                    onValueChange={(v) => field.onChange(v ? Number(v) : undefined)}
+                    onValueChange={(v) =>
+                      field.onChange(v ? Number(v) : undefined)
+                    }
                     value={field.value ? String(field.value) : ''}
                   >
                     <FormControl>
@@ -385,9 +397,7 @@ export function OperationForm({
                             <Input
                               placeholder="Поиск кошелька..."
                               value={walletSearch}
-                              onChange={(e) =>
-                                setWalletSearch(e.target.value)
-                              }
+                              onChange={(e) => setWalletSearch(e.target.value)}
                               className="h-8"
                             />
                           </div>
@@ -441,7 +451,7 @@ export function OperationForm({
                           placeholder="0"
                           inputMode="numeric"
                         />
-                      </FormControl>                  
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -478,91 +488,95 @@ export function OperationForm({
                   .map((item, realIndex) => ({ item, realIndex }))
                   .filter(({ item }) => item.direction === dir)
                   .map(({ item, realIndex }) => (
-                  <div key={item.id} className="flex gap-3 items-end">
-                    <FormField
-                      control={form.control}
-                      name={`entries.${realIndex}.wallet.id`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormLabel>
-                            Кошелек <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value || ''}
-                          >
+                    <div key={item.id} className="flex gap-3 items-end">
+                      <FormField
+                        control={form.control}
+                        name={`entries.${realIndex}.wallet.id`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormLabel>
+                              Кошелек{' '}
+                              <span className="text-destructive">*</span>
+                            </FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value || ''}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="lg:w-[250px] w-full">
+                                  <SelectValue placeholder="Выберите кошелек" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <div className="px-2 pb-2">
+                                  <Input
+                                    placeholder="Поиск кошелька..."
+                                    value={walletSearch}
+                                    onChange={(e) =>
+                                      setWalletSearch(e.target.value)
+                                    }
+                                    className="h-8"
+                                  />
+                                </div>
+                                {wallets?.wallets
+                                  ?.filter((wallet) =>
+                                    wallet.name
+                                      .toLowerCase()
+                                      .includes(walletSearch.toLowerCase()),
+                                  )
+                                  .map((wallet) => (
+                                    <SelectItem
+                                      key={wallet.id}
+                                      value={wallet.id}
+                                    >
+                                      {wallet.name} — {wallet.amount}{' '}
+                                      {wallet.currency.code}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`entries.${realIndex}.amount`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Сумма <span className="text-destructive">*</span>
+                            </FormLabel>
                             <FormControl>
-                              <SelectTrigger className="lg:w-[250px] w-full">
-                                <SelectValue placeholder="Выберите кошелек" />
-                              </SelectTrigger>
+                              <Input
+                                type="number"
+                                {...field}
+                                value={field.value || 0}
+                                onChange={(e) => {
+                                  const value = e.target.valueAsNumber;
+                                  field.onChange(isNaN(value) ? 0 : value);
+                                }}
+                                className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                              />
                             </FormControl>
-                            <SelectContent>
-                              <div className="px-2 pb-2">
-                                <Input
-                                  placeholder="Поиск кошелька..."
-                                  value={walletSearch}
-                                  onChange={(e) =>
-                                    setWalletSearch(e.target.value)
-                                  }
-                                  className="h-8"
-                                />
-                              </div>
-                              {wallets?.wallets
-                                ?.filter((wallet) =>
-                                  wallet.name
-                                    .toLowerCase()
-                                    .includes(walletSearch.toLowerCase()),
-                                )
-                                .map((wallet) => (
-                                  <SelectItem key={wallet.id} value={wallet.id}>
-                                    {wallet.name} — {wallet.amount}{' '}
-                                    {wallet.currency.code}
-                                  </SelectItem>
-                                ))}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                    <FormField
-                      control={form.control}
-                      name={`entries.${realIndex}.amount`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Сумма <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              {...field}
-                              value={field.value || 0}
-                              onChange={(e) => {
-                                const value = e.target.valueAsNumber;
-                                field.onChange(isNaN(value) ? 0 : value);
-                              }}
-                              className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => remove(realIndex)}
-                      className="text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
-                ))}
-            </div>
-          ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => remove(realIndex)}
+                        className="text-destructive hover:bg-destructive/10"
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+            ))}
           </div>
         )}
 

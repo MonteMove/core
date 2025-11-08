@@ -28,9 +28,5 @@ export const useCreateWallet = () => {
       queryClient.invalidateQueries({ queryKey: PINNED_WALLETS_QUERY_KEY });
       router.push(ROUTER_MAP.WALLETS);
     },
-    onError: (error) => {
-      console.error('Ошибка при создании кошелька', error);
-      toast.error('Не удалось создать кошелек. Попробуйте ещё раз.');
-    },
   });
 };

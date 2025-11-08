@@ -2,6 +2,7 @@ model OperationType {
   id            String   @id @default(uuid()) @db.Uuid
   userId        String   @map("user_id") @db.Uuid
   updatedById   String   @map("updated_by_id") @db.Uuid
+  code          String   @unique
   name          String
   description   String?
   isSeparateTab Boolean  @default(false) @map("is_separate_tab")
@@ -17,6 +18,7 @@ model OperationType {
 
   @@index([userId], map: "operation_types_user_id_idx")
   @@index([updatedById], map: "operation_types_updated_by_id_idx")
+  @@index([code], map: "operation_types_code_idx")
   @@index([name], map: "operation_types_name_idx")
   @@index([active], map: "operation_types_active_idx")
   @@index([createdAt], map: "operation_types_created_at_idx")

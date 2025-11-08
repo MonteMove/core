@@ -13,8 +13,5 @@ export function useDeleteUser() {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success(`Пользователь удалён`);
     },
-    onError: () => {
-      toast.error('Не удалось удалить пользователя');
-    },
   });
 }

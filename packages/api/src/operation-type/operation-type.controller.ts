@@ -6,6 +6,7 @@ import {
     HttpCode,
     HttpStatus,
     Param,
+    Patch,
     Post,
     Put,
     Query,
@@ -34,6 +35,7 @@ import {
     DeleteOperationTypeUseCase,
     GetOperationTypeByIdUseCase,
     GetOperationTypesUseCase,
+    RestoreOperationTypeUseCase,
     UpdateOperationTypeUseCase,
 } from './use-cases';
 
@@ -48,6 +50,7 @@ export class OperationTypeController {
         private readonly getOperationTypesUseCase: GetOperationTypesUseCase,
         private readonly updateOperationTypeUseCase: UpdateOperationTypeUseCase,
         private readonly deleteOperationTypeUseCase: DeleteOperationTypeUseCase,
+        private readonly restoreOperationTypeUseCase: RestoreOperationTypeUseCase,
     ) {}
 
     @Post()
@@ -172,5 +175,25 @@ export class OperationTypeController {
         return {
             message: result.message,
         };
+    }
+
+    @Patch(':id/restore')
+    @HttpCode(HttpStatus.OK)
+    @Roles(RoleCode.admin)
+    @ApiOperation({
+        summary: 'Восстановить тип операции',
+        description: 'Восстанавливает удалённый тип операции. Доступно только администраторам.',
+    })
+    @ApiIdParam('Уникальный идентификатор типа операции')
+    @ApiResponse({
+        status: 200,
+        description: 'Тип операции успешно восстановлен',
+    })
+    @ApiReadResponses()
+    public async restoreOperationType(
+        @Param('id') operationTypeId: string,
+        @CurrentUserId() userId: string,
+    ): Promise<{ message: string }> {
+        return await this.restoreOperationTypeUseCase.execute(operationTypeId, userId);
     }
 }

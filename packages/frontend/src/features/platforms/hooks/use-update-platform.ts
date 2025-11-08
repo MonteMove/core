@@ -16,10 +16,5 @@ export const useUpdatePlatform = () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
       toast.success('Платформа успешно обновлена');
     },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.message || 'Не удалось обновить платформу';
-      toast.error(message);
-    },
   });
 };

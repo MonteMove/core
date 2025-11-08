@@ -7,7 +7,7 @@ import { BankWalletCard } from '@/entities/wallet';
 import { CryptoWalletCard } from '@/entities/wallet';
 import { SimpleWalletCard } from '@/entities/wallet';
 import { Card, CardContent } from '@/shared';
-import { Skeleton } from '@/shared';
+import { Loading } from '@/shared';
 
 interface CardDashboardProps {
   isLoading: boolean;
@@ -44,21 +44,7 @@ export const CardDashboard = ({
   }
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {Array.from({ length: 2 }).map((_, index) => (
-          <Card key={index} className="w-full">
-            <CardContent className="space-y-3 p-4">
-              <Skeleton className="h-4 w-20" />
-              <div className="space-y-3">
-                <Skeleton className="h-5 w-1/3" />
-                <Skeleton className="h-16 w-full" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
+    return <Loading />;
   }
 
   const groupsWithWallets = currencyGroups.filter(

@@ -2,7 +2,7 @@
 
 import { useWalletMonthlyLimit } from '@/entities/wallet/model/use-wallet-monthly-limit';
 import { formatNumber } from '@/shared/lib/utils/format-number';
-import { cn } from '@/shared/lib/utils';
+import { cn, Loading } from '@/shared';
 
 interface WalletMonthlyLimitProps {
   walletId: string;
@@ -18,11 +18,7 @@ export const WalletMonthlyLimit = ({
   const { data, isLoading } = useWalletMonthlyLimit(walletId, true);
 
   if (isLoading) {
-    return (
-      <div className="text-xs text-muted-foreground">
-        Загрузка лимита...
-      </div>
-    );
+    return <Loading className="text-xs py-0" />;
   }
 
   if (!data || data.limit === null) {

@@ -36,14 +36,10 @@ import {
   EmptyMedia,
   EmptyTitle,
   Form,
-  FormControl,
-  FormField,
   formatDateTime,
-  FormItem,
-  FormLabel,
   Input,
+  Loading,
   ROUTER_MAP,
-  Skeleton,
   Tabs,
   TabsList,
   TabsTrigger,
@@ -78,11 +74,7 @@ export default function OperationsPage() {
   const router = useRouter();
   const { data, error, hasNextPage, isFetching, isLoading } =
     useInfiniteOperations();
-  const { data: operationTypes, isLoading: operationTypesLoading } =
-    useOperationTypes();
-  const { data: applications, isLoading: applicationsLoading } =
-    useApplicationsList();
-  const { data: users } = useUsers();
+  const { data: operationTypes } = useOperationTypes();
   const { copyOperation } = useCopyOperation();
   const { mutate: deleteOperation } = useDeleteOperation();
   const lastOperationRef = useRef<HTMLDivElement | null>(null);
@@ -148,13 +140,7 @@ export default function OperationsPage() {
         <div className="space-y-2">
           <div className="">
             {isLoading ? (
-              <div className="flex flex-col gap-2">
-                {new Array(5).fill(null).map((_, i) => (
-                  <Card key={i} className="h-[176] w-full p-0">
-                    <Skeleton className="h-[176] w-full"></Skeleton>
-                  </Card>
-                ))}
-              </div>
+              <Loading />
             ) : error ? (
               <div className="justify-items-center">
                 <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
@@ -356,9 +342,7 @@ export default function OperationsPage() {
               </div>
             )}
           </div>
-          {isFetching && hasNextPage && (
-            <p className="text-center py-4">Загрузка...</p>
-          )}
+          {isFetching && hasNextPage && <Loading className="py-4" />}
         </div>
       </form>
     </Form>

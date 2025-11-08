@@ -1,12 +1,30 @@
 import { z } from 'zod';
 
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string(),
+});
+
+const NetworkSchema = z.object({
+  id: z.string().uuid(),
+  code: z.string(),
+  name: z.string(),
+});
+
 export const NetworkTypeSchema = z.object({
   id: z.string().uuid(),
+  userId: z.string().uuid(),
+  updatedById: z.string().uuid(),
   networkId: z.string().uuid(),
   code: z.string(),
   name: z.string(),
   active: z.boolean(),
   deleted: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  network: NetworkSchema,
+  created_by: UserSchema,
+  updated_by: UserSchema,
 });
 
 export const CreateNetworkTypeSchema = z.object({
@@ -27,9 +45,8 @@ export const GetNetworkTypesResponseSchema = z.object({
   networkTypes: z.array(NetworkTypeSchema),
 });
 
-export const GetNetworkTypeResponseSchema = z.object({
-  networkType: NetworkTypeSchema,
-});
+// Backend возвращает прямой объект типа сети, а не обёрнутый
+export const GetNetworkTypeResponseSchema = NetworkTypeSchema;
 
 export const CreateNetworkTypeResponseSchema = z.object({
   message: z.string(),

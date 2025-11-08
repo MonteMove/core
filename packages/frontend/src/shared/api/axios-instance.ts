@@ -14,6 +14,7 @@ export const axiosInstance = axios.create({
 });
 
 let isRefreshing = false;
+let failedRefresh = false;
 let refreshSubscribers: ((token: string | null) => void)[] = [];
 
 function subscribeTokenRefresh(cb: (token: string | null) => void) {
@@ -22,6 +23,12 @@ function subscribeTokenRefresh(cb: (token: string | null) => void) {
 
 function onRefreshed(token: string | null) {
   refreshSubscribers.forEach((cb) => cb(token));
+  refreshSubscribers = [];
+}
+
+export function resetRefreshState() {
+  failedRefresh = false;
+  isRefreshing = false;
   refreshSubscribers = [];
 }
 
@@ -55,10 +62,13 @@ axiosInstance.interceptors.response.use(
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (failedRefresh) {
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           subscribeTokenRefresh((token) => {
-            console.log(token);
             if (token) {
               originalRequest.headers = {
                 ...originalRequest.headers,
@@ -89,6 +99,7 @@ axiosInstance.interceptors.response.use(
         await setToken(data.accessToken);
 
         isRefreshing = false;
+        failedRefresh = false;
         onRefreshed(data.accessToken);
 
         originalRequest.headers = {
@@ -98,6 +109,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
+        failedRefresh = true;
         onRefreshed(null);
         const { clearToken } = useAuthStore.getState();
         await clearToken();

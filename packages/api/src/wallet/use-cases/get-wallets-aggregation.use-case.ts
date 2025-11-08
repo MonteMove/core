@@ -71,6 +71,29 @@ export class GetWalletsAggregationUseCase {
             where.OR = orConditions;
         }
 
+        const isAllTabContext =
+            walletTypeId === undefined &&
+            (visible === true || visible === undefined) &&
+            (deleted === false || deleted === undefined) &&
+            (pinned === false || pinned === undefined);
+
+        if (isAllTabContext) {
+            const andConditions = Array.isArray(where.AND)
+                ? where.AND
+                : where.AND
+                    ? [where.AND]
+                    : [];
+            where.AND = [
+                ...andConditions,
+                {
+                    OR: [
+                        { walletTypeId: null },
+                        { walletType: { showInTabs: false } },
+                    ],
+                },
+            ];
+        }
+
         if (balanceStatus !== undefined) {
             where.balanceStatus = balanceStatus;
         }

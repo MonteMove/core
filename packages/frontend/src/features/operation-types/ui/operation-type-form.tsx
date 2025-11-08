@@ -30,6 +30,9 @@ import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { useCreateOperationType } from '../hooks/use-create-operation-type';
 import { useUpdateOperationType } from '../hooks/use-update-operation-type';
 
+// Системные типы операций, у которых нельзя изменить код
+const SYSTEM_OPERATION_TYPE_CODES = ['avans', 'correction'];
+
 interface OperationTypeFormProps {
   isEdit?: boolean;
   initialData?: OperationType;
@@ -51,12 +54,14 @@ export function OperationTypeForm({
       defaultValues:
         isEdit && initialData
           ? {
+              code: initialData.code,
               name: initialData.name,
               description: initialData.description || '',
               isSeparateTab: initialData.isSeparateTab,
               active: initialData.active,
             }
           : {
+              code: '',
               name: '',
               description: '',
               isSeparateTab: false,
@@ -80,10 +85,39 @@ export function OperationTypeForm({
   };
 
   const mutation = isEdit ? updateMutation : createMutation;
+  const isSystemType =
+    isEdit &&
+    initialData &&
+    SYSTEM_OPERATION_TYPE_CODES.includes(initialData.code);
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="code"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Код <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="deposit"
+                  {...field}
+                  disabled={isSystemType}
+                />
+              </FormControl>
+              <FormDescription>
+                {isSystemType
+                  ? 'Код системного типа операции нельзя изменить'
+                  : 'Уникальный код типа операции (только латиница, цифры, дефис, подчеркивание)'}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="name"
@@ -150,11 +184,15 @@ export function OperationTypeForm({
               <div className="space-y-0.5">
                 <FormLabel>Активность</FormLabel>
                 <FormDescription>
-                  Активные типы операций доступны для выбора при создании операций и заявок
+                  Активные типы операций доступны для выбора при создании
+                  операций и заявок
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}

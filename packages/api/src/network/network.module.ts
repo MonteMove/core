@@ -4,6 +4,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { PrismaService } from '../common/services/prisma.service';
 import { NetworkController } from './network.controller';
+import { NetworkInitService } from './network-init.service';
 import {
     CreateNetworkUseCase,
     DeleteNetworkUseCase,
@@ -16,6 +17,7 @@ import {
 @Module({
     controllers: [NetworkController],
     providers: [
+        NetworkInitService,
         CreateNetworkUseCase,
         GetNetworkByIdUseCase,
         GetNetworksUseCase,

@@ -30,6 +30,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   ROUTER_MAP,
   Table,
   TableBody,
@@ -49,16 +50,11 @@ export default function PlatformsPage() {
   const [platformToDelete, setPlatformToDelete] = useState<string | null>(null);
 
   const tab = searchParams.get('tab') || 'all';
-  const showDeleted = tab === 'deleted';
+  const showDeleted = tab === 'deleted' ? true : undefined;
 
   const { data, isLoading } = usePlatforms();
   const deleteMutation = useDeletePlatform();
   const restoreMutation = useRestorePlatform();
-
-  const platforms = data?.platforms || [];
-  const filteredPlatforms = showDeleted
-    ? platforms.filter((p) => p.deleted)
-    : platforms.filter((p) => !p.deleted);
 
   const handleTabChange = useCallback(
     (value: string) => {
@@ -105,118 +101,107 @@ export default function PlatformsPage() {
           </Tabs>
 
           {isLoading ? (
-            <div className="text-center py-8">Загрузка...</div>
-          ) : filteredPlatforms.length === 0 ? (
+            <Loading />
+          ) : data?.platforms.length === 0 ? (
             <Empty>
-              <EmptyMedia>
-                <Boxes className="w-12 h-12" />
-              </EmptyMedia>
               <EmptyHeader>
-                <EmptyTitle>Платформы не найдены</EmptyTitle>
-                <EmptyDescription>
-                  {showDeleted
-                    ? 'Нет удалённых платформ'
-                    : 'Создайте первую платформу'}
-                </EmptyDescription>
-              </EmptyHeader>
-              {!showDeleted && (
+                <EmptyMedia variant="icon">
+                  <Boxes />
+                </EmptyMedia>
                 <EmptyContent>
-                  <Button asChild>
-                    <Link href={ROUTER_MAP.PLATFORMS_CREATE}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Создать платформу
-                    </Link>
-                  </Button>
+                  <EmptyTitle>
+                    {tab === 'deleted'
+                      ? 'Нет удалённых платформ'
+                      : 'Платформы ещё не созданы'}
+                  </EmptyTitle>
+                  <EmptyDescription>
+                    {tab === 'deleted'
+                      ? 'Все удалённые платформы будут отображаться здесь.'
+                      : 'Создайте первую платформу для использования в системе.'}
+                  </EmptyDescription>
                 </EmptyContent>
-              )}
+              </EmptyHeader>
             </Empty>
           ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Название</TableHead>
-                    <TableHead>Код</TableHead>
-                    <TableHead>Описание</TableHead>
-                    <TableHead>URL</TableHead>
-                    <TableHead>Статус</TableHead>
-                    <TableHead className="text-right">Действия</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredPlatforms.map((platform) => (
-                    <TableRow key={platform.id}>
-                      <TableCell className="font-medium">
-                        {platform.name}
-                      </TableCell>
-                      <TableCell>{platform.code}</TableCell>
-                      <TableCell className="max-w-xs truncate">
-                        {platform.description || '—'}
-                      </TableCell>
-                      <TableCell>
-                        {platform.url ? (
-                          <a
-                            href={platform.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:underline"
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Код</TableHead>
+                  <TableHead>Название</TableHead>
+                  <TableHead>Статус</TableHead>
+                  <TableHead className="text-right">Действия</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data?.platforms.map((platform) => (
+                  <TableRow
+                    key={platform.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() =>
+                      !showDeleted &&
+                      router.push(`${ROUTER_MAP.PLATFORMS_EDIT}/${platform.id}`)
+                    }
+                  >
+                    <TableCell className="font-medium">
+                      {platform.code}
+                    </TableCell>
+                    <TableCell>{platform.name}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          platform.active
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {platform.active ? 'Активна' : 'Неактивна'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        {showDeleted ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRestore(platform.id);
+                            }}
                           >
-                            Ссылка
-                          </a>
+                            <RotateCcw className="w-4 h-4" />
+                          </Button>
                         ) : (
-                          '—'
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            platform.active
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {platform.active ? 'Активна' : 'Неактивна'}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          {!showDeleted ? (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  router.push(
-                                    `${ROUTER_MAP.PLATFORMS_EDIT}/${platform.id}`,
-                                  )
-                                }
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDeleteClick(platform.id)}
-                              >
-                                <Trash2 className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </>
-                          ) : (
+                          <>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleRestore(platform.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `${ROUTER_MAP.PLATFORMS_EDIT}/${platform.id}`,
+                                );
+                              }}
                             >
-                              <RotateCcw className="w-4 h-4" />
+                              <Pencil className="w-4 h-4" />
                             </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteClick(platform.id);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
@@ -226,13 +211,16 @@ export default function PlatformsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Удалить платформу?</AlertDialogTitle>
             <AlertDialogDescription>
-              Это действие можно будет отменить. Платформа будет помечена как
-              удалённая.
+              Платформа будет перемещена в удаленные. Вы сможете восстановить её
+              позже из вкладки &quot;Удалённые&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Отмена</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Удалить
             </AlertDialogAction>
           </AlertDialogFooter>

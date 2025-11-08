@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Copy } from 'lucide-react';
 
 import { WalletOwner } from '@/entities/wallet';
 import type { Wallet } from '@/entities/wallet';
@@ -11,14 +12,22 @@ import { ChangeOwnerDialog } from '@/features/wallets/ui/change-owner-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
-import { cn, formatDate } from '@/shared/lib/utils';
+import { cn, formatDate, copyHandler } from '@/shared/lib/utils';
+import {
+  formatWalletCopyText,
+  isSpecialWallet,
+  isBybitWallet,
+  isTrustWallet,
+  getSpecialWalletTemplate,
+  formatSpecialWalletCopyText,
+} from '@/shared/lib/wallet-copy-helpers';
 import { Button } from '@/shared/ui/shadcn/button';
+import { Checkbox } from '@/shared/ui/shadcn/checkbox';
 import { formatNumber } from '@/shared/lib/utils/format-number';
 import {
   Card,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/shared/ui/shadcn/card';
 import {
   DropdownMenu,
@@ -29,9 +38,19 @@ import {
 
 interface CryptoWalletCardProps {
   wallet: Wallet;
+  selectionMode?: boolean;
+  isSelected?: boolean;
+  onSelect?: (walletId: string) => void;
+  onEnterSelectionMode?: () => void;
 }
 
-export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
+export const CryptoWalletCard = ({
+  wallet,
+  selectionMode = false,
+  isSelected = false,
+  onSelect,
+  onEnterSelectionMode,
+}: CryptoWalletCardProps) => {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [changeOwnerDialogOpen, setChangeOwnerDialogOpen] = useState(false);
@@ -51,9 +70,6 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
       toast.success('Настройки обновлены');
     },
-    onError: () => {
-      toast.error('Ошибка при обновлении');
-    },
   });
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -63,9 +79,19 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
     }
   };
 
+  const handleOperations = () => {
+    router.push(ROUTER_MAP.WALLET_OPERATIONS(wallet.id));
+    setMenuOpen(false);
+  };
+
   const handleEdit = () => {
     router.push(`${ROUTER_MAP.WALLETS_EDIT}/${wallet.id}`);
     setMenuOpen(false);
+  };
+
+  const handleEnterSelectionMode = () => {
+    setMenuOpen(false);
+    onEnterSelectionMode?.();
   };
 
   const handleDelete = () => {
@@ -103,9 +129,6 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
       toast.success('Статус баланса обновлен');
     },
-    onError: () => {
-      toast.error('Ошибка при обновлении статуса');
-    },
   });
 
   const handleBalanceStatusChange = (status: string) => {
@@ -123,14 +146,55 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
         wallet.active ? 'Кошелек деактивирован' : 'Кошелек активирован',
       );
     },
-    onError: () => {
-      toast.error('Ошибка при изменении статуса');
-    },
   });
 
   const handleToggleActive = () => {
     toggleActiveMutation.mutate(!wallet.active);
     setMenuOpen(false);
+  };
+
+  const toggleVisibleMutation = useMutation({
+    mutationFn: (visible: boolean) =>
+      WalletService.toggleVisible(wallet.id, visible),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wallets'] });
+      queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
+      queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
+      toast.success(wallet.visible ? 'Кошелек скрыт' : 'Кошелек показан');
+    },
+  });
+
+  const handleToggleVisible = () => {
+    toggleVisibleMutation.mutate(!wallet.visible);
+    setMenuOpen(false);
+  };
+
+  const handleCopyRequisites = () => {
+    const copyText = formatWalletCopyText(wallet);
+    if (copyText) {
+      navigator.clipboard
+        .writeText(copyText)
+        .then(() => {
+          toast.success(`Реквизиты кошелька "${wallet.name}" скопированы`);
+        })
+        .catch((err) => {
+          toast.error(`Не удалось скопировать: ${err}`);
+        });
+    } else {
+      toast.error('Нет данных для копирования');
+    }
+  };
+
+  const handleCopySpecialTemplate = (template: string) => {
+    const copyText = formatSpecialWalletCopyText(wallet, template);
+    navigator.clipboard
+      .writeText(copyText)
+      .then(() => {
+        toast.success(`Шаблон для "${wallet.name}" скопирован`);
+      })
+      .catch((err) => {
+        toast.error(`Не удалось скопировать: ${err}`);
+      });
   };
 
   const getFullDescription = () => {
@@ -200,22 +264,36 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
 
   return (
     <>
-      <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+      <DropdownMenu
+        open={!selectionMode && menuOpen}
+        onOpenChange={setMenuOpen}
+      >
         <DropdownMenuTrigger asChild>
           <Card
             role="button"
             tabIndex={0}
             onClick={(e) => {
-              // Не открываем меню если кликнули на кнопку названия
-              if ((e.target as HTMLElement).closest('button[data-wallet-link]')) {
+              // Не открываем меню если кликнули на кнопку названия или чекбокс
+              if (
+                (e.target as HTMLElement).closest('button[data-wallet-link]') ||
+                (e.target as HTMLElement).closest('[data-checkbox]')
+              ) {
                 return;
               }
+
+              if (selectionMode) {
+                onSelect?.(wallet.id);
+                return;
+              }
+
               setMenuOpen(true);
             }}
             onKeyDown={handleKeyDown}
             className={cn(
-              'w-full cursor-pointer overflow-hidden',
-              wallet.monthlyLimit && wallet.monthlyLimit > 0 ? 'py-0 gap-0' : 'gap-3',
+              'w-full cursor-pointer overflow-hidden focus:outline-none focus-visible:outline-none',
+              wallet.monthlyLimit && wallet.monthlyLimit > 0
+                ? 'py-0 gap-0'
+                : 'gap-3',
               getBorderClass(wallet.balanceStatus),
               !wallet.active && 'opacity-40',
             )}
@@ -229,29 +307,123 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
                 />
               </div>
             )}
-            <CardHeader className={wallet.monthlyLimit && wallet.monthlyLimit > 0 ? 'pt-6 pb-6' : ''}>
+            <CardHeader
+              className={
+                wallet.monthlyLimit && wallet.monthlyLimit > 0
+                  ? 'pt-6 pb-6'
+                  : ''
+              }
+            >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="space-y-2 sm:max-w-[70%]">
                   <div className="flex flex-wrap items-center gap-2">
+                    {selectionMode && (
+                      <Checkbox
+                        data-checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => onSelect?.(wallet.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative z-10"
+                      />
+                    )}
                     <Button
                       variant="link"
-                      className="text-lg sm:text-xl p-0 h-auto font-semibold relative z-10 no-underline hover:no-underline"
+                      className="text-lg sm:text-xl p-0 h-auto font-semibold relative z-10 no-underline hover:no-underline cursor-pointer"
                       data-wallet-link
                       onPointerDown={(e) => {
                         e.stopPropagation();
                         router.push(ROUTER_MAP.WALLET_OPERATIONS(wallet.id));
                       }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                      }}
                     >
                       {getWalletTypeLabel(wallet.walletType)} {wallet.name}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 relative z-10 cursor-pointer"
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        copyHandler(wallet.name);
+                      }}
+                      title="Скопировать название"
+                    >
+                      <Copy className="h-3.5 w-3.5" />
                     </Button>
                     <WalletOwner user={wallet.user} />
                   </div>
                   {getFullDescription() && (
                     <CardDescription>{getFullDescription()}</CardDescription>
+                  )}
+
+                  {/* Кнопки копирования реквизитов */}
+                  {wallet.details && (
+                    <div className="mt-3 flex gap-2 items-center">
+                      {isSpecialWallet(wallet) ? (
+                        <>
+                          {isBybitWallet(wallet) && (
+                            <>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onPointerDown={(e) => {
+                                  e.stopPropagation();
+                                  handleCopySpecialTemplate(
+                                    `<${wallet.currency.code}>, TRON (TRC-20):`,
+                                  );
+                                }}
+                                className="relative z-10 cursor-pointer"
+                              >
+                                TRC
+                              </Button>
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onPointerDown={(e) => {
+                                  e.stopPropagation();
+                                  const template =
+                                    getSpecialWalletTemplate(wallet);
+                                  if (template)
+                                    handleCopySpecialTemplate(template);
+                                }}
+                                className="relative z-10 cursor-pointer"
+                              >
+                                BB
+                              </Button>
+                            </>
+                          )}
+                          {isTrustWallet(wallet) && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              onPointerDown={(e) => {
+                                e.stopPropagation();
+                                const template =
+                                  getSpecialWalletTemplate(wallet);
+                                if (template)
+                                  handleCopySpecialTemplate(template);
+                              }}
+                              className="relative z-10 cursor-pointer"
+                            >
+                              <Copy className="h-4 w-4 mr-2" />
+                              Копировать шаблон
+                            </Button>
+                          )}
+                        </>
+                      ) : (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onPointerDown={(e) => {
+                            e.stopPropagation();
+                            handleCopyRequisites();
+                          }}
+                          className="relative z-10 cursor-pointer"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Копировать реквизиты
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div className="text-left sm:text-right">
@@ -319,20 +491,27 @@ export const CryptoWalletCard = ({ wallet }: CryptoWalletCardProps) => {
               />
             </div>
           </div>
-          <DropdownMenuItem onSelect={handleEdit}>
-            Редактировать
+          <DropdownMenuItem onSelect={handleEnterSelectionMode}>
+            Выбрать
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleChangeOwner}>
-            Держатель
+          <DropdownMenuItem onSelect={handleOperations}>
+            Операции
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={handleToggleActive}>
-            {wallet.active ? 'Деактивировать' : 'Активировать'}
+          <DropdownMenuItem onSelect={handleEdit}>Изменить</DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleToggleVisible}>
+            {wallet.visible ? 'Скрыть' : 'Показать'}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleTogglePinned}>
             {wallet.pinned ? 'Открепить' : 'Закрепить'}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleTogglePinOnMain}>
             {wallet.pinOnMain ? 'Открепить с главной' : 'Закрепить на главной'}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleToggleActive}>
+            {wallet.active ? 'Деактивировать' : 'Активировать'}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={handleChangeOwner}>
+            Держатель
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-destructive/60"

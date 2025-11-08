@@ -11,7 +11,7 @@ export class CreatePlatformUseCase {
         createPlatformDto: CreatePlatformDto,
         userId: string,
     ): Promise<PlatformResponseDto> {
-        const { code, name, description, icon, url, active } = createPlatformDto;
+        const { code, name, active } = createPlatformDto;
 
         const existingPlatformByCode = await this.prisma.platform.findFirst({
             where: {
@@ -32,9 +32,6 @@ export class CreatePlatformUseCase {
                 updatedById: userId,
                 code,
                 name,
-                description,
-                icon,
-                url,
                 active: active ?? true,
             },
         });
@@ -43,9 +40,6 @@ export class CreatePlatformUseCase {
             id: platform.id,
             name: platform.name,
             code: platform.code,
-            description: platform.description,
-            icon: platform.icon,
-            url: platform.url,
             active: platform.active,
             deleted: platform.deleted,
             createdAt: platform.createdAt,

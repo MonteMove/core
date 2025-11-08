@@ -21,8 +21,5 @@ export const useGeneralReport = () => {
 
       toast.success('Общий отчёт скачивается!');
     },
-    onError: () => {
-      toast.error('Не удалось сформировать общий отчёт');
-    },
   });
 };

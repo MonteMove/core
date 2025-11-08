@@ -30,6 +30,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   ROUTER_MAP,
   Table,
   TableBody,
@@ -100,9 +101,7 @@ export default function CurrenciesPage() {
           </Tabs>
 
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
+            <Loading />
           ) : data?.currencies.length === 0 ? (
             <Empty>
               <EmptyHeader>
@@ -217,7 +216,7 @@ export default function CurrenciesPage() {
             <AlertDialogTitle>Удалить валюту?</AlertDialogTitle>
             <AlertDialogDescription>
               Валюта будет перемещена в удаленные. Вы сможете восстановить её
-              позже из вкладки "Удалённые".
+              позже из вкладки &quot;Удалённые&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

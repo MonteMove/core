@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { UserAuth } from '@/entities/users/model/user-schemas';
 import { env } from '@/shared/lib/env-config';
+import { resetRefreshState } from '@/shared/api/axios-instance';
 
 export interface AuthState {
   clearToken: () => Promise<void>;
@@ -28,6 +29,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (token) {
       set({ token });
       localStorage.setItem(env.NEXT_PUBLIC_AUTH_TOKEN_KEY, token);
+      resetRefreshState();
     }
   },
   clearToken: async () => {

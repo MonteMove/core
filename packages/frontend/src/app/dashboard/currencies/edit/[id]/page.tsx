@@ -10,7 +10,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
+  Loading,
+} from '@/shared';
 
 export default function EditCurrencyPage({
   params,
@@ -21,13 +22,7 @@ export default function EditCurrencyPage({
   const { data: currency, isLoading } = useCurrencyById(id);
 
   if (isLoading) {
-    return (
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Загрузка...</p>
-        </div>
-      </div>
-    );
+    return <Loading variant="page" />;
   }
 
   if (!currency) {

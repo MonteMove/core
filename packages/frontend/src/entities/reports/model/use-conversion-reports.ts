@@ -21,8 +21,5 @@ export const useConversionReport = () => {
 
       toast.success('Отчёт скачивается!');
     },
-    onError: () => {
-      toast.error('Не удалось сформировать общий отчёт');
-    },
   });
 };

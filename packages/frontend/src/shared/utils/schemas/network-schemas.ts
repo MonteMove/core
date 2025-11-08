@@ -2,10 +2,23 @@ import { z } from 'zod';
 
 import { PaginationSchema } from './common-schemas';
 
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string(),
+});
+
 export const NetworkSchema = z.object({
   id: z.string().uuid(),
+  userId: z.string().uuid().optional(),
+  updatedById: z.string().uuid().optional(),
   code: z.string(),
   name: z.string(),
+  active: z.boolean().optional(),
+  deleted: z.boolean().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+  created_by: UserSchema.optional(),
+  updated_by: UserSchema.optional(),
 });
 
 export const GetNetworksResponseSchema = z.object({
@@ -21,10 +34,18 @@ export const NetworkTypeSummaryNetworkSchema = z.object({
 
 export const NetworkTypeSchema = z.object({
   id: z.string().uuid(),
+  userId: z.string().uuid().optional(),
+  updatedById: z.string().uuid().optional(),
   networkId: z.string().uuid(),
   code: z.string(),
   name: z.string(),
+  active: z.boolean().optional(),
+  deleted: z.boolean().optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
   network: NetworkTypeSummaryNetworkSchema.optional(),
+  created_by: UserSchema.optional(),
+  updated_by: UserSchema.optional(),
 });
 
 export const GetNetworkTypesResponseSchema = z.object({

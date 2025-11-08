@@ -30,6 +30,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
+  Loading,
   ROUTER_MAP,
   Table,
   TableBody,
@@ -101,9 +102,7 @@ export default function NetworkTypesPage() {
             </TabsList>
           </Tabs>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Загрузка...
-            </div>
+            <Loading />
           ) : data?.networkTypes.length === 0 ? (
             <Empty>
               <EmptyHeader>
@@ -216,7 +215,7 @@ export default function NetworkTypesPage() {
             <AlertDialogTitle>Удалить тип сети?</AlertDialogTitle>
             <AlertDialogDescription>
               Тип сети будет перемещен в удаленные. Вы сможете восстановить его
-              позже из вкладки "Удалённые".
+              позже из вкладки &quot;Удалённые&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

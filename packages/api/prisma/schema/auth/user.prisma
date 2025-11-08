@@ -40,6 +40,8 @@ model User {
   networkTypesUpdated     NetworkType[]    @relation("network_types_updated_by")
   platformsCreated        Platform[]       @relation("platforms_created_by")
   platformsUpdated        Platform[]       @relation("platforms_updated_by")
+  banksCreated            Bank[]           @relation("banks_created_by")
+  banksUpdated            Bank[]           @relation("banks_updated_by")
 
   @@unique([username], map: "users_username_unique")
   @@unique([telegramId], map: "users_telegram_id_unique")

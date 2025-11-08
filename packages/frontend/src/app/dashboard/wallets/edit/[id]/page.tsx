@@ -12,7 +12,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/ui/shadcn/card';
+  Loading,
+} from '@/shared';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
 interface EditWalletPageProps {
@@ -33,13 +34,7 @@ export default function EditWalletPage({ params }: EditWalletPageProps) {
   });
 
   if (isLoading) {
-    return (
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Загрузка...</p>
-        </div>
-      </div>
-    );
+    return <Loading variant="page" />;
   }
 
   if (error || !wallet) {

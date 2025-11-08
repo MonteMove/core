@@ -59,8 +59,14 @@ export const OperationEntryCreateDtoSchema = z.object({
 export const CreateOperationDtoSchema = z.object({
   typeId: z.string().uuid('Выберите тип операции'),
   applicationId: z.number().optional(),
-  description: z.string().max(2000, 'Максимум 2000 символов').optional().nullable(),
-  entries: z.array(OperationEntryCreateDtoSchema).min(1, 'Добавьте хотя бы одну запись операции'),
+  description: z
+    .string()
+    .max(2000, 'Максимум 2000 символов')
+    .optional()
+    .nullable(),
+  entries: z
+    .array(OperationEntryCreateDtoSchema)
+    .min(1, 'Добавьте хотя бы одну запись операции'),
   creatureDate: z.string().optional(),
 });
 
@@ -68,11 +74,15 @@ export const CreateOperationBackendDtoSchema = z.object({
   typeId: z.string().uuid(),
   applicationId: z.number().optional(),
   description: z.string().max(2000).optional().nullable(),
-  entries: z.array(z.object({
-    walletId: z.string().uuid(),
-    direction: z.enum(['credit', 'debit']),
-    amount: z.number().positive(),
-  })).min(1),
+  entries: z
+    .array(
+      z.object({
+        walletId: z.string().uuid(),
+        direction: z.enum(['credit', 'debit']),
+        amount: z.number().positive(),
+      }),
+    )
+    .min(1),
   creatureDate: z.string().optional(),
 });
 
@@ -173,7 +183,9 @@ export const GetOperationsParamsSchema = z.object({
 
 export type OperationResponseDto = z.infer<typeof OperationResponseDtoSchema>;
 export type UpdateOperationDto = z.infer<typeof UpdateOperationDtoSchema>;
-export type UpdateOperationBackendDto = z.infer<typeof UpdateOperationBackendDtoSchema>;
+export type UpdateOperationBackendDto = z.infer<
+  typeof UpdateOperationBackendDtoSchema
+>;
 export type GetOperationsResponseDto = z.infer<
   typeof GetOperationsResponseDtoSchema
 >;
@@ -183,7 +195,9 @@ export type ReportsConversion = z.infer<typeof ReportsConversionSchema>;
 export type ReportsPeriod = z.infer<typeof ReportsPeriodSchema>;
 export type OperationEntryDto = z.infer<typeof OperationEntryDtoSchema>;
 export type CreateOperationDto = z.infer<typeof CreateOperationDtoSchema>;
-export type CreateOperationBackendDto = z.infer<typeof CreateOperationBackendDtoSchema>;
+export type CreateOperationBackendDto = z.infer<
+  typeof CreateOperationBackendDtoSchema
+>;
 export type OperationEntryCreateDto = z.infer<
   typeof OperationEntryCreateDtoSchema
 >;

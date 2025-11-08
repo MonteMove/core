@@ -39,6 +39,7 @@ export * from '@/shared/ui/components/top-loader';
 export * from '@/shared/ui/components/color-field';
 export * from '@/shared/ui/components/settings';
 export * from '@/shared/ui/components/required-label';
+export * from '@/shared/ui/components/loading';
 export * from '@/shared/utils/constants/router-map';
 export * from '@/shared/utils/constants/application-key';
 export * from '@/shared/utils/constants/users-query-key';

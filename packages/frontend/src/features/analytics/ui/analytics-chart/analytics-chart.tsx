@@ -28,7 +28,7 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-  Skeleton,
+  Loading,
 } from '@/shared';
 
 export const AnalyticsCharts = () => {
@@ -38,21 +38,7 @@ export const AnalyticsCharts = () => {
     useMonthlyAnalytics();
 
   if (isLoading || isMonthlyLoading) {
-    return (
-      <div className="grid gap-4 md:grid-cols-2">
-        {[...Array(2)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-              <Skeleton className="h-4 w-48" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-[300px] w-full" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!analyticsData?.summary) {
@@ -80,13 +66,6 @@ export const AnalyticsCharts = () => {
     },
   };
 
-  const COLORS = [
-    'var(--chart-1)',
-    'var(--chart-2)',
-    'var(--chart-3)',
-    'var(--chart-4)',
-    'var(--chart-5)',
-  ];
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

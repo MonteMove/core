@@ -39,7 +39,6 @@ export const useUpdateApplication = () => {
       router.push(ROUTER_MAP.APPLICATIONS);
       toast.success('Заявка обновлена');
     },
-    onError: () => toast.error('Ошибка при обновлении'),
   });
 };
 export const useUpdateStatusApplication = () => {
@@ -52,7 +51,6 @@ export const useUpdateStatusApplication = () => {
       queryClient.invalidateQueries({ queryKey: APPLICATION_QUERY_KEY });
       toast.success('Статус заявки обновлён');
     },
-    onError: () => toast.error('Ошибка при обновлении статуса'),
   });
 };
 
@@ -128,17 +126,18 @@ export const useDeleteApplication = (filters?: GetApplicationsFilters) => {
         queryKey: APPLICATIONS_WITH_FILTERS_KEY(filters) as readonly unknown[],
       });
     },
-
-    onError: () => {
-      toast.error('Ошибка при удалении');
-    },
   });
 };
 
 export const useApplicationsList = () => {
   return useQuery({
     queryKey: ['applications', 'list', 'open'],
-    queryFn: () => ApplicationService.getApplications({ page: 1, limit: 100, status: 'open' }),
+    queryFn: () =>
+      ApplicationService.getApplications({
+        page: 1,
+        limit: 100,
+        status: 'open',
+      }),
   });
 };
 

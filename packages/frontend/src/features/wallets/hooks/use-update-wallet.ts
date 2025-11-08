@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { isAxiosError } from 'axios';
 
 import type { CreateWalletRequest } from '@/entities/wallet';
 import { WalletService } from '@/entities/wallet/api/wallet-service';
@@ -20,12 +19,6 @@ export function useUpdateWallet(walletId: string) {
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
       toast.success('Кошелек успешно обновлен');
       router.push(ROUTER_MAP.WALLETS);
-    },
-    onError: (error) => {
-      const errorMessage = isAxiosError(error)
-        ? error.response?.data?.message || 'Ошибка при обновлении кошелька'
-        : 'Ошибка при обновлении кошелька';
-      toast.error(errorMessage);
     },
   });
 }

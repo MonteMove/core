@@ -8,6 +8,7 @@ import Link from 'next/link';
 import {
   Book,
   Boxes,
+  Building2,
   ChartColumnIncreasing,
   Coins,
   FolderKanban,
@@ -105,6 +106,11 @@ const data = {
       title: 'Платформы',
       url: ROUTER_MAP.PLATFORMS,
       icon: Boxes,
+    },
+    {
+      title: 'Банки',
+      url: ROUTER_MAP.BANKS,
+      icon: Building2,
     },
   ],
   navSecondary: [

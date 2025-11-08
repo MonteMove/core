@@ -14,9 +14,13 @@ import { axiosInstance } from '@/shared/api/axios-instance';
 import { API_MAP } from '@/shared/utils/constants/api-map';
 
 export class OperationTypeService {
-  public static async getOperationTypes(): Promise<OperationType[]> {
+  public static async getOperationTypes(
+    deleted?: boolean,
+  ): Promise<OperationType[]> {
+    const params = deleted !== undefined ? { deleted } : {};
     const response = await axiosInstance.get(
       API_MAP.OPERATION_TYPES.OPERATION_TYPES,
+      { params },
     );
     return OperationTypesResponseSchema.parse(response.data).operationTypes;
   }
@@ -56,5 +60,14 @@ export class OperationTypeService {
       API_MAP.OPERATION_TYPES.OPERATION_TYPE_BY_ID(id),
     );
     return DeleteOperationTypeResponseSchema.parse(response.data);
+  }
+
+  public static async restoreOperationType(
+    id: string,
+  ): Promise<{ message: string }> {
+    const response = await axiosInstance.patch(
+      `${API_MAP.OPERATION_TYPES.OPERATION_TYPE_BY_ID(id)}/restore`,
+    );
+    return response.data;
   }
 }

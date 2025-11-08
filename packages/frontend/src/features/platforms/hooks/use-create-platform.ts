@@ -16,10 +16,5 @@ export const useCreatePlatform = () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
       toast.success('Платформа успешно создана');
     },
-    onError: (error: any) => {
-      const message =
-        error?.response?.data?.message || 'Не удалось создать платформу';
-      toast.error(message);
-    },
   });
 };

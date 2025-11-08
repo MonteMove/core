@@ -14,7 +14,7 @@ import {
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  Skeleton,
+  Loading,
   Table,
   TableBody,
   TableCell,
@@ -88,6 +88,10 @@ export const AnalyticsTable = () => {
     return <ArrowDown className="ml-2 h-4 w-4 inline" />;
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="overflow-x-auto border rounded-lg shadow-sm">
       <Table>
@@ -145,18 +149,7 @@ export const AnalyticsTable = () => {
         </TableHeader>
 
         <TableBody>
-          {isLoading &&
-            [...Array(5)].map((_, i) => (
-              <TableRow key={i}>
-                {[...Array(8)].map((_, j) => (
-                  <TableCell key={j}>
-                    <Skeleton className="h-4 w-full" />
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-
-          {!isLoading && sortedData && sortedData.length > 0
+          {sortedData && sortedData.length > 0
             ? sortedData.map((item) => (
                 <TableRow key={item.walletId}>
                   <TableCell className="text-center text-sm">
@@ -188,7 +181,7 @@ export const AnalyticsTable = () => {
                   </TableCell>
                 </TableRow>
               ))
-            : !isLoading && (
+            : (
                 <TableRow>
                   <TableCell colSpan={8} className="p-0">
                     <Empty>

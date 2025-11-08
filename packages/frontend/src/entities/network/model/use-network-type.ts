@@ -6,8 +6,8 @@ export const useNetworkType = (id: string) => {
   return useQuery({
     queryKey: ['network-type', id],
     queryFn: async () => {
-      const response = await networkApi.getNetworkType(id);
-      return response.networkType;
+      const networkType = await networkApi.getNetworkType(id);
+      return networkType;
     },
     enabled: !!id,
   });

@@ -4,6 +4,9 @@ import { PrismaService } from '../../common/services/prisma.service';
 import { UpdateNetworkTypeDto } from '../dto';
 import { UpdateNetworkTypeResponse } from '../types';
 
+// Системные типы сетей, у которых нельзя изменить код
+const SYSTEM_NETWORK_TYPE_CODES = ['trc-20'];
+
 @Injectable()
 export class UpdateNetworkTypeUseCase {
     constructor(private readonly prisma: PrismaService) {}
@@ -21,6 +24,15 @@ export class UpdateNetworkTypeUseCase {
 
         if (!existingNetworkType || existingNetworkType.deleted) {
             throw new NotFoundException('Тип сети не найден');
+        }
+
+        // Проверка: нельзя изменить код системного типа сети
+        if (
+            code !== undefined &&
+            SYSTEM_NETWORK_TYPE_CODES.includes(existingNetworkType.code) &&
+            code !== existingNetworkType.code
+        ) {
+            throw new BadRequestException('Нельзя изменить код системного типа сети');
         }
 
         if (networkId) {

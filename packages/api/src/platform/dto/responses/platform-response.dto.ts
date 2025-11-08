@@ -10,29 +10,8 @@ export class PlatformResponseDto {
     @ApiProperty({ description: 'Название платформы', example: 'Bybit' })
     public name: string;
 
-    @ApiProperty({ description: 'Код платформы', example: 'BYBIT' })
+    @ApiProperty({ description: 'Код платформы', example: 'bybit' })
     public code: string;
-
-    @ApiPropertyOptional({
-        description: 'Описание платформы',
-        example: 'Криптовалютная биржа',
-        nullable: true,
-    })
-    public description?: string | null;
-
-    @ApiPropertyOptional({
-        description: 'URL иконки платформы',
-        example: 'https://example.com/icon.png',
-        nullable: true,
-    })
-    public icon?: string | null;
-
-    @ApiPropertyOptional({
-        description: 'URL сайта платформы',
-        example: 'https://www.bybit.com',
-        nullable: true,
-    })
-    public url?: string | null;
 
     @ApiProperty({
         description: 'Активность платформы',

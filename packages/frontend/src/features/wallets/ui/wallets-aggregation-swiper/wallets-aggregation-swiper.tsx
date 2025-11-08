@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 
 import { GetWalletsFilter } from '@/entities/wallet';
 import { useWalletsAggregation } from '@/entities/wallet/model/use-wallets-aggregation';
-import { Card, CardContent, Skeleton } from '@/shared';
+import { Card, CardContent, Loading } from '@/shared';
 import { formatNumber } from '@/shared/lib/utils/format-number';
 
 interface WalletsAggregationSwiperProps {
@@ -14,8 +14,8 @@ interface WalletsAggregationSwiperProps {
 export function WalletsAggregationSwiper({
   filters,
 }: WalletsAggregationSwiperProps) {
-  const { data, isLoading, isFetching, isError } = useWalletsAggregation(filters);
-  const showSkeleton = isLoading || isFetching;
+  const { data, isLoading, isFetching, isError } =
+    useWalletsAggregation(filters);
 
   const summaries = useMemo(
     () =>
@@ -41,24 +41,8 @@ export function WalletsAggregationSwiper({
     );
   }
 
-  if (showSkeleton) {
-    return (
-      <div className="w-full min-h-[124px]">
-        <div className="w-full max-w-7xl mx-auto overflow-x-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
-          <div className="flex gap-4 pb-2">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Card key={index} className="min-w-[280px] flex-shrink-0 p-0">
-                <CardContent className="flex flex-col p-4 gap-1">
-                  <Skeleton className="h-7 w-32" />
-                  <Skeleton className="h-4 w-16 mt-1" />
-                  <Skeleton className="h-3 w-24 mt-1" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+  if (isLoading || isFetching) {
+    return <Loading />;
   }
 
   if (summaries.length === 0) {
