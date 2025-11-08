@@ -63,6 +63,12 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (failedRefresh) {
+        if (
+          typeof window !== 'undefined' &&
+          !window.location.pathname.includes('/login')
+        ) {
+          window.location.href = '/login';
+        }
         return Promise.reject(error);
       }
 

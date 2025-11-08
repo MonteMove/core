@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { AuthService } from '@/entities/auth/api/auth-service';
 import { LoginRequest } from '@/entities/auth/model/auth-schemas';
 import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
+import { resetRefreshState } from '@/shared/api/axios-instance';
 import { LOGIN_QUERY_KEY } from '@/shared/utils/constants/auth-query-key';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 
@@ -23,6 +24,7 @@ export const useLogin = () => {
       return AuthService.Login(loginData);
     },
     onSuccess: (data) => {
+      resetRefreshState();
       setToken(data.accessToken);
       setUser(data.user);
 
