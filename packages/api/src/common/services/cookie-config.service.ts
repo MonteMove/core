@@ -17,7 +17,7 @@ export class CookieConfigService {
             | 'lax'
             | 'none';
         const secure = this.configService.getOrThrow<string>('REFRESH_TOKEN_COOKIE_SECURE') === 'true';
-        
+
         return {
             httpOnly: true,
             secure,

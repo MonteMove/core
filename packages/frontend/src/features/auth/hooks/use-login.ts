@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { AuthService } from '@/entities/auth/api/auth-service';
 import { LoginRequest } from '@/entities/auth/model/auth-schemas';
-import { setAuthMarker } from '@/features/auth/actions/set-refresh-token-cookie';
+import { setAuthMarker } from '@/features/auth/actions/set-auth-marker';
 import { useAuthStore } from '@/features/users/ui/user-stores/user-store';
 import { resetRefreshState } from '@/shared/api/axios-instance';
 import { env } from '@/shared/lib/env-config';
