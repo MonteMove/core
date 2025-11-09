@@ -54,7 +54,19 @@ export function OperationViewDialog({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Тип операции</p>
-                  <p className="font-medium">{operation.type.name}</p>
+                  <div className="flex items-center gap-2 flex-wrap mt-1">
+                    <p className="font-medium">{operation.type.name}</p>
+                    {operation.applicationId && (
+                      <span className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-md">
+                        Заявка #{operation.applicationId}
+                      </span>
+                    )}
+                    {operation.conversionGroupId && (
+                      <span className="text-xs bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-md">
+                        Конвертация #{operation.conversionGroupId}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Дата создания</p>

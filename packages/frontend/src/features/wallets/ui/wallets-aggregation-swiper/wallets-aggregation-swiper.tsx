@@ -42,7 +42,11 @@ export function WalletsAggregationSwiper({
   }
 
   if (isLoading || isFetching) {
-    return <Loading />;
+    return (
+      <div className="min-h-[124px]">
+        <Loading />
+      </div>
+    );
   }
 
   if (summaries.length === 0) {

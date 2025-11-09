@@ -18,6 +18,7 @@ enum WalletKind {
 model Wallet {
   id            String        @id @default(uuid()) @db.Uuid
   userId        String        @map("user_id") @db.Uuid
+  secondUserId  String?       @map("second_user_id") @db.Uuid
   updatedById   String        @map("updated_by_id") @db.Uuid
   currencyId    String        @map("currency_id") @db.Uuid
   name          String
@@ -36,6 +37,7 @@ model Wallet {
   updatedAt     DateTime      @updatedAt @map("updated_at")
 
   user            User             @relation("wallet_owner", fields: [userId], references: [id])
+  secondUser      User?            @relation("wallet_second_owner", fields: [secondUserId], references: [id])
   created_by      User             @relation("wallets_created_by", fields: [updatedById], references: [id], map: "wallets_created_by_fkey")
   updated_by      User             @relation("wallets_updated_by", fields: [updatedById], references: [id], map: "wallets_updated_by_fkey")
   currency        Currency         @relation(fields: [currencyId], references: [id])
@@ -45,6 +47,7 @@ model Wallet {
   details         WalletDetail?
 
   @@index([userId], map: "wallets_user_idx")
+  @@index([secondUserId], map: "wallets_second_user_idx")
   @@index([updatedById], map: "wallets_updated_by_idx")
   @@index([currencyId], map: "wallets_currency_idx")
   @@index([walletKind], map: "wallets_wallet_kind_idx")

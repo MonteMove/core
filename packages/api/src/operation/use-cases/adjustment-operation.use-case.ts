@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { OperationDirection } from '../../../prisma/generated/prisma';
 import { PrismaService } from '../../common';
+import { addOperationTypeFlags } from '../../operation-type/constants/operation-type.constants';
 import { WalletRecalculationService } from '../../wallet/services';
 import { AdjustmentOperationDto } from '../dto';
 import { AdjustmentOperationResponse } from '../types';
@@ -104,6 +105,7 @@ export class AdjustmentOperationUseCase {
                         select: {
                             id: true,
                             name: true,
+                            code: true,
                         },
                     },
                     created_by: {
@@ -127,7 +129,10 @@ export class AdjustmentOperationUseCase {
 
             return {
                 message: `Корректировка выполнена: ${actionType} на ${adjustmentAmount}`,
-                operation: operationResponse,
+                operation: {
+                    ...operationResponse,
+                    type: addOperationTypeFlags(operationResponse.type),
+                },
                 previousAmount: currentAmount,
                 newAmount: targetAmount,
                 adjustmentAmount,

@@ -25,6 +25,12 @@ export class GetPinnedWalletsUseCase {
                         username: true,
                     },
                 },
+                secondUser: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
                 created_by: {
                     select: {
                         id: true,

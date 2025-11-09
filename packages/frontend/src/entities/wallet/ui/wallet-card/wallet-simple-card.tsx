@@ -12,8 +12,11 @@ import { ChangeOwnerDialog } from '@/features/wallets/ui/change-owner-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
-import { cn, formatDate, copyHandler } from '@/shared/lib/utils';
-import { formatWalletCopyText } from '@/shared/lib/wallet-copy-helpers';
+import { cn, formatDate } from '@/shared/lib/utils';
+import {
+  formatWalletCopyText,
+  formatWalletRequisites,
+} from '@/shared/lib/wallet-copy-helpers';
 import { Button } from '@/shared/ui/shadcn/button';
 import { Checkbox } from '@/shared/ui/shadcn/checkbox';
 import { formatNumber } from '@/shared/lib/utils/format-number';
@@ -286,26 +289,36 @@ export const SimpleWalletCard = ({
                       {wallet.walletKind === 'simple' ? 'Касса ' : ''}
                       {wallet.name}
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 relative z-10 cursor-pointer"
-                      onPointerDown={(e) => {
-                        e.stopPropagation();
-                        copyHandler(wallet.name);
-                      }}
-                      title="Скопировать название"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                    <WalletOwner user={wallet.user} />
+                    {formatWalletRequisites(wallet) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 relative z-20 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          handleCopyRequisites();
+                        }}
+                        onPointerDown={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                        }}
+                        title="Скопировать реквизиты"
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                    <WalletOwner
+                      user={wallet.user}
+                      secondUser={wallet.secondUser}
+                    />
                   </div>
                   {wallet.description && (
                     <CardDescription>{wallet.description}</CardDescription>
                   )}
 
                   {/* Кнопка копирования реквизитов */}
-                  {(wallet.details || wallet.description) && (
+                  {formatWalletRequisites(wallet) && (
                     <div className="mt-3">
                       <Button
                         variant="default"
@@ -423,6 +436,7 @@ export const SimpleWalletCard = ({
         walletId={wallet.id}
         walletName={wallet.name}
         currentOwner={wallet.user}
+        currentSecondOwner={wallet.secondUser}
       />
     </>
   );

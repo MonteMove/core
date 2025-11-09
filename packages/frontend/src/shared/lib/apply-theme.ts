@@ -1,24 +1,26 @@
-export function applySavedTheme() {
+import { DEFAULT_THEME } from '@/shared/utils/constants/settings-theme';
+
+export function applySavedTheme(theme?: 'light' | 'dark' | null) {
   if (typeof window === 'undefined') return;
 
   const root = document.documentElement;
 
-  const savedPrimary = localStorage.getItem('primary-color');
-  const savedBackground = localStorage.getItem('background-color');
-  const savedForeground = localStorage.getItem('foreground-color');
+  let currentTheme: 'light' | 'dark';
+  if (theme) {
+    currentTheme = theme;
+  } else {
+    const isDark = root.classList.contains('dark');
+    currentTheme = isDark ? 'dark' : 'light';
+  }
 
-  if (savedPrimary) {
-    root.style.setProperty('--primary', savedPrimary);
-  }
-  if (savedBackground) {
-    root.style.setProperty('--background', savedBackground);
-    root.style.setProperty('--card', savedBackground);
-    root.style.setProperty('--popover', savedBackground);
-    root.style.setProperty('--muted', savedBackground);
-    root.style.setProperty('--accent', savedBackground);
-    root.style.setProperty('--border', savedBackground);
-  }
-  if (savedForeground) {
-    root.style.setProperty('--foreground', savedForeground);
-  }
+  Object.keys(DEFAULT_THEME.light).forEach((key) => {
+    root.style.removeProperty(`--${key}`);
+  });
+
+  Object.keys(DEFAULT_THEME[currentTheme]).forEach((key) => {
+    const savedValue = localStorage.getItem(`${currentTheme}-${key}-color`);
+    if (savedValue) {
+      root.style.setProperty(`--${key}`, savedValue);
+    }
+  });
 }

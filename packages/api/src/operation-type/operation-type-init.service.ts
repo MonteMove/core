@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
 import { PrismaService } from '../common/services/prisma.service';
+import { OPERATION_TYPE_CODES } from './constants/operation-type.constants';
 
 @Injectable()
 export class OperationTypeInitService implements OnModuleInit {
@@ -33,15 +34,21 @@ export class OperationTypeInitService implements OnModuleInit {
 
         const operationTypes = [
             {
-                code: 'avans',
+                code: OPERATION_TYPE_CODES.AVANS,
                 name: 'Аванс',
                 description: 'Аванс',
                 isSeparateTab: true,
             },
             {
-                code: 'correction',
+                code: OPERATION_TYPE_CODES.CORRECTION,
                 name: 'Корректировка',
                 description: 'Корректировка баланса кошелька',
+                isSeparateTab: false,
+            },
+            {
+                code: OPERATION_TYPE_CODES.CONVERSION,
+                name: 'Конвертация',
+                description: 'Конвертация валюты',
                 isSeparateTab: false,
             },
         ];

@@ -51,6 +51,30 @@ export class OperationTypeResponseDto {
     public active: boolean;
 
     @ApiProperty({
+        description: 'Является ли тип операции системным (нельзя изменить код)',
+        example: false,
+    })
+    public isSystem: boolean;
+
+    @ApiProperty({
+        description: 'Является ли тип операции корректировкой',
+        example: false,
+    })
+    public isCorrection: boolean;
+
+    @ApiProperty({
+        description: 'Является ли тип операции конвертацией',
+        example: false,
+    })
+    public isConversion: boolean;
+
+    @ApiProperty({
+        description: 'Является ли тип операции авансом',
+        example: false,
+    })
+    public isAvans: boolean;
+
+    @ApiProperty({
         description: 'Дата создания записи',
         example: '2024-01-01T00:00:00.000Z',
     })

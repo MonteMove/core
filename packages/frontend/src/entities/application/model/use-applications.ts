@@ -63,7 +63,7 @@ export const useApplications = (id: number) => {
 
 export const useInfiniteApplications = (
   filters?: GetApplicationsFilters,
-  defaultLimit = 10,
+  defaultLimit = 100,
 ) => {
   return useInfiniteQuery<
     GetApplicationsResponse,
@@ -144,19 +144,28 @@ export const useApplicationsList = () => {
 export function useCopyApplication() {
   const copyApplication = useCallback(
     async (application: ApplicationResponse) => {
-      const text = `
-id заявки: ${application.id}
-Статус: ${application.status == 'done' ? 'Завершена' : 'В работе'}
-Сумма: ${application.amount}
-Валюта: ${application.currency.code}
-Тип операции: ${application.operation_type.name}
-Создана: ${formatDateTime(application.createdAt)}
-Исполнитель: ${application.assignee_user.username}
-Дата встречи: ${formatDateTime(application.meetingDate)}
-Телефон: ${application.phone || 'Не указано'}
-Telegram: ${application.telegramUsername || 'Не указано'}
-Описание: ${application.description || 'Не указано'}
-`;
+      const lines = [
+        `id заявки: ${application.id}`,
+        `Статус: ${application.status == 'done' ? 'Завершена' : 'В работе'}`,
+        `Сумма: ${application.amount}`,
+        `Валюта: ${application.currency.code}`,
+        `Тип операции: ${application.operation_type.name}`,
+        `Создана: ${formatDateTime(application.createdAt)}`,
+        `Исполнитель: ${application.assignee_user.username}`,
+        `Дата встречи: ${formatDateTime(application.meetingDate)}`,
+      ];
+
+      if (application.phone) {
+        lines.push(`Телефон: ${application.phone}`);
+      }
+      if (application.telegramUsername) {
+        lines.push(`Telegram: ${application.telegramUsername}`);
+      }
+      if (application.description) {
+        lines.push(`Описание: ${application.description}`);
+      }
+
+      const text = lines.join('\n');
 
       try {
         await navigator.clipboard.writeText(text);

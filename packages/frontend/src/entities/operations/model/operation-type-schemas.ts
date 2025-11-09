@@ -11,6 +11,10 @@ export const OperationTypeSchema = z.object({
   description: z.string().nullable(),
   isSeparateTab: z.boolean(),
   active: z.boolean(),
+  isSystem: z.boolean(),
+  isCorrection: z.boolean(),
+  isConversion: z.boolean(),
+  isAvans: z.boolean(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   created_by: z
@@ -81,6 +85,10 @@ export const OperationTypesResponseSchema = z.object({
 export const OperationTypeInfoSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
+  code: z.string(),
+  isCorrection: z.boolean(),
+  isConversion: z.boolean(),
+  isAvans: z.boolean(),
 });
 
 export const OperationInfoSchema = z.object({

@@ -18,6 +18,7 @@ export class CreateWalletUseCase {
             walletKind = WalletKind.simple,
             walletTypeId,
             currencyId,
+            secondUserId,
             active = true,
             pinOnMain = false,
             pinned = false,
@@ -33,6 +34,7 @@ export class CreateWalletUseCase {
         const wallet = await this.prisma.wallet.create({
             data: {
                 userId,
+                ...(secondUserId && { secondUserId }),
                 updatedById: userId,
                 name,
                 description,
@@ -68,6 +70,12 @@ export class CreateWalletUseCase {
             },
             include: {
                 user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                secondUser: {
                     select: {
                         id: true,
                         username: true,

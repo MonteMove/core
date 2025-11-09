@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../common';
+import { addOperationTypeFlags, OPERATION_TYPE_CODES } from '../../operation-type/constants/operation-type.constants';
 import { WalletRecalculationService } from '../../wallet/services';
 import { CreateOperationDto } from '../dto';
 import { CreateOperationResponse } from '../types';
@@ -16,21 +17,27 @@ export class CreateOperationUseCase {
         const { typeId, description, conversionGroupId, entries, applicationId, creatureDate } = createOperationDto;
 
         return this.prisma.$transaction(async (tx) => {
-            // Получаем тип операции для проверки специальной логики
             const operationType = await tx.operationType.findUnique({
                 where: { id: typeId },
-                select: { name: true },
+                select: { code: true },
             });
 
-            // Валидация и обработка для типа "Корректировка"
-            if (operationType?.name === 'Корректировка') {
+            if (operationType?.code === OPERATION_TYPE_CODES.CONVERSION) {
+                if (!conversionGroupId) {
+                    throw new BadRequestException(
+                        'Для операции "Конвертация" необходимо указать номер конвертации (conversionGroupId)',
+                    );
+                }
+            }
+
+            // Валидация и обработка длятипа "Корректировка"
+            if (operationType?.code === OPERATION_TYPE_CODES.CORRECTION) {
                 if (entries.length !== 1) {
                     throw new BadRequestException(
                         'Операция "Корректировка" должна содержать ровно одну запись (один кошелек)',
                     );
                 }
 
-                // Для корректировки: amount - это желаемый баланс, нужно вычислить разницу
                 const entry = entries[0];
                 const currentBalance = await this.walletRecalculationService.getCalculatedWalletAmount(
                     tx,
@@ -39,7 +46,6 @@ export class CreateOperationUseCase {
                 const desiredBalance = entry.amount;
                 const difference = desiredBalance - currentBalance;
 
-                // Обновляем amount на разницу и устанавливаем правильное направление
                 if (difference > 0) {
                     entry.amount = difference;
                     entry.direction = 'credit';
@@ -53,7 +59,6 @@ export class CreateOperationUseCase {
                 }
             }
 
-            // Проверка месячных лимитов для всех кошельков в операции
             for (const entry of entries) {
                 const wallet = await tx.wallet.findUnique({
                     where: { id: entry.walletId },
@@ -73,14 +78,11 @@ export class CreateOperationUseCase {
                     throw new BadRequestException(`Кошелек с ID ${entry.walletId} не найден`);
                 }
 
-                // Если у кошелька установлен месячный лимит, проверяем его
                 if (wallet.monthlyLimit && wallet.monthlyLimit > 0) {
-                    // Определяем границы текущего месяца
                     const now = new Date();
                     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
                     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-                    // Получаем сумму всех операций за текущий месяц
                     const monthlyEntries = await tx.operationEntry.findMany({
                         where: {
                             walletId: entry.walletId,
@@ -98,7 +100,6 @@ export class CreateOperationUseCase {
                     const currentSpent = monthlyEntries.reduce((sum, e) => sum + e.amount, 0);
                     const remaining = wallet.monthlyLimit - currentSpent;
 
-                    // Проверяем, не превысит ли новая операция лимит
                     if (entry.amount > remaining) {
                         throw new BadRequestException(
                             `Превышен месячный лимит кошелька "${wallet.name}". ` +
@@ -176,6 +177,7 @@ export class CreateOperationUseCase {
                         select: {
                             id: true,
                             name: true,
+                            code: true,
                         },
                     },
                     created_by: {
@@ -197,7 +199,10 @@ export class CreateOperationUseCase {
 
             return {
                 message: 'Операция успешно создана',
-                operation: operationResponse,
+                operation: {
+                    ...operationResponse,
+                    type: addOperationTypeFlags(operationResponse.type),
+                },
             };
         });
     }

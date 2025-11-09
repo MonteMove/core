@@ -31,6 +31,7 @@ export class GenerateOperationsReportUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 created_by: {

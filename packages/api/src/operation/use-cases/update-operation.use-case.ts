@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { addOperationTypeFlags, OPERATION_TYPE_CODES } from '../../operation-type/constants/operation-type.constants';
 import { WalletRecalculationService } from '../../wallet/services/wallet-recalculation.service';
 import { UpdateOperationDto } from '../dto';
 import { UpdateOperationResponse } from '../types';
@@ -36,7 +37,7 @@ export class UpdateOperationUseCase {
                 type: {
                     select: {
                         id: true,
-                        name: true,
+                        code: true,
                     },
                 },
             },
@@ -50,17 +51,17 @@ export class UpdateOperationUseCase {
             const { typeId, description, conversionGroupId, entries, creatureDate, applicationId } = updateOperationDto;
 
             // Получаем тип операции для проверки специальной логики
-            let operationType: { name: string } | null = null;
+            let operationType: { code: string } | null = null;
 
             if (typeId) {
                 operationType = await tx.operationType.findUnique({
                     where: { id: typeId },
-                    select: { name: true },
+                    select: { code: true },
                 });
             }
 
             // Валидация и обработка для типа "Корректировка"
-            if (operationType && operationType.name === 'Корректировка' && entries) {
+            if (operationType && operationType.code === OPERATION_TYPE_CODES.CORRECTION && entries) {
                 if (entries.length !== 1) {
                     throw new BadRequestException(
                         'Операция "Корректировка" должна содержать ровно одну запись (один кошелек)',
@@ -97,11 +98,14 @@ export class UpdateOperationUseCase {
                 // Получаем новый тип операции
                 const newType = await tx.operationType.findUnique({
                     where: { id: typeId },
-                    select: { name: true },
+                    select: { code: true },
                 });
 
                 // Если старый тип был "Аванс", а новый - нет, то нужно завершить заявку
-                if (existingOperation.type.name === 'Аванс' && newType?.name !== 'Аванс') {
+                if (
+                    existingOperation.type.code === OPERATION_TYPE_CODES.AVANS &&
+                    newType?.code !== OPERATION_TYPE_CODES.AVANS
+                ) {
                     shouldCompleteApplication = true;
                 }
             }
@@ -281,6 +285,7 @@ export class UpdateOperationUseCase {
                         select: {
                             id: true,
                             name: true,
+                            code: true,
                         },
                     },
                     created_by: {
@@ -302,7 +307,10 @@ export class UpdateOperationUseCase {
 
             return {
                 message: 'Операция успешно обновлена',
-                operation: operationResponse,
+                operation: {
+                    ...operationResponse,
+                    type: addOperationTypeFlags(operationResponse.type),
+                },
             };
         });
     }

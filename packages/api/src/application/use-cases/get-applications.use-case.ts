@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '../../../prisma/generated/prisma';
 import { PrismaService } from '../../common/services/prisma.service';
 import { calculatePagination, createAllDataPaginationResponse, createPaginationResponse } from '../../common/utils';
+import { addOperationTypeFlags } from '../../operation-type/constants/operation-type.constants';
 import { GetApplicationsDto } from '../dto';
 import { GetApplicationsOutput } from '../types';
 
@@ -147,6 +148,7 @@ export class GetApplicationsUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 operation: {
@@ -168,7 +170,10 @@ export class GetApplicationsUseCase {
 
         const applications = await this.prisma.application.findMany(findManyOptions);
 
-        const applicationsResponse = applications.map(({ deleted: _, ...application }) => application);
+        const applicationsResponse = applications.map(({ deleted: _, ...application }) => ({
+            ...application,
+            operation_type: addOperationTypeFlags(application.operation_type),
+        }));
 
         const paginationResponse = pagination.shouldPaginate
             ? createPaginationResponse(total, page!, limit!)

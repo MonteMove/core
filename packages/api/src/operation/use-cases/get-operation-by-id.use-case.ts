@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { addOperationTypeFlags } from '../../operation-type/constants/operation-type.constants';
 import { OperationResponse } from '../types';
 
 @Injectable()
@@ -36,6 +37,7 @@ export class GetOperationByIdUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 created_by: {
@@ -59,6 +61,9 @@ export class GetOperationByIdUseCase {
 
         const { deleted: _, ...operationResponse } = operation;
 
-        return operationResponse;
+        return {
+            ...operationResponse,
+            type: addOperationTypeFlags(operationResponse.type),
+        };
     }
 }

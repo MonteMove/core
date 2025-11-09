@@ -1,8 +1,8 @@
 import type { Wallet } from '@/entities/wallet/model/wallet-schemas';
 
 const warningText =
-  'Убедительная просьба - переводить на строго указанные реквизиты, соблюдая все требования к переводу!\n' +
-  'При переводе на некорректные реквизиты, а также при несоблюдении иных требований, мы не сможем провести обмен и возврат денежных средств!';
+  'Убедительная просьба - переводить на строго указанные реквизиты.\n' +
+  'При переводе на некорректные реквизиты мы не сможем провести обмен и возврат средств!';
 
 /**
  * Формирует текст реквизитов для копирования в зависимости от типа кошелька
@@ -15,14 +15,11 @@ export const formatWalletRequisites = (wallet: Wallet): string | null => {
     return null;
   }
 
-  // Для криптокошельков
   if (wallet.walletKind === 'crypto') {
-    // Адрес кошелька
     if (details.address) {
       parts.push(details.address);
     }
 
-    // Сеть и тип сети
     const networkInfo: string[] = [];
     if (details.network?.name) {
       networkInfo.push(details.network.name);
@@ -34,58 +31,45 @@ export const formatWalletRequisites = (wallet: Wallet): string | null => {
       parts.push(`Сеть: ${networkInfo.join(' ')}`);
     }
 
-    // UID биржи (для Bybit и подобных)
     if (details.exchangeUid) {
       parts.push(`UID: ${details.exchangeUid}`);
     }
 
-    // Username (для платформ типа Trust Wallet)
     if (details.username) {
       parts.push(`Username: ${details.username}`);
     }
 
-    // Платформа
     if (details.platform?.name) {
       parts.push(`Платформа: ${details.platform.name}`);
     }
   }
 
-  // Для банковских кошельков
   if (wallet.walletKind === 'bank') {
-    // Номер карты
     if (details.card) {
       parts.push(`Карта: ${details.card}`);
     }
 
-    // Телефон
     if (details.phone) {
       parts.push(`Телефон: ${details.phone}`);
     }
 
-    // Владелец
     if (details.ownerFullName) {
       parts.push(`Владелец: ${details.ownerFullName}`);
     }
 
-    // Банк
     if (details.bank?.name) {
       parts.push(`Банк: ${details.bank.name}`);
     }
 
-    // Account ID (для некоторых платежных систем)
     if (details.accountId) {
       parts.push(`ID: ${details.accountId}`);
     }
   }
 
-  // Для простых кошельков (касса и т.д.)
   if (wallet.walletKind === 'simple') {
-    // Описание из основного поля
     if (wallet.description) {
       parts.push(wallet.description);
     }
-
-    // Дополнительные данные из details если есть
     if (details.phone) {
       parts.push(`Телефон: ${details.phone}`);
     }

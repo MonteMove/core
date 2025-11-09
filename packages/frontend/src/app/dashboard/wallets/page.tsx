@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Wallet as WalletIcon } from 'lucide-react';
@@ -14,11 +14,10 @@ import {
   GetWalletsFilter,
   GetWalletsFilterSchema,
   Wallet,
-  WalletCardSkeleton,
   SimpleWalletCard,
   SortOrder,
   WalletSortField,
-  useWallets,
+  useInfiniteWallets,
 } from '@/entities/wallet';
 import { useWalletTypes } from '@/entities/wallet-type';
 import {
@@ -195,8 +194,39 @@ export default function WalletsPage() {
     return result;
   }, [formValues]);
 
-  const { data, isLoading, isFetching } = useWallets(filteredValues);
-  const showSkeleton = isLoading || isFetching;
+  const {
+    data: infiniteData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteWallets(filteredValues);
+
+  const wallets = useMemo(
+    () => infiniteData?.pages.flatMap((page) => page.wallets) || [],
+    [infiniteData],
+  );
+
+  const lastWalletRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!lastWalletRef.current || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    const node = lastWalletRef.current;
+    if (node) observer.observe(node);
+
+    return () => {
+      if (node) observer.unobserve(node);
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleToggleSelection = (walletId: string) => {
     setSelectedWallets((prev) => {
@@ -240,7 +270,8 @@ export default function WalletsPage() {
     handleCancelSelection();
   };
 
-  const renderWalletCard = (wallet: Wallet) => {
+  const renderWalletCard = (wallet: Wallet, index: number) => {
+    const isLastWallet = index === wallets.length - 1;
     const commonProps = {
       selectionMode,
       isSelected: selectedWallets.has(wallet.id),
@@ -248,21 +279,27 @@ export default function WalletsPage() {
       onEnterSelectionMode: handleEnterSelectionMode,
     };
 
-    switch (wallet.walletKind) {
-      case 'crypto':
-        return (
-          <CryptoWalletCard key={wallet.id} wallet={wallet} {...commonProps} />
-        );
-      case 'bank':
-        return (
-          <BankWalletCard key={wallet.id} wallet={wallet} {...commonProps} />
-        );
-      case 'simple':
-      default:
-        return (
-          <SimpleWalletCard key={wallet.id} wallet={wallet} {...commonProps} />
-        );
+    const cardElement = (() => {
+      switch (wallet.walletKind) {
+        case 'crypto':
+          return <CryptoWalletCard wallet={wallet} {...commonProps} />;
+        case 'bank':
+          return <BankWalletCard wallet={wallet} {...commonProps} />;
+        case 'simple':
+        default:
+          return <SimpleWalletCard wallet={wallet} {...commonProps} />;
+      }
+    })();
+
+    if (isLastWallet) {
+      return (
+        <div key={wallet.id} ref={lastWalletRef}>
+          {cardElement}
+        </div>
+      );
     }
+
+    return <div key={wallet.id}>{cardElement}</div>;
   };
 
   return (
@@ -375,14 +412,7 @@ export default function WalletsPage() {
       </Tabs>
 
       <div className="space-y-4">
-        {showSkeleton && (
-          <>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <WalletCardSkeleton key={index} />
-            ))}
-          </>
-        )}
-        {!showSkeleton && data?.wallets.length === 0 && (
+        {wallets.length === 0 && !isFetchingNextPage && (
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
@@ -398,7 +428,7 @@ export default function WalletsPage() {
             </EmptyHeader>
           </Empty>
         )}
-        {!showSkeleton && data?.wallets.map(renderWalletCard)}
+        {wallets.map(renderWalletCard)}
       </div>
 
       <BulkActionsBar

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '../../../prisma/generated/prisma';
 import { PrismaService } from '../../common/services/prisma.service';
 import { calculatePagination, createAllDataPaginationResponse, createPaginationResponse } from '../../common/utils';
+import { OPERATION_TYPE_CODES, SYSTEM_OPERATION_TYPE_CODES } from '../constants/operation-type.constants';
 import { GetOperationTypesDto } from '../dto';
 import { GetOperationTypesResponse } from '../types';
 
@@ -78,12 +79,20 @@ export class GetOperationTypesUseCase {
 
         const operationTypes = await this.prisma.operationType.findMany(findManyOptions);
 
+        const operationTypesWithFlags = operationTypes.map((type) => ({
+            ...type,
+            isSystem: SYSTEM_OPERATION_TYPE_CODES.includes(type.code),
+            isCorrection: type.code === OPERATION_TYPE_CODES.CORRECTION,
+            isConversion: type.code === OPERATION_TYPE_CODES.CONVERSION,
+            isAvans: type.code === OPERATION_TYPE_CODES.AVANS,
+        }));
+
         const paginationResponse = pagination.shouldPaginate
             ? createPaginationResponse(total, page!, limit!)
             : createAllDataPaginationResponse(total);
 
         return {
-            operationTypes,
+            operationTypes: operationTypesWithFlags,
             pagination: paginationResponse,
         };
     }

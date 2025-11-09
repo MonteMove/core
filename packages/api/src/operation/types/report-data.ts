@@ -29,6 +29,7 @@ export type OperationsReportOperation = Prisma.OperationGetPayload<{
             select: {
                 id: true;
                 name: true;
+                code: true;
             };
         };
         created_by: {
@@ -61,6 +62,7 @@ export type ConversionReportOperation = Prisma.OperationGetPayload<{
             select: {
                 id: true;
                 name: true;
+                code: true;
             };
         };
         created_by: {
@@ -104,6 +106,7 @@ export interface OperationWithDetails {
     type: {
         id: string;
         name: string;
+        code: string;
     };
     created_by: {
         id: string;

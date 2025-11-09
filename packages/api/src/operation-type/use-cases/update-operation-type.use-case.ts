@@ -1,11 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { OPERATION_TYPE_CODES, SYSTEM_OPERATION_TYPE_CODES } from '../constants/operation-type.constants';
 import { UpdateOperationTypeDto } from '../dto';
 import { UpdateOperationTypeResponse } from '../types';
-
-// Системные типы операций, у которых нельзя изменить код
-const SYSTEM_OPERATION_TYPE_CODES = ['avans', 'correction'];
 
 @Injectable()
 export class UpdateOperationTypeUseCase {
@@ -29,7 +27,6 @@ export class UpdateOperationTypeUseCase {
             throw new NotFoundException('Тип операции не найден');
         }
 
-        // Проверка: нельзя изменить код системного типа операции
         if (
             updateOperationTypeDto.code !== undefined &&
             SYSTEM_OPERATION_TYPE_CODES.includes(existingOperationType.code) &&
@@ -74,7 +71,13 @@ export class UpdateOperationTypeUseCase {
 
         return {
             message: 'Тип операции успешно обновлён',
-            operationType,
+            operationType: {
+                ...operationType,
+                isSystem: SYSTEM_OPERATION_TYPE_CODES.includes(operationType.code),
+                isCorrection: operationType.code === OPERATION_TYPE_CODES.CORRECTION,
+                isConversion: operationType.code === OPERATION_TYPE_CODES.CONVERSION,
+                isAvans: operationType.code === OPERATION_TYPE_CODES.AVANS,
+            },
         };
     }
 }

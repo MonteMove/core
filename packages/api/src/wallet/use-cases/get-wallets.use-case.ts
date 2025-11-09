@@ -20,6 +20,7 @@ export class GetWalletsUseCase {
             maxAmount,
             currencyId,
             userId,
+            secondUserId,
             active,
             pinOnMain,
             pinned,
@@ -66,6 +67,7 @@ export class GetWalletsUseCase {
                 { currency: { code: { contains: search, mode: 'insensitive' } } },
                 { currency: { name: { contains: search, mode: 'insensitive' } } },
                 { user: { username: { contains: search, mode: 'insensitive' } } },
+                { secondUser: { username: { contains: search, mode: 'insensitive' } } },
             );
 
             const searchLower = search.toLowerCase();
@@ -126,6 +128,10 @@ export class GetWalletsUseCase {
             where.userId = userId;
         }
 
+        if (secondUserId) {
+            where.secondUserId = secondUserId;
+        }
+
         if (active !== undefined) {
             where.active = active;
         }
@@ -143,6 +149,12 @@ export class GetWalletsUseCase {
             },
             include: {
                 user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                secondUser: {
                     select: {
                         id: true,
                         username: true,

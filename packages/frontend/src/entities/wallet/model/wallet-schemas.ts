@@ -83,6 +83,8 @@ export const WalletSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid().optional(),
   user: WalletUserSchema.optional(),
+  secondUserId: z.string().uuid().optional().nullable(),
+  secondUser: WalletUserSchema.optional().nullable(),
   updatedById: z.string().uuid(),
   currencyId: z.string().uuid(),
   walletTypeId: z.string().uuid().optional().nullable(),
@@ -255,6 +257,11 @@ export const CreateWalletSchema = z
       .string({ message: 'Валюта обязательна' })
       .min(1, 'Валюта обязательна')
       .uuid('Укажите корректный UUID'),
+    secondUserId: z
+      .string()
+      .uuid('Укажите корректный UUID')
+      .optional()
+      .or(z.literal('')),
     active: z.boolean().default(true),
     pinOnMain: z.boolean().default(false),
     pinned: z.boolean().default(false),
@@ -310,6 +317,7 @@ export const GetWalletsFilterSchema = z.object({
 
   currencyId: z.string().uuid().optional(),
   userId: z.string().uuid().optional(),
+  secondUserId: z.string().uuid().optional(),
 
   active: z.boolean().optional(),
 

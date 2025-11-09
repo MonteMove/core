@@ -86,7 +86,7 @@ type GuideFilterWithPagination = GetGuidesParamsRequest & {
 
 export const useInfiniteGuides = (
   filters?: GetGuidesParamsRequest,
-  defaultLimit = 20,
+  defaultLimit = 100,
 ) => {
   return useInfiniteQuery<
     GetGuidesResponse,
@@ -152,15 +152,28 @@ export const useDeleteGuide = (filters?: GetGuidesParamsRequest) => {
 
 export function useCopyGuide() {
   const copyGuide = useCallback(async (guide: GuideResponse) => {
-    const text = `
-ФИО: ${guide.fullName || 'Не указано'}
-Телефон: ${guide.phone || 'Не указано'}
-Дата рождения: ${guide.birthDate || 'Не указано'}
-Номер карты: ${guide.cardNumber || 'Не указано'}
-Адрес: ${guide.address || 'Не указано'}
-Описание: ${guide.description || 'Не указано'}
-Создан: ${formatDateTime(guide.createdAt)}
-`;
+    const lines = [
+      `ФИО: ${guide.fullName}`,
+      `Создан: ${formatDateTime(guide.createdAt)}`,
+    ];
+
+    if (guide.phone) {
+      lines.push(`Телефон: ${guide.phone}`);
+    }
+    if (guide.birthDate) {
+      lines.push(`Дата рождения: ${guide.birthDate}`);
+    }
+    if (guide.cardNumber) {
+      lines.push(`Номер карты: ${guide.cardNumber}`);
+    }
+    if (guide.address) {
+      lines.push(`Адрес: ${guide.address}`);
+    }
+    if (guide.description) {
+      lines.push(`Описание: ${guide.description}`);
+    }
+
+    const text = lines.join('\n');
 
     try {
       await navigator.clipboard.writeText(text);

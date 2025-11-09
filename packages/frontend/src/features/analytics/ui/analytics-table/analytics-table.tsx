@@ -164,14 +164,14 @@ export const AnalyticsTable = () => {
                 <TableCell className="text-center text-sm font-medium">
                   {formatNumber(item.currentBalance)}
                 </TableCell>
-                <TableCell className="text-center text-sm text-green-600">
+                <TableCell className="text-center text-sm text-success/80">
                   +{formatNumber(item.coming)}
                 </TableCell>
-                <TableCell className="text-center text-sm text-red-600">
+                <TableCell className="text-center text-sm text-destructive/80">
                   -{formatNumber(item.expenditure)}
                 </TableCell>
                 <TableCell
-                  className={`text-center text-sm font-medium ${item.netFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                  className={`text-center text-sm font-medium ${item.netFlow >= 0 ? 'text-success/80' : 'text-destructive/80'}`}
                 >
                   {item.netFlow >= 0 ? '+' : ''}
                   {formatNumber(item.netFlow)}

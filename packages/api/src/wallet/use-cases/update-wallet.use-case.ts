@@ -21,6 +21,7 @@ export class UpdateWalletUseCase {
             walletKind,
             walletTypeId,
             currencyId,
+            secondUserId,
             active,
             pinOnMain,
             pinned,
@@ -48,6 +49,7 @@ export class UpdateWalletUseCase {
                 ...(walletKind !== undefined && { walletKind }),
                 ...(walletTypeId !== undefined && { walletTypeId }),
                 ...(currencyId !== undefined && { currencyId }),
+                ...(secondUserId !== undefined && { secondUserId }),
                 ...(active !== undefined && { active }),
                 ...(pinOnMain !== undefined && { pinOnMain }),
                 ...(pinned !== undefined && { pinned }),
@@ -57,6 +59,12 @@ export class UpdateWalletUseCase {
             },
             include: {
                 user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                secondUser: {
                     select: {
                         id: true,
                         username: true,

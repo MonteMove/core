@@ -4,7 +4,15 @@ import React, { Fragment, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { Copy, FileText, Info, Pencil, Trash } from 'lucide-react';
+import {
+  CheckCircle,
+  Copy,
+  FileText,
+  Info,
+  Pencil,
+  RotateCcw,
+  Trash,
+} from 'lucide-react';
 
 import {
   CardApplication,
@@ -128,7 +136,11 @@ export const InfiniteApplicationsList = () => {
                     }
                   }}
                 >
-                  <Pencil className="mr-2 h-4 w-4 text-primary" />{' '}
+                  {app.status == 'done' ? (
+                    <RotateCcw className="mr-2 h-4 w-4 text-primary" />
+                  ) : (
+                    <CheckCircle className="mr-2 h-4 w-4 text-primary" />
+                  )}{' '}
                   {app.status == 'done' ? 'В работе' : 'Завершить'}
                 </DropdownMenuItem>
                 {app.operationId && (

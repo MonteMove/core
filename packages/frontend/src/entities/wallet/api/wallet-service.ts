@@ -86,6 +86,18 @@ export class WalletService {
     return WalletSchema.parse(wallet);
   }
 
+  public static async updateSecondOwner(
+    walletId: string,
+    secondUserId: string | undefined,
+  ): Promise<Wallet> {
+    const { data } = await axiosInstance.patch(
+      `${API_MAP.WALLETS.WALLETS}/${walletId}`,
+      { secondUserId },
+    );
+    const wallet = data?.wallet ?? data;
+    return WalletSchema.parse(wallet);
+  }
+
   public static async toggleWalletPin(
     walletId: string,
     pinned: boolean,

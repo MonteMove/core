@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { PrismaService } from '../../common';
+import { PrismaService } from '../../common/services/prisma.service';
+import { addOperationTypeFlags, OPERATION_TYPE_CODES } from '../../operation-type/constants/operation-type.constants';
 import { UpdateApplicationDto } from '../dto';
 import { UpdateApplicationOutput } from '../types';
 
@@ -34,7 +35,6 @@ export class UpdateApplicationUseCase {
             throw new NotFoundException('Заявка не найдена');
         }
 
-        // Если изменился тип операции, пересчитываем hasAdvance
         let hasAdvance: boolean | undefined;
 
         if (operationTypeId !== undefined) {
@@ -43,7 +43,7 @@ export class UpdateApplicationUseCase {
                 select: { name: true },
             });
 
-            hasAdvance = operationType?.name === 'Аванс';
+            hasAdvance = operationType?.name === OPERATION_TYPE_CODES.AVANS;
         }
 
         const application = await this.prisma.application.update({
@@ -94,6 +94,7 @@ export class UpdateApplicationUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 operation: {
@@ -109,7 +110,10 @@ export class UpdateApplicationUseCase {
 
         return {
             message: 'Заявка успешно обновлена',
-            application: applicationResponse,
+            application: {
+                ...applicationResponse,
+                operation_type: addOperationTypeFlags(applicationResponse.operation_type),
+            },
         };
     }
 }

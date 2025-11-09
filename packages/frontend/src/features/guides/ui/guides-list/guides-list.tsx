@@ -139,73 +139,80 @@ export function GuidesList({ filters }: { filters?: GetGuidesParamsRequest }) {
                           </CardHeader>
 
                           <CardContent className="flex flex-col">
-                            <p>
-                              <strong className="mr-1">Телефон:</strong>
-                              <span
-                                className="block lg:inline text-primary cursor-pointer"
-                                onPointerDown={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (guide.phone) copyHandler(guide.phone);
-                                }}
-                              >
-                                {guide.phone || 'Не указано'}
-                              </span>
-                            </p>
-                            <p>
-                              <strong className="mr-1">Дата рождения:</strong>
-                              <span className="block lg:inline">
-                                {guide.birthDate
-                                  ? formatDate(new Date(guide.birthDate))
-                                  : 'Не указано'}
-                              </span>
-                            </p>
-                            <p>
-                              <strong className="mr-1">Номер карты:</strong>
-                              <span
-                                className="block lg:inline text-primary cursor-pointer"
-                                onPointerDown={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (guide.cardNumber)
-                                    copyHandler(guide.cardNumber);
-                                }}
-                              >
-                                {guide.cardNumber || 'Не указано'}
-                              </span>
-                            </p>
-                            <p>
-                              <strong className="mr-1">Адрес:</strong>
-                              <span className="block lg:inline">
-                                {guide.address || 'Не указано'}
-                              </span>
-                            </p>
+                            {guide.phone && (
+                              <p>
+                                <strong className="mr-1">Телефон:</strong>
+                                <span
+                                  className="block lg:inline text-primary cursor-pointer"
+                                  onPointerDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    copyHandler(guide.phone!);
+                                  }}
+                                >
+                                  {guide.phone}
+                                </span>
+                              </p>
+                            )}
+                            {guide.birthDate && (
+                              <p>
+                                <strong className="mr-1">Дата рождения:</strong>
+                                <span className="block lg:inline">
+                                  {formatDate(new Date(guide.birthDate))}
+                                </span>
+                              </p>
+                            )}
+                            {guide.cardNumber && (
+                              <p>
+                                <strong className="mr-1">Номер карты:</strong>
+                                <span
+                                  className="block lg:inline text-primary cursor-pointer"
+                                  onPointerDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    copyHandler(guide.cardNumber!);
+                                  }}
+                                >
+                                  {guide.cardNumber}
+                                </span>
+                              </p>
+                            )}
+                            {guide.address && (
+                              <p>
+                                <strong className="mr-1">Адрес:</strong>
+                                <span className="block lg:inline">
+                                  {guide.address}
+                                </span>
+                              </p>
+                            )}
                           </CardContent>
 
-                          <CardFooter className="flex justify-between items-start gap-2">
-                            <p className="flex-1">
-                              <strong className="mr-1">Описание:</strong>
-                              <span className="block lg:inline">
-                                {guide.description || 'Не указано'}
-                              </span>
-                            </p>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="shrink-0"
-                              onPointerDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                              }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                copyGuide(guide);
-                              }}
-                            >
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                          </CardFooter>
+                          {guide.description && (
+                            <CardFooter className="flex justify-between items-start gap-2">
+                              <p className="flex-1">
+                                <strong className="mr-1">Описание:</strong>
+                                <span className="block lg:inline">
+                                  {guide.description}
+                                </span>
+                              </p>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="shrink-0"
+                                onPointerDown={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  copyGuide(guide);
+                                }}
+                              >
+                                <Copy className="h-4 w-4" />
+                              </Button>
+                            </CardFooter>
+                          )}
                         </Card>
                       </DropdownMenuTrigger>
 

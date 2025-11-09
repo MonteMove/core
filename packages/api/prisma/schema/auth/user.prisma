@@ -30,6 +30,7 @@ model User {
   currenciesCreated       Currency[]       @relation("currencies_created_by")
   currenciesUpdated       Currency[]       @relation("currencies_updated_by")
   wallets                 Wallet[]         @relation("wallet_owner")
+  secondWallets           Wallet[]         @relation("wallet_second_owner")
   walletsCreated          Wallet[]         @relation("wallets_created_by")
   walletsUpdated          Wallet[]         @relation("wallets_updated_by")
   walletDetailsCreated    WalletDetail[]   @relation("wallet_details_created_by")

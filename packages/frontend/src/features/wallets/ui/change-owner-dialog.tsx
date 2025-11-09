@@ -34,7 +34,11 @@ interface ChangeOwnerDialogProps {
     id: string;
     username: string;
   } | null;
-  onConfirm?: (newOwnerId: string) => void;
+  currentSecondOwner?: {
+    id: string;
+    username: string;
+  } | null;
+  onConfirm?: (newOwnerId: string, newSecondOwnerId?: string) => void;
 }
 
 export const ChangeOwnerDialog = ({
@@ -43,10 +47,14 @@ export const ChangeOwnerDialog = ({
   walletId,
   walletName,
   currentOwner,
+  currentSecondOwner,
   onConfirm,
 }: ChangeOwnerDialogProps) => {
   const [selectedOwnerId, setSelectedOwnerId] = useState<string>(
     currentOwner?.id || '',
+  );
+  const [selectedSecondOwnerId, setSelectedSecondOwnerId] = useState<string>(
+    currentSecondOwner?.id || '',
   );
   const queryClient = useQueryClient();
 
@@ -61,13 +69,33 @@ export const ChangeOwnerDialog = ({
   });
 
   const changeOwnerMutation = useMutation({
-    mutationFn: (newOwnerId: string) =>
-      WalletService.changeWalletOwner(walletId, newOwnerId),
+    mutationFn: async ({
+      userId,
+      secondUserId,
+    }: {
+      userId?: string;
+      secondUserId?: string;
+    }) => {
+      // If primary owner changed, use changeWalletOwner
+      if (userId && userId !== currentOwner?.id) {
+        await WalletService.changeWalletOwner(walletId, userId);
+      }
+
+      // If second owner changed, use updateSecondOwner
+      const currentSecondId = currentSecondOwner?.id || '';
+      if (secondUserId !== currentSecondId) {
+        await WalletService.updateSecondOwner(
+          walletId,
+          secondUserId || undefined,
+        );
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success('Держатель кошелька успешно изменен');
-      onConfirm?.(selectedOwnerId);
+      queryClient.invalidateQueries({ queryKey: ['wallet', walletId] });
+      toast.success('Владельцы кошелька успешно изменены');
+      onConfirm?.(selectedOwnerId, selectedSecondOwnerId || undefined);
       onOpenChange(false);
     },
   });
@@ -75,8 +103,15 @@ export const ChangeOwnerDialog = ({
   const holders = holdersData?.users || [];
 
   const handleConfirm = () => {
-    if (selectedOwnerId && selectedOwnerId !== currentOwner?.id) {
-      changeOwnerMutation.mutate(selectedOwnerId);
+    const ownerChanged = selectedOwnerId !== currentOwner?.id;
+    const secondOwnerChanged =
+      selectedSecondOwnerId !== (currentSecondOwner?.id || '');
+
+    if (selectedOwnerId && (ownerChanged || secondOwnerChanged)) {
+      changeOwnerMutation.mutate({
+        userId: selectedOwnerId,
+        secondUserId: selectedSecondOwnerId || undefined,
+      });
     }
   };
 
@@ -84,40 +119,80 @@ export const ChangeOwnerDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Изменить держателя кошелька</DialogTitle>
+          <DialogTitle>Изменить владельцев кошелька</DialogTitle>
           <DialogDescription>
-            Выберите нового держателя для кошелька &quot;{walletName}&quot;
+            Выберите владельцев для кошелька &quot;{walletName}&quot;
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="py-4 space-y-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin" />
             </div>
           ) : (
-            <Select value={selectedOwnerId} onValueChange={setSelectedOwnerId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Выберите держателя" />
-              </SelectTrigger>
-              <SelectContent>
-                {holders.map((holder: UserType) => (
-                  <SelectItem key={holder.id} value={holder.id}>
-                    {holder.username}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Владелец 1 <span className="text-destructive">*</span>
+                </label>
+                <Select
+                  value={selectedOwnerId}
+                  onValueChange={setSelectedOwnerId}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Выберите владельца" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {holders.map((holder: UserType) => (
+                      <SelectItem key={holder.id} value={holder.id}>
+                        {holder.username}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {currentOwner && (
+                  <p className="text-xs text-muted-foreground">
+                    Текущий: {currentOwner.username}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Владелец 2 (опционально)
+                </label>
+                <Select
+                  value={selectedSecondOwnerId || 'none'}
+                  onValueChange={(val) =>
+                    setSelectedSecondOwnerId(val === 'none' ? '' : val)
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Не выбран" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Не выбран</SelectItem>
+                    {holders
+                      .filter((h: UserType) => h.id !== selectedOwnerId)
+                      .map((holder: UserType) => (
+                        <SelectItem key={holder.id} value={holder.id}>
+                          {holder.username}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                {currentSecondOwner && (
+                  <p className="text-xs text-muted-foreground">
+                    Текущий: {currentSecondOwner.username}
+                  </p>
+                )}
+              </div>
+            </>
           )}
           {!isLoading && holders.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
               Нет доступных держателей. Назначьте пользователям статус держателя
               в разделе управления пользователями.
-            </p>
-          )}
-          {currentOwner && (
-            <p className="text-sm text-muted-foreground mt-4">
-              Текущий держатель:{' '}
-              <span className="font-medium">{currentOwner.username}</span>
             </p>
           )}
         </div>
@@ -133,7 +208,8 @@ export const ChangeOwnerDialog = ({
             onClick={handleConfirm}
             disabled={
               !selectedOwnerId ||
-              selectedOwnerId === currentOwner?.id ||
+              (selectedOwnerId === currentOwner?.id &&
+                selectedSecondOwnerId === (currentSecondOwner?.id || '')) ||
               changeOwnerMutation.isPending
             }
           >

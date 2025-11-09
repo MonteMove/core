@@ -101,6 +101,7 @@ export function OperationForm({
           typeId: initialData.typeId,
           applicationId: initialData.applicationId || undefined,
           description: initialData.description ?? '',
+          conversionGroupId: initialData.conversionGroupId ?? null,
           entries: initialData.entries.map((e) => ({
             wallet: e.wallet,
             direction: e.direction,
@@ -112,6 +113,7 @@ export function OperationForm({
           typeId: '',
           applicationId: undefined,
           description: '',
+          conversionGroupId: null,
           entries: [],
           creatureDate: undefined,
         },
@@ -122,25 +124,22 @@ export function OperationForm({
     name: 'entries',
   });
 
-  // Проверяем, является ли выбранный тип операции "Корректировкой"
   const selectedTypeId = form.watch('typeId');
   const selectedOperationType = operationTypes?.find(
     (type) => type.id === selectedTypeId,
   );
-  const isCorrection = selectedOperationType?.name === 'Корректировка';
+  const isCorrection = selectedOperationType?.isCorrection ?? false;
+  const isConversion = selectedOperationType?.isConversion ?? false;
 
-  // Для корректировки ограничиваем количество записей до 1
   React.useEffect(() => {
     if (isCorrection) {
       if (fields.length === 0) {
-        // Если нет записей, добавляем одну пустую
         append({
           wallet: { id: '', name: '' },
           direction: 'debit',
           amount: 0,
         });
       } else if (fields.length > 1) {
-        // Если больше одной записи, оставляем только первую
         while (fields.length > 1) {
           remove(fields.length - 1);
         }
@@ -164,6 +163,9 @@ export function OperationForm({
       ...(data.applicationId &&
         data.applicationId > 0 && { applicationId: data.applicationId }),
       description: data.description ?? null,
+      ...(data.conversionGroupId && {
+        conversionGroupId: data.conversionGroupId,
+      }),
       entries: transformedEntries,
       creatureDate: data.creatureDate,
     };
@@ -198,6 +200,9 @@ export function OperationForm({
           data.applicationId > 0 && { applicationId: data.applicationId }),
         creatureDate: data.creatureDate,
         description: data.description ?? null,
+        ...(data.conversionGroupId !== undefined && {
+          conversionGroupId: data.conversionGroupId,
+        }),
         entries: mergedEntries,
       };
 
@@ -216,7 +221,12 @@ export function OperationForm({
         className={cn('flex flex-col gap-6', className)}
         {...props}
       >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div
+          className={cn(
+            'grid grid-cols-1 gap-4',
+            isConversion ? 'md:grid-cols-2' : 'md:grid-cols-3',
+          )}
+        >
           {/* Тип операции */}
           <FormField
             control={form.control}
@@ -227,7 +237,12 @@ export function OperationForm({
                   Тип операции <span className="text-destructive">*</span>
                 </FormLabel>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    if (!isEditing) {
+                      form.setValue('entries', []);
+                    }
+                  }}
                   value={field.value || ''}
                 >
                   <FormControl>
@@ -287,6 +302,36 @@ export function OperationForm({
             )}
           />
 
+          {/* Номер конвертации - только для типа "Конвертация" */}
+          {isConversion && (
+            <FormField
+              control={form.control}
+              name="conversionGroupId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Номер конвертации{' '}
+                    <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Введите номер"
+                      required
+                      {...field}
+                      value={field.value ?? ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value ? Number(value) : null);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
           {/* Дата */}
           <FormField
             control={form.control}
@@ -315,7 +360,6 @@ export function OperationForm({
                         const parts = formatted.split('.');
                         if (parts.length === 3) {
                           const [dd, mm, yyyy] = parts.map(Number);
-                          // Создаем дату напрямую в UTC, чтобы избежать смещения часовых поясов
                           const parsed = new Date(Date.UTC(yyyy, mm - 1, dd));
                           if (!isNaN(parsed.getTime())) {
                             field.onChange(parsed.toISOString());
@@ -439,14 +483,20 @@ export function OperationForm({
                       <FormControl>
                         <Input
                           value={
-                            typeof field.value === 'number'
+                            typeof field.value === 'number' && field.value !== 0
                               ? formatNumber(field.value)
-                              : String(field.value || '')
+                              : field.value === 0
+                                ? '0'
+                                : ''
                           }
                           onChange={(e) => {
                             const value = e.target.value;
+                            if (value === '' || value === null) {
+                              field.onChange('');
+                              return;
+                            }
                             const parsed = parseFormattedNumber(value);
-                            field.onChange(isNaN(parsed) ? 0 : parsed);
+                            field.onChange(isNaN(parsed) ? '' : parsed);
                           }}
                           placeholder="0"
                           inputMode="numeric"
@@ -551,10 +601,17 @@ export function OperationForm({
                               <Input
                                 type="number"
                                 {...field}
-                                value={field.value || 0}
+                                value={field.value ?? ''}
                                 onChange={(e) => {
-                                  const value = e.target.valueAsNumber;
-                                  field.onChange(isNaN(value) ? 0 : value);
+                                  const value = e.target.value;
+                                  if (value === '' || value === null) {
+                                    field.onChange('');
+                                    return;
+                                  }
+                                  const numValue = parseFloat(value);
+                                  field.onChange(
+                                    isNaN(numValue) ? '' : numValue,
+                                  );
                                 }}
                                 className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                               />

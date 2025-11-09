@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { addOperationTypeFlags, OPERATION_TYPE_CODES } from '../../operation-type/constants/operation-type.constants';
 import { CreateApplicationDto } from '../dto';
 import { CreateApplicationOutput } from '../types';
 
@@ -26,7 +27,7 @@ export class CreateApplicationUseCase {
             select: { name: true },
         });
 
-        const hasAdvance = operationType?.name === 'Аванс';
+        const hasAdvance = operationType?.name === OPERATION_TYPE_CODES.AVANS;
 
         const application = await this.prisma.application.create({
             data: {
@@ -73,6 +74,7 @@ export class CreateApplicationUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 operation: {
@@ -88,7 +90,10 @@ export class CreateApplicationUseCase {
 
         return {
             message: 'Заявка успешно создана',
-            application: applicationResponse,
+            application: {
+                ...applicationResponse,
+                operation_type: addOperationTypeFlags(applicationResponse.operation_type),
+            },
         };
     }
 }

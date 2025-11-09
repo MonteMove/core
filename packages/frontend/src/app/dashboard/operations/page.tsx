@@ -176,7 +176,9 @@ export default function OperationsPage() {
                           pageIndex === data.pages.length - 1 &&
                           operationIndex === page.operations.length - 1;
 
-                        const showDetails = expandedIds.includes(operation.id);
+                        const showDetails =
+                          expandedIds.includes(operation.id) ||
+                          operation.type.isCorrection;
 
                         return (
                           <DropdownMenu key={operation.id}>
@@ -205,13 +207,24 @@ export default function OperationsPage() {
                                   );
                                 }}
                               >
-                                <CardContent className="py-0">
+                                <CardContent className="py-0 relative">
                                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                     <div className="space-y-2 flex-1">
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-2 flex-wrap">
                                         <p className="font-semibold">
                                           {operation.type.name}
                                         </p>
+                                        {operation.applicationId && (
+                                          <span className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-md">
+                                            Заявка #{operation.applicationId}
+                                          </span>
+                                        )}
+                                        {operation.conversionGroupId && (
+                                          <span className="text-xs bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-md">
+                                            Конвертация #
+                                            {operation.conversionGroupId}
+                                          </span>
+                                        )}
                                       </div>
                                       <p className="text-sm text-muted-foreground">
                                         {operation.created_by?.username}
@@ -225,9 +238,21 @@ export default function OperationsPage() {
                                           >
                                             {showDetails ? (
                                               <p className="text-sm">
-                                                <span className="font-medium">
-                                                  {entry.wallet.name}:{' '}
-                                                </span>
+                                                <Button
+                                                  variant="link"
+                                                  className="p-0 h-auto font-medium relative z-10 no-underline hover:no-underline cursor-pointer"
+                                                  data-wallet-link
+                                                  onPointerDown={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(
+                                                      ROUTER_MAP.WALLET_OPERATIONS(
+                                                        entry.walletId,
+                                                      ),
+                                                    );
+                                                  }}
+                                                >
+                                                  {entry.wallet.name}:
+                                                </Button>{' '}
                                                 {entry.direction ===
                                                 'credit' ? (
                                                   <>
@@ -259,10 +284,30 @@ export default function OperationsPage() {
                                               </p>
                                             ) : (
                                               <p className="text-sm">
-                                                <span className="font-medium">
-                                                  {entry.wallet.name}:{' '}
+                                                <Button
+                                                  variant="link"
+                                                  className="p-0 h-auto font-medium relative z-10 no-underline hover:no-underline cursor-pointer"
+                                                  data-wallet-link
+                                                  onPointerDown={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(
+                                                      ROUTER_MAP.WALLET_OPERATIONS(
+                                                        entry.walletId,
+                                                      ),
+                                                    );
+                                                  }}
+                                                >
+                                                  {entry.wallet.name}:
+                                                </Button>{' '}
+                                                <span
+                                                  className={
+                                                    entry.direction === 'credit'
+                                                      ? 'text-success/80 font-semibold'
+                                                      : 'text-destructive/80 font-semibold'
+                                                  }
+                                                >
+                                                  {entry.after ?? 0}
                                                 </span>
-                                                <span>{entry.after ?? 0}</span>
                                               </p>
                                             )}
                                           </div>

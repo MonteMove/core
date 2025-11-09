@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { OPERATION_TYPE_CODES, SYSTEM_OPERATION_TYPE_CODES } from '../constants/operation-type.constants';
 import { CreateOperationTypeDto } from '../dto';
 import { CreateOperationTypeResponse } from '../types';
 
@@ -40,7 +41,13 @@ export class CreateOperationTypeUseCase {
 
         return {
             message: 'Тип операции успешно создан',
-            operationType,
+            operationType: {
+                ...operationType,
+                isSystem: SYSTEM_OPERATION_TYPE_CODES.includes(operationType.code),
+                isCorrection: operationType.code === OPERATION_TYPE_CODES.CORRECTION,
+                isConversion: operationType.code === OPERATION_TYPE_CODES.CONVERSION,
+                isAvans: operationType.code === OPERATION_TYPE_CODES.AVANS,
+            },
         };
     }
 }

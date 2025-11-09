@@ -17,6 +17,12 @@ export class GetWalletByIdUseCase {
                         username: true,
                     },
                 },
+                secondUser: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
                 created_by: {
                     select: {
                         id: true,

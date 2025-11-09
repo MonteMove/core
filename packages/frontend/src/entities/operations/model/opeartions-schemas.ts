@@ -7,6 +7,8 @@ import {
 } from '@/entities/reports';
 import { PaginationSchema } from '@/shared/utils/schemas/common-schemas';
 
+import { OperationTypeInfoSchema } from './operation-type-schemas';
+
 export const OperationSchema = z.object({
   id: z.string().uuid(),
   description: z.string().nullable(),
@@ -64,6 +66,7 @@ export const CreateOperationDtoSchema = z.object({
     .max(2000, 'Максимум 2000 символов')
     .optional()
     .nullable(),
+  conversionGroupId: z.number().int().positive().optional().nullable(),
   entries: z
     .array(OperationEntryCreateDtoSchema)
     .min(1, 'Добавьте хотя бы одну запись операции'),
@@ -74,6 +77,7 @@ export const CreateOperationBackendDtoSchema = z.object({
   typeId: z.string().uuid(),
   applicationId: z.number().optional(),
   description: z.string().max(2000).optional().nullable(),
+  conversionGroupId: z.number().int().positive().optional().nullable(),
   entries: z
     .array(
       z.object({
@@ -118,6 +122,7 @@ export const UpdateOperationDtoSchema = z.object({
     .max(2000, 'Максимум 2000 символов')
     .optional()
     .nullable(),
+  conversionGroupId: z.number().int().positive().optional().nullable(),
   entries: z.array(OperationEntryDtoSchema).optional(),
   creatureDate: z.string().optional(),
 });
@@ -130,6 +135,7 @@ export const UpdateOperationBackendDtoSchema = z.object({
     .max(2000, 'Максимум 2000 символов')
     .optional()
     .nullable(),
+  conversionGroupId: z.number().int().positive().optional().nullable(),
   entries: z.array(UpdateOperationEntryBackendSchema).optional(),
   creatureDate: z.string().optional(),
 });
@@ -145,11 +151,11 @@ export const OperationResponseDtoSchema = z.object({
     .max(2000, 'Максиммум 2000 символов')
     .optional()
     .nullable(),
-  conversionGroupId: z.string().uuid().nullable(),
+  conversionGroupId: z.number().int().positive().nullable(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   entries: z.array(OperationEntryApiSchema),
-  type: z.object({ id: z.string().uuid(), name: z.string() }),
+  type: OperationTypeInfoSchema,
   created_by: z
     .object({
       id: z.string().uuid(),

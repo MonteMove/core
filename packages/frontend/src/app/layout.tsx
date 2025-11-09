@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 
-import { applySavedTheme } from '@/shared';
 import { Providers } from '@/shared/ui/components/providers';
 import { ThemeInitScript } from '@/shared/ui/components/theme-init-script';
 import { Toaster } from '@/shared/ui/shadcn/sonner';
@@ -24,9 +23,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  if (typeof window !== 'undefined') {
-    applySavedTheme();
-  }
   return (
     <html lang="ru" suppressHydrationWarning>
       <head>

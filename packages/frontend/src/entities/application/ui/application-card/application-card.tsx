@@ -62,33 +62,36 @@ export const CardApplication = ({ application }: CardApplicationProps) => {
             {formatDateTime(application.meetingDate)}
           </span>
         </p>
-        <p>
-          <strong className="mr-1">Telegram:</strong>
-          <span
-            className="block lg:inline text-primary cursor-pointer"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (application.telegramUsername)
-                copyHandler(application.telegramUsername);
-            }}
-          >
-            {application.telegramUsername || 'Не указано'}
-          </span>
-        </p>
-        <p>
-          <strong className="mr-1">Телефон:</strong>
-          <span
-            className="block lg:inline text-primary cursor-pointer"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (application.phone) copyHandler(application.phone);
-            }}
-          >
-            {application.phone || 'Не указано'}
-          </span>
-        </p>
+        {application.telegramUsername && (
+          <p>
+            <strong className="mr-1">Telegram:</strong>
+            <span
+              className="block lg:inline text-primary cursor-pointer"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                copyHandler(application.telegramUsername!);
+              }}
+            >
+              {application.telegramUsername}
+            </span>
+          </p>
+        )}
+        {application.phone && (
+          <p>
+            <strong className="mr-1">Телефон:</strong>
+            <span
+              className="block lg:inline text-primary cursor-pointer"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                copyHandler(application.phone!);
+              }}
+            >
+              {application.phone}
+            </span>
+          </p>
+        )}
         {application.hasAdvance && (
           <div className="mt-3 rounded border border-primary/40 bg-primary/10 p-2">
             <p className="text-sm">
@@ -101,30 +104,30 @@ export const CardApplication = ({ application }: CardApplicationProps) => {
         )}
       </CardContent>
 
-      <CardFooter className="flex justify-between items-start gap-2">
-        <p className="flex-1">
-          <strong className="mr-1">Описание:</strong>
-          <span className="block lg:inline">
-            {application.description || 'Не указано'}
-          </span>
-        </p>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="shrink-0"
-          onPointerDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (application.description) copyHandler(application.description);
-          }}
-        >
-          <Copy className="h-4 w-4" />
-        </Button>
-      </CardFooter>
+      {application.description && (
+        <CardFooter className="flex justify-between items-start gap-2">
+          <p className="flex-1">
+            <strong className="mr-1">Описание:</strong>
+            <span className="block lg:inline">{application.description}</span>
+          </p>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="shrink-0"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              copyHandler(application.description!);
+            }}
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

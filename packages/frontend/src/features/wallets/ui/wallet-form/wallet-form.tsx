@@ -10,6 +10,7 @@ import { useNetworkTypes } from '@/entities/network/model/use-network-types';
 import { useNetworks } from '@/entities/network/model/use-networks';
 import { usePlatforms } from '@/entities/platform';
 import { useBanks } from '@/entities/bank';
+import { useUsers } from '@/entities/users';
 import {
   CreateWalletFormValues,
   CreateWalletRequest,
@@ -72,6 +73,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
     useWalletTypes();
   const { data: platformsData, isLoading: isPlatformsLoading } = usePlatforms();
   const { data: banksData, isLoading: isBanksLoading } = useBanks();
+  const { data: usersData } = useUsers();
 
   const form = useForm<CreateWalletFormValues>({
     resolver: zodResolver(CreateWalletSchema),
@@ -83,6 +85,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           walletKind: initialData.walletKind || WalletKind.simple,
           walletTypeId: initialData.walletTypeId || undefined,
           currencyId: initialData.currencyId || '',
+          secondUserId: initialData.secondUserId || '',
           active: initialData.active ?? true,
           pinOnMain: initialData.pinOnMain ?? false,
           pinned: initialData.pinned ?? false,
@@ -108,6 +111,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           walletKind: WalletKind.simple,
           walletTypeId: undefined,
           currencyId: '',
+          secondUserId: '',
           active: true,
           pinOnMain: false,
           pinned: false,
@@ -287,40 +291,77 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="monthlyLimit"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Месячный лимит</FormLabel>
-              <FormControl>
-                <Input
-                  value={
-                    typeof field.value === 'number'
-                      ? formatNumber(field.value)
-                      : ''
-                  }
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '') {
-                      field.onChange(undefined);
-                      return;
+        <div className="grid gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="monthlyLimit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Месячный лимит</FormLabel>
+                <FormControl>
+                  <Input
+                    value={
+                      typeof field.value === 'number'
+                        ? formatNumber(field.value)
+                        : ''
                     }
-                    const parsed = parseFormattedNumber(value);
-                    field.onChange(isNaN(parsed) ? undefined : parsed);
-                  }}
-                  placeholder="Не установлен"
-                  inputMode="numeric"
-                />
-              </FormControl>
-              <FormDescription>
-                Лимит на сумму всех операций за месяц. Остаток будет
-                рассчитываться автоматически.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '') {
+                        field.onChange(undefined);
+                        return;
+                      }
+                      const parsed = parseFormattedNumber(value);
+                      field.onChange(isNaN(parsed) ? undefined : parsed);
+                    }}
+                    placeholder="Не установлен"
+                    inputMode="numeric"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Лимит на сумму всех операций за месяц
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="secondUserId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Второй владелец (опционально)</FormLabel>
+                <Select
+                  onValueChange={(val) =>
+                    field.onChange(val === 'none' ? '' : val)
+                  }
+                  value={field.value || 'none'}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Выберите второго владельца" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="none">Не выбран</SelectItem>
+                    {usersData?.users
+                      ?.filter((user) => user.isHolder)
+                      .map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.username}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Выберите второго держателя кошелька, если требуется
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <FormField

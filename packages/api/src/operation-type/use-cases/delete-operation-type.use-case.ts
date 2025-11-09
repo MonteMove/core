@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { SYSTEM_OPERATION_TYPE_CODES } from '../constants/operation-type.constants';
 import { DeleteOperationTypeResponse } from '../types';
-
-const SYSTEM_OPERATION_TYPE_CODES = ['avans', 'correction'];
 
 @Injectable()
 export class DeleteOperationTypeUseCase {

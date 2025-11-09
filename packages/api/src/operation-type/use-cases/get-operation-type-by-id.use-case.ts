@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { OPERATION_TYPE_CODES, SYSTEM_OPERATION_TYPE_CODES } from '../constants/operation-type.constants';
 import { GetOperationTypeByIdResponse } from '../types';
 
 @Injectable()
@@ -32,7 +33,13 @@ export class GetOperationTypeByIdUseCase {
         const { deleted: _, ...operationTypeResponse } = operationType;
 
         return {
-            operationType: operationTypeResponse,
+            operationType: {
+                ...operationTypeResponse,
+                isSystem: SYSTEM_OPERATION_TYPE_CODES.includes(operationTypeResponse.code),
+                isCorrection: operationTypeResponse.code === OPERATION_TYPE_CODES.CORRECTION,
+                isConversion: operationTypeResponse.code === OPERATION_TYPE_CODES.CONVERSION,
+                isAvans: operationTypeResponse.code === OPERATION_TYPE_CODES.AVANS,
+            },
         };
     }
 }

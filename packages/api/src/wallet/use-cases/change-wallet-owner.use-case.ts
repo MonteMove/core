@@ -24,6 +24,12 @@ export class ChangeWalletOwnerUseCase {
                         username: true,
                     },
                 },
+                secondUser: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
             },
         });
 
@@ -55,6 +61,12 @@ export class ChangeWalletOwnerUseCase {
             },
             include: {
                 user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    },
+                },
+                secondUser: {
                     select: {
                         id: true,
                         username: true,

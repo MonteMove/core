@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { PrismaService } from '../../common/services/prisma.service';
+import { addOperationTypeFlags } from '../../operation-type/constants/operation-type.constants';
 import { GetApplicationByIdOutput } from '../types';
 
 @Injectable()
@@ -40,6 +41,7 @@ export class GetApplicationByIdUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 operation: {
@@ -58,7 +60,10 @@ export class GetApplicationByIdUseCase {
         const { deleted: _, ...applicationResponse } = application;
 
         return {
-            application: applicationResponse,
+            application: {
+                ...applicationResponse,
+                operation_type: addOperationTypeFlags(applicationResponse.operation_type),
+            },
         };
     }
 }

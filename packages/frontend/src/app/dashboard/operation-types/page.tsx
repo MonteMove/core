@@ -11,7 +11,6 @@ import { useOperationTypes } from '@/entities/operations/model/use-operation-typ
 import { useDeleteOperationType } from '@/features/operation-types/hooks/use-delete-operation-type';
 import { useRestoreOperationType } from '@/features/operation-types/hooks/use-restore-operation-type';
 
-const SYSTEM_OPERATION_TYPE_CODES = ['avans', 'correction'];
 import {
   AlertDialog,
   AlertDialogAction,
@@ -191,9 +190,7 @@ export default function OperationTypesPage() {
                               >
                                 <Pencil className="w-4 h-4" />
                               </Button>
-                              {!SYSTEM_OPERATION_TYPE_CODES.includes(
-                                operationType.code,
-                              ) && (
+                              {!operationType.isSystem && (
                                 <Button
                                   variant="ghost"
                                   size="sm"

@@ -93,6 +93,7 @@ export function WalletsFiltersSheet({
     localFilters.walletKind,
     localFilters.currencyId,
     localFilters.userId,
+    localFilters.secondUserId,
     localFilters.minAmount,
     localFilters.maxAmount,
     localFilters.sortField,
@@ -196,7 +197,7 @@ export function WalletsFiltersSheet({
           </div>
 
           <div className="space-y-2">
-            <Label>Пользователь</Label>
+            <Label>Владелец 1</Label>
             <Select
               value={localFilters.userId ?? ''}
               onValueChange={(val) =>
@@ -210,11 +211,39 @@ export function WalletsFiltersSheet({
                 <SelectValue placeholder="Все" />
               </SelectTrigger>
               <SelectContent>
-                {users?.users?.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.username}
-                  </SelectItem>
-                ))}
+                {users?.users
+                  ?.filter((u) => u.isHolder)
+                  .map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.username}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Владелец 2</Label>
+            <Select
+              value={localFilters.secondUserId ?? ''}
+              onValueChange={(val) =>
+                setLocalFilters((prev) => ({
+                  ...prev,
+                  secondUserId: val || undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Все" />
+              </SelectTrigger>
+              <SelectContent>
+                {users?.users
+                  ?.filter((u) => u.isHolder)
+                  .map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                      {u.username}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

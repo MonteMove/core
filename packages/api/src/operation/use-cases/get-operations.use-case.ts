@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '../../../prisma/generated/prisma';
 import { PrismaService } from '../../common/services/prisma.service';
 import { calculatePagination, createAllDataPaginationResponse, createPaginationResponse } from '../../common/utils';
+import { addOperationTypeFlags } from '../../operation-type/constants/operation-type.constants';
 import { GetOperationsDto } from '../dto';
 import { GetOperationsResponse } from '../types';
 
@@ -18,6 +19,9 @@ export class GetOperationsUseCase {
             updatedById,
             conversionGroupId,
             walletId,
+            applicationId,
+            dateFrom,
+            dateTo,
             direction,
             minAmount,
             maxAmount,
@@ -51,6 +55,20 @@ export class GetOperationsUseCase {
         }
         if (conversionGroupId) {
             where.conversionGroupId = conversionGroupId;
+        }
+
+        if (applicationId) {
+            where.applicationId = applicationId;
+        }
+
+        if (dateFrom || dateTo) {
+            where.createdAt = {};
+            if (dateFrom) {
+                where.createdAt.gte = new Date(dateFrom);
+            }
+            if (dateTo) {
+                where.createdAt.lte = new Date(dateTo);
+            }
         }
 
         if (walletId || direction || minAmount !== undefined || maxAmount !== undefined) {
@@ -113,6 +131,7 @@ export class GetOperationsUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 created_by: {
@@ -140,7 +159,10 @@ export class GetOperationsUseCase {
 
         const operations = await this.prisma.operation.findMany(findManyOptions);
 
-        const operationsResponse = operations.map(({ deleted: _, ...operation }) => operation);
+        const operationsResponse = operations.map(({ deleted: _, ...operation }) => ({
+            ...operation,
+            type: addOperationTypeFlags(operation.type),
+        }));
 
         const paginationResponse = pagination.shouldPaginate
             ? createPaginationResponse(total, page!, limit!)

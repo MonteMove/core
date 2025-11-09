@@ -85,12 +85,12 @@ export const AnalyticsCharts = () => {
               <Legend />
               <Bar
                 dataKey="поступления"
-                fill="hsl(142.1 76.2% 36.3%)"
+                fill="hsl(var(--success))"
                 radius={[4, 4, 0, 0]}
               />
               <Bar
                 dataKey="расходы"
-                fill="hsl(0 84.2% 60.2%)"
+                fill="hsl(var(--destructive))"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>

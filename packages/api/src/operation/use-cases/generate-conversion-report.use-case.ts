@@ -49,6 +49,7 @@ export class GenerateConversionReportUseCase {
                     select: {
                         id: true,
                         name: true,
+                        code: true,
                     },
                 },
                 created_by: {

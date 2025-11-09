@@ -43,14 +43,14 @@ export const AnalyticsSummary = () => {
         <div className="text-xs font-medium text-muted-foreground">
           Поступления
         </div>
-        <div className="text-lg font-bold text-green-600">
+        <div className="text-lg font-bold text-success/80">
           +{formatNumber(summary.totalComing)}
         </div>
       </Card>
 
       <Card className="p-3">
         <div className="text-xs font-medium text-muted-foreground">Расходы</div>
-        <div className="text-lg font-bold text-red-600">
+        <div className="text-lg font-bold text-destructive/80">
           -{formatNumber(summary.totalExpenditure)}
         </div>
       </Card>
@@ -60,7 +60,7 @@ export const AnalyticsSummary = () => {
           Чистый поток
         </div>
         <div
-          className={`text-lg font-bold ${summary.totalNetFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}
+          className={`text-lg font-bold ${summary.totalNetFlow >= 0 ? 'text-success/80' : 'text-destructive/80'}`}
         >
           {summary.totalNetFlow >= 0 ? '+' : ''}
           {formatNumber(summary.totalNetFlow)}

@@ -30,9 +30,6 @@ import { ROUTER_MAP } from '@/shared/utils/constants/router-map';
 import { useCreateOperationType } from '../hooks/use-create-operation-type';
 import { useUpdateOperationType } from '../hooks/use-update-operation-type';
 
-// Системные типы операций, у которых нельзя изменить код
-const SYSTEM_OPERATION_TYPE_CODES = ['avans', 'correction'];
-
 interface OperationTypeFormProps {
   isEdit?: boolean;
   initialData?: OperationType;
@@ -85,10 +82,8 @@ export function OperationTypeForm({
   };
 
   const mutation = isEdit ? updateMutation : createMutation;
-  const isSystemType =
-    isEdit &&
-    initialData &&
-    SYSTEM_OPERATION_TYPE_CODES.includes(initialData.code);
+
+  const isSystemType = isEdit && initialData ? initialData.isSystem : false;
 
   return (
     <Form {...form}>

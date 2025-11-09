@@ -74,6 +74,35 @@ export class GetOperationsDto {
     public walletId?: string;
 
     @ApiProperty({
+        description: 'Фильтр по ID заявки',
+        example: 123,
+        required: false,
+    })
+    @IsOptional()
+    @Type(() => Number)
+    @IsInt({ message: 'ID заявки должен быть числом' })
+    @Min(1, { message: 'ID заявки должен быть больше 0' })
+    public applicationId?: number;
+
+    @ApiProperty({
+        description: 'Дата начала периода (формат ISO 8601)',
+        example: '2024-01-01T00:00:00.000Z',
+        required: false,
+    })
+    @IsOptional()
+    @IsString({ message: 'Дата начала должна быть строкой' })
+    public dateFrom?: string;
+
+    @ApiProperty({
+        description: 'Дата окончания периода (формат ISO 8601)',
+        example: '2024-12-31T23:59:59.999Z',
+        required: false,
+    })
+    @IsOptional()
+    @IsString({ message: 'Дата окончания должна быть строкой' })
+    public dateTo?: string;
+
+    @ApiProperty({
         description: 'Фильтр по направлению записи',
         enum: OperationDirection,
         required: false,

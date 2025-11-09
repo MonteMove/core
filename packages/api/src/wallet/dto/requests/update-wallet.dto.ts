@@ -75,6 +75,15 @@ export class UpdateWalletDto {
     public currencyId?: string;
 
     @ApiProperty({
+        description: 'ID второго владельца кошелька',
+        example: '123e4567-e89b-12d3-a456-426614174001',
+        required: false,
+    })
+    @IsOptional()
+    @IsUUID('4', { message: 'ID второго владельца должен быть валидным UUID' })
+    public secondUserId?: string;
+
+    @ApiProperty({
         description: 'Активен ли кошелек',
         example: true,
         required: false,

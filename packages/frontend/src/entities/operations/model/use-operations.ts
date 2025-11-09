@@ -80,7 +80,7 @@ type OperationFilterWithPagination = GetOperationsParams & {
 
 export const useInfiniteOperations = (
   filters?: GetOperationsParams,
-  defaultLimit = 20,
+  defaultLimit = 100,
 ) => {
   return useInfiniteQuery<
     GetOperationsResponseDto,

@@ -100,6 +100,15 @@ export class GetWalletsDto {
     public userId?: string;
 
     @ApiProperty({
+        description: 'Фильтр по ID второго владельца кошелька',
+        example: '123e4567-e89b-12d3-a456-426614174001',
+        required: false,
+    })
+    @IsOptional()
+    @IsUUID('4', { message: 'ID второго владельца должен быть валидным UUID' })
+    public secondUserId?: string;
+
+    @ApiProperty({
         description: 'Фильтр по активности кошелька',
         example: true,
         required: false,

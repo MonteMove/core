@@ -86,13 +86,15 @@ export class JwtTokenService {
             });
         }
 
-        const refreshTokenExpiresInMs = Number(
-            this.configService.getOrThrow<string>('JWT_REFRESH_TOKEN_EXPIRES_IN_MS'),
+        const refreshTokenExpiresInSeconds = Number(
+            this.configService.getOrThrow<string>('JWT_REFRESH_TOKEN_EXPIRES_IN'),
         );
 
-        if (isNaN(refreshTokenExpiresInMs) || refreshTokenExpiresInMs <= 0) {
-            throw new Error(`Невалидное значение JWT_REFRESH_TOKEN_EXPIRES_IN_MS: ${refreshTokenExpiresInMs}`);
+        if (isNaN(refreshTokenExpiresInSeconds) || refreshTokenExpiresInSeconds <= 0) {
+            throw new Error(`Невалидное значение JWT_REFRESH_TOKEN_EXPIRES_IN: ${refreshTokenExpiresInSeconds}`);
         }
+
+        const refreshTokenExpiresInMs = refreshTokenExpiresInSeconds * 1000;
 
         const expirationTime = Date.now() + refreshTokenExpiresInMs;
         const expirationDate = new Date(expirationTime);
