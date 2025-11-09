@@ -5,6 +5,7 @@ export const env = {
   NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY:
     process.env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY ?? '',
   JWT_SECRET: process.env.JWT_SECRET ?? '',
+  USE_DEV_AUTH_MARKER: process.env.USE_DEV_AUTH_MARKER === 'true',
 };
 
 export const isDevelopment = env.NODE_ENV === 'development';

@@ -25,9 +25,6 @@ async function bootstrap() {
         origin: corsOrigins ? corsOrigins.split(',').map((origin) => origin.trim()) : true,
         methods: corsMethods.split(',').map((method) => method.trim()),
         allowedHeaders: corsHeaders.split(',').map((header) => header.trim()),
-        exposedHeaders: ['Set-Cookie'],
-        preflightContinue: false,
-        optionsSuccessStatus: 204,
     });
 
     app.use(cookieParser());

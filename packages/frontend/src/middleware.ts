@@ -8,13 +8,25 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { pathname, search } = request.nextUrl;
   const isLoginRoute = pathname === ROUTER_MAP.LOGIN;
 
-  const refreshToken = request.cookies.get(
-    env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY,
-  )?.value;
+  let hasValidToken = false;
+  let cookieToDelete: string | undefined;
 
-  const hasValidToken = refreshToken
-    ? (await verifyJwtToken(refreshToken)) !== null
-    : false;
+  if (env.USE_DEV_AUTH_MARKER) {
+    const authMarker = request.cookies.get('auth_marker')?.value;
+    hasValidToken = authMarker === 'authenticated';
+    cookieToDelete = authMarker ? 'auth_marker' : undefined;
+  } else {
+    const refreshToken = request.cookies.get(
+      env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY,
+    )?.value;
+
+    hasValidToken = refreshToken
+      ? (await verifyJwtToken(refreshToken)) !== null
+      : false;
+    cookieToDelete = refreshToken
+      ? env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY
+      : undefined;
+  }
 
   if (!hasValidToken && !isLoginRoute) {
     const loginUrl = new URL(ROUTER_MAP.LOGIN, request.url);
@@ -25,8 +37,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
     }
 
     const response = NextResponse.redirect(loginUrl);
-    if (refreshToken) {
-      response.cookies.delete(env.NEXT_PUBLIC_AUTH_REFRESH_TOKEN_COOKIE_KEY);
+    if (cookieToDelete) {
+      response.cookies.delete(cookieToDelete);
     }
     return response;
   }
