@@ -79,13 +79,13 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
     resolver: zodResolver(CreateWalletSchema),
     defaultValues: initialData
       ? {
-          name: initialData.name || '',
+          name: initialData.name,
           description: initialData.description ?? '',
           amount: initialData.amount || 0,
           walletKind: initialData.walletKind || WalletKind.simple,
           walletTypeId: initialData.walletTypeId || undefined,
-          currencyId: initialData.currencyId || '',
-          secondUserId: initialData.secondUserId || '',
+          currencyId: initialData.currencyId,
+          secondUserId: initialData.secondUserId || undefined,
           active: initialData.active ?? true,
           pinOnMain: initialData.pinOnMain ?? false,
           pinned: initialData.pinned ?? false,
@@ -111,7 +111,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
           walletKind: WalletKind.simple,
           walletTypeId: undefined,
           currencyId: '',
-          secondUserId: '',
+          secondUserId: undefined,
           active: true,
           pinOnMain: false,
           pinned: false,
@@ -334,7 +334,7 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
                 <FormLabel>Второй владелец (опционально)</FormLabel>
                 <Select
                   onValueChange={(val) =>
-                    field.onChange(val === 'none' ? '' : val)
+                    field.onChange(val === 'none' ? undefined : val)
                   }
                   value={field.value || 'none'}
                 >
