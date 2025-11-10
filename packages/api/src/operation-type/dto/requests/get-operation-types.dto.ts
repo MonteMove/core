@@ -93,5 +93,5 @@ export class GetOperationTypesDto {
     @IsInt({ message: 'Количество элементов должно быть числом' })
     @Min(1, { message: 'Количество элементов должно быть больше 0' })
     @Max(100, { message: 'Количество элементов не должно превышать 100' })
-    public limit?: number = 10;
+    public limit?: number = 100;
 }
