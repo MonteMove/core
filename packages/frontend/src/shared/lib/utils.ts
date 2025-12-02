@@ -22,7 +22,7 @@ export const copyHandler = (value: string | number | null) => {
     .then(() => {
       toast.success('Скопировано');
     })
-    .catch((err) => {
+    .catch(() => {
       toast.error('Не удалось скопировать');
     });
 };

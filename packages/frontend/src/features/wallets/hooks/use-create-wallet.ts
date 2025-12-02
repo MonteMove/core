@@ -21,8 +21,7 @@ export const useCreateWallet = () => {
     mutationKey: [...WALLETS_QUERY_KEY, 'create'],
     mutationFn: (payload: CreateWalletRequest) =>
       WalletService.createWallet(payload),
-    onSuccess: (wallet) => {
-      const walletName = wallet.name?.trim() || 'Кошелек';
+    onSuccess: () => {
       toast.success('Создан');
       queryClient.invalidateQueries({ queryKey: WALLETS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: PINNED_WALLETS_QUERY_KEY });

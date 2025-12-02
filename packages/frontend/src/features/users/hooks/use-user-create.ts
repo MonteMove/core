@@ -12,7 +12,7 @@ export const useCreateUser = () => {
     mutationKey: USERS_QUERY_KEY,
     mutationFn: (userData: RegisterRequest) => UserService.createUser(userData),
 
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('Создан');
     },
   });

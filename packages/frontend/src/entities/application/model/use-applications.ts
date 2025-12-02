@@ -49,7 +49,7 @@ export const useUpdateStatusApplication = () => {
     mutationFn: ({ id, ...data }: { id: string } & UpdateApplicationRequest) =>
       ApplicationService.update(id, data),
 
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       // гарантируем, что кэш обновится
       queryClient.invalidateQueries({ queryKey: APPLICATION_QUERY_KEY });
       toast.success('Обновлён');

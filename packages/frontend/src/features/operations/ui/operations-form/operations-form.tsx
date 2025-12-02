@@ -9,7 +9,6 @@ import {
   useForm,
   useController,
   Control,
-  FieldPath,
 } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 
@@ -51,10 +50,6 @@ import {
   cn,
   formatDate,
 } from '@/shared';
-import {
-  formatNumber,
-  parseFormattedNumber,
-} from '@/shared/lib/utils/format-number';
 
 /** Компонент поля суммы, использует useController */
 const AmountInputField = ({
