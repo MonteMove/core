@@ -41,13 +41,16 @@ export const useUpdateApplication = () => {
     },
   });
 };
+
 export const useUpdateStatusApplication = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ id, ...data }: { id: string } & UpdateApplicationRequest) =>
       ApplicationService.update(id, data),
-    onSuccess: () => {
-      // Инвалидируем кэш заявок для обновления списка
+
+    onSuccess: (data, variables, context) => {
+      // гарантируем, что кэш обновится
       queryClient.invalidateQueries({ queryKey: APPLICATION_QUERY_KEY });
       toast.success('Обновлён');
     },

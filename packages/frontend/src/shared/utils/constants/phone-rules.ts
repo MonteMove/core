@@ -49,4 +49,22 @@ export const PHONE_RULES: PhoneRule[] = [
     groups: [3, 7],
     type: 'space',
   },
+
+  // 🇷🇸 Сербия
+  {
+    code: '381',
+    example: '+381 63 123 4567',
+    total: 10, // 3 + 2 + 3 + 2
+    groups: [2, 3, 4], // XX XXX XXXX
+    type: 'space',
+  },
+
+  // 🇲🇪 Черногория
+  {
+    code: '382',
+    example: '+382 67 123 456',
+    total: 11, // 3 + 2 + 3 + 3
+    groups: [2, 3, 3], // XX XXX XXX
+    type: 'space',
+  },
 ];

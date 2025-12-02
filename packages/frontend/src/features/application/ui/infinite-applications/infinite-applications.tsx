@@ -105,7 +105,10 @@ export const InfiniteApplicationsList = () => {
               >
                 <DropdownMenuItem
                   className="hover:bg-primary/60 dark:hover:bg-primary/60"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+
                     if (app.status === 'done') {
                       // Вернуть в работу
                       updateStatuseApplicationMutation({
@@ -113,26 +116,25 @@ export const InfiniteApplicationsList = () => {
                         status: 'open',
                       });
                     } else {
-                      // Завершить заявку
-                      // Если заявка с авансом и НЕТ операции - открываем создание операции
-                      if (app.hasAdvance && !app.operationId) {
-                        router.push(
-                          ROUTER_MAP.OPERATIONS_CREATE +
-                            '?applicationId=' +
-                            app.id,
-                        );
-                      } else if (app.hasAdvance && app.operationId) {
-                        // Если заявка с авансом и ЕСТЬ операция - открываем редактирование операции
-                        router.push(
-                          ROUTER_MAP.OPERATIONS_EDIT + '/' + app.operationId,
-                        );
-                      } else {
-                        // Обычная заявка - просто меняем статус
-                        updateStatuseApplicationMutation({
+                      // ➤ Всегда сначала завершаем заявку
+                      updateStatuseApplicationMutation(
+                        {
                           id: app.id.toString(),
                           status: 'done',
-                        });
-                      }
+                        },
+                        {
+                          onSuccess: () => {
+                            // ➤ После успешного завершения — переход
+                            setTimeout(() => {
+                              router.push(
+                                ROUTER_MAP.OPERATIONS_CREATE +
+                                  '?applicationId=' +
+                                  app.id,
+                              );
+                            }, 10); // фикс для DropdownMenu
+                          },
+                        },
+                      );
                     }
                   }}
                 >
@@ -143,6 +145,7 @@ export const InfiniteApplicationsList = () => {
                   )}{' '}
                   {app.status == 'done' ? 'В работе' : 'Завершить'}
                 </DropdownMenuItem>
+
                 {app.operationId && (
                   <DropdownMenuItem
                     className="hover:bg-primary/60 dark:hover:bg-primary/60"

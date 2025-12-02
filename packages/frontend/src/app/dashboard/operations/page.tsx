@@ -1,8 +1,6 @@
 'use client';
 
-import { Fragment, useState } from 'react';
-import { useRef } from 'react';
-
+import { Fragment, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,6 +54,7 @@ export default function OperationsPage() {
       dateTo: '',
     },
   });
+
   const handleReset = () => {
     form.reset({
       search: '',
@@ -78,8 +77,10 @@ export default function OperationsPage() {
   const lastOperationRef = useRef<HTMLDivElement | null>(null);
   const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
+  // >>> вкладки от сервера, где isSeparateTab = true
   const tabTypes = operationTypes?.filter((type) => type.isSeparateTab) || [];
 
+  // watching current filter tab
   const currentTypeId = form.watch('typeId');
   const activeTab = currentTypeId || 'all';
 
@@ -108,14 +109,12 @@ export default function OperationsPage() {
           </CardHeader>
         </Card>
 
+        {/* Вкладки */}
         <Tabs
           value={activeTab}
           onValueChange={(val) => {
-            if (val === 'all') {
-              form.setValue('typeId', null);
-            } else {
-              form.setValue('typeId', val);
-            }
+            if (val === 'all') form.setValue('typeId', null);
+            else form.setValue('typeId', val);
           }}
         >
           <TabsList
@@ -127,6 +126,7 @@ export default function OperationsPage() {
             <TabsTrigger value="all" className="w-full">
               Все операции
             </TabsTrigger>
+
             {tabTypes.map((type) => (
               <TabsTrigger key={type.id} value={type.id} className="w-full">
                 {type.name}
@@ -136,14 +136,12 @@ export default function OperationsPage() {
         </Tabs>
 
         <div className="space-y-2">
-          <div className="">
+          <div>
             {isLoading ? (
               <Loading />
             ) : error ? (
               <div className="justify-items-center">
-                <Card className="h-[100] w-full p-0 justify-center items-center text-lg">
-                  {/* <p className="text-destructive">Ошибка при загрузке: {error.message}</p> */}
-                </Card>
+                <Card className="h-[100] w-full p-0 justify-center items-center text-lg" />
               </div>
             ) : !data?.pages[0]?.operations.length ? (
               <Empty>
@@ -155,8 +153,6 @@ export default function OperationsPage() {
                     <EmptyTitle>Операции не найдены</EmptyTitle>
                     <EmptyDescription>
                       Нет операций, соответствующих выбранным фильтрам.
-                      Попробуйте изменить параметры поиска или создайте новую
-                      операцию.
                     </EmptyDescription>
                   </EmptyContent>
                 </EmptyHeader>
@@ -166,11 +162,13 @@ export default function OperationsPage() {
                 {data?.pages.map((page, pageIndex) => (
                   <Fragment key={pageIndex}>
                     {page.operations
-                      .filter((operation) =>
-                        activeTab === 'deposit'
-                          ? operation.type.name.toLowerCase().includes('попол')
-                          : true,
-                      )
+
+                      // >>> новый корректный фильтр по вкладкам
+                      .filter((operation) => {
+                        if (activeTab === 'all') return true;
+                        return operation.type.id === activeTab;
+                      })
+
                       .map((operation, operationIndex) => {
                         const isLast =
                           pageIndex === data.pages.length - 1 &&
@@ -186,26 +184,6 @@ export default function OperationsPage() {
                               <Card
                                 ref={isLast ? lastOperationRef : null}
                                 className="relative cursor-pointer hover:bg-accent/50 transition-colors mb-2"
-                                onTouchStart={(e) => {
-                                  const timer = setTimeout(() => {
-                                    e.currentTarget.click();
-                                  }, 600);
-                                  const cancel = () => clearTimeout(timer);
-                                  e.currentTarget.addEventListener(
-                                    'touchend',
-                                    cancel,
-                                    {
-                                      once: true,
-                                    },
-                                  );
-                                  e.currentTarget.addEventListener(
-                                    'touchmove',
-                                    cancel,
-                                    {
-                                      once: true,
-                                    },
-                                  );
-                                }}
                               >
                                 <CardContent className="py-0 relative">
                                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -214,11 +192,13 @@ export default function OperationsPage() {
                                         <p className="font-semibold">
                                           {operation.type.name}
                                         </p>
+
                                         {operation.applicationId && (
                                           <span className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-md">
                                             Заявка #{operation.applicationId}
                                           </span>
                                         )}
+
                                         {operation.conversionGroupId && (
                                           <span className="text-xs bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-md">
                                             Конвертация #
@@ -226,6 +206,7 @@ export default function OperationsPage() {
                                           </span>
                                         )}
                                       </div>
+
                                       <p className="text-sm text-muted-foreground">
                                         {operation.created_by?.username}
                                       </p>
@@ -331,12 +312,12 @@ export default function OperationsPage() {
                               </Card>
                             </DropdownMenuTrigger>
 
+                            {/* dropdown */}
                             <DropdownMenuContent
                               align="center"
                               className="w-40 bg-background shadow-md rounded-md text-foreground"
                             >
                               <DropdownMenuItem
-                                className="hover:bg-primary/60 dark:hover:bg-primary/60"
                                 onClick={() =>
                                   router.push(
                                     ROUTER_MAP.OPERATIONS_EDIT +
@@ -345,11 +326,11 @@ export default function OperationsPage() {
                                   )
                                 }
                               >
-                                <Pencil className="mr-2 h-4 w-4 text-primary" />{' '}
+                                <Pencil className="mr-2 h-4 w-4 text-primary" />
                                 Редактировать
                               </DropdownMenuItem>
+
                               <DropdownMenuItem
-                                className="hover:bg-primary/60 dark:hover:bg-primary/60"
                                 onClick={() =>
                                   setExpandedIds((prev) =>
                                     prev.includes(operation.id)
@@ -361,19 +342,19 @@ export default function OperationsPage() {
                                 <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
                                 {showDetails ? 'Скрыть' : 'Подробнее'}
                               </DropdownMenuItem>
+
                               <DropdownMenuItem
-                                className="hover:bg-primary/60 dark:hover:bg-primary/60"
                                 onClick={() => copyOperation(operation)}
                               >
-                                <Copy className="mr-2 h-4 w-4 text-primary" />{' '}
+                                <Copy className="mr-2 h-4 w-4 text-primary" />
                                 Копировать
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
-                                className="text-destructive/60 hover:text-destructive hover:bg-destructive/10 dark:hover:bg-destructive/20"
+                                className="text-destructive/60 hover:text-destructive hover:bg-destructive/10"
                                 onClick={() => deleteOperation(operation.id)}
                               >
-                                <Trash className="mr-2 h-4 w-4 text-destructive/60" />{' '}
+                                <Trash className="mr-2 h-4 w-4 text-destructive/60" />
                                 Удалить
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -385,6 +366,7 @@ export default function OperationsPage() {
               </div>
             )}
           </div>
+
           {isFetching && hasNextPage && <Loading className="py-4" />}
         </div>
       </form>

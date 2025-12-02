@@ -49,6 +49,7 @@ export function formatByRule(digitsRaw?: string) {
   let digits = digitsRaw.replace(/\D/g, '');
   if (!digits) return '';
 
+  // Приведение 8 → 7 только для РФ
   if (digits === '8') digits = '7';
 
   const rule = findPhoneRule(digits);
@@ -56,6 +57,7 @@ export function formatByRule(digitsRaw?: string) {
 
   const rest = digits.slice(rule.code.length);
 
+  // 🇷🇺 Россия
   if (rule.type === 'ru') {
     let out = '+7';
     if (rest.length > 0) out += ' (' + rest.slice(0, 3);
@@ -65,6 +67,7 @@ export function formatByRule(digitsRaw?: string) {
     return out;
   }
 
+  // 🇺🇸 США
   if (rule.type === 'us') {
     let out = '+1';
     if (rest.length > 0) out += ' (' + rest.slice(0, 3);
@@ -73,8 +76,10 @@ export function formatByRule(digitsRaw?: string) {
     return out;
   }
 
+  // 🌍 Страны формата "space": 380, 375, 381, 382, 44, 49
   const parts: string[] = [];
   let idx = 0;
+
   for (const g of rule.groups) {
     if (idx >= rest.length) break;
     parts.push(rest.slice(idx, idx + g));
