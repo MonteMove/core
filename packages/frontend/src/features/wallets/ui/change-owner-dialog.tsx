@@ -94,7 +94,7 @@ export const ChangeOwnerDialog = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', walletId] });
-      toast.success('Владельцы кошелька успешно изменены');
+      toast.success('Изменено');
       onConfirm?.(selectedOwnerId, selectedSecondOwnerId || undefined);
       onOpenChange(false);
     },

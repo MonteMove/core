@@ -19,7 +19,7 @@ export const useGeneralReport = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success('Общий отчёт скачивается!');
+      toast.success('Скачивается!');
     },
   });
 };

@@ -12,7 +12,7 @@ export const useUpdateWalletType = () => {
       walletTypeApi.updateWalletType(id, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
-      toast.success(response.message || 'Тип кошелька успешно обновлён');
+      toast.success(response.message || 'Обновлён');
     },
   });
 };

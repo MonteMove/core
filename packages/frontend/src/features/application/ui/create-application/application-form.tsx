@@ -83,7 +83,7 @@ export function ApplicationForm({
           amount: 0,
           telegramUsername: '',
           phone: '',
-          meetingDate: undefined,
+          meetingDate: new Date().toISOString(),
         },
   });
 
@@ -186,14 +186,14 @@ export function ApplicationForm({
                           <SelectValue placeholder="Выберите тип" />
                         </SelectTrigger>
                         <SelectContent>
-                          {operationTypes?.map((operationType) => (
-                            <SelectItem
-                              key={operationType.id}
-                              value={operationType.id}
-                            >
-                              {operationType.name}
-                            </SelectItem>
-                          ))}
+                          {operationTypes
+                            ?.slice()
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((t) => (
+                              <SelectItem key={t.id} value={t.id}>
+                                {t.name}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     )}

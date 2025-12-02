@@ -11,7 +11,7 @@ export function useDeleteUser() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success(`Пользователь удалён`);
+      toast.success(`Удалён`);
     },
   });
 }

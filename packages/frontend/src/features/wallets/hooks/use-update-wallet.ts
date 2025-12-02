@@ -17,7 +17,7 @@ export function useUpdateWallet(walletId: string) {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', walletId] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success('Кошелек успешно обновлен');
+      toast.success('Обновлен');
       router.push(ROUTER_MAP.WALLETS);
     },
   });

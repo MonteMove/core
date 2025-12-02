@@ -14,7 +14,7 @@ export const useCreatePlatform = () => {
       PlatformService.createPlatform(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
-      toast.success('Платформа успешно создана');
+      toast.success('Создана');
     },
   });
 };

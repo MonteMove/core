@@ -19,7 +19,7 @@ export const useCreateApplication = () => {
     mutationFn: (data: CreateApplicationRequest) =>
       ApplicationService.create(data),
     onSuccess: () => {
-      toast.success('Заявка успешно создана!');
+      toast.success('Создана');
       queryClient.invalidateQueries({ queryKey: [APPLICATION_QUERY_KEY] });
       router.push(ROUTER_MAP.APPLICATIONS);
     },

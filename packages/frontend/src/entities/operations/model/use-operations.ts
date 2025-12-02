@@ -40,7 +40,7 @@ export const useCreateOperation = () => {
       OperationsService.create(data),
     onSuccess: () => {
       router.push(ROUTER_MAP.OPERATIONS);
-      toast.success('Справочник успешно создан');
+      toast.success('Создана');
     },
   });
 };
@@ -142,7 +142,7 @@ export const useUpdateOperation = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: OPERATIONS_QUERY_KEY });
       router.push(ROUTER_MAP.OPERATIONS);
-      toast.success('Операция обновлена');
+      toast.success('Обновлена');
     },
   });
 };
@@ -155,7 +155,7 @@ export const useDeleteOperation = (filters?: GetOperationsParams) => {
     mutationFn: (id: string) => OperationsService.delete(id),
 
     onSuccess: () => {
-      toast.success('Справочник удалён');
+      toast.success('Удалена');
 
       queryClient.invalidateQueries({
         queryKey: OPERATIONS_WITH_FILTERS_KEY(filters) as readonly unknown[],
@@ -172,7 +172,7 @@ export function useCopyOperation() {
 
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('Скопировано в буфер обмена');
+      toast.success('Скопировано');
       return true;
     } catch (err) {
       console.error('Ошибка при копировании:', err);

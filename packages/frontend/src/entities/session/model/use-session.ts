@@ -27,7 +27,7 @@ export const useDeactivateMySession = () => {
     mutationKey: SESSION_DELETE_MUTATION_KEY,
     mutationFn: (id: string) => SessionService.delete(id),
     onSuccess: () => {
-      toast.success('Сессия деактивирована');
+      toast.success('Деактивирована');
       queryClient.invalidateQueries({ queryKey: SESSIONS_QUERY_KEY });
       router.refresh?.();
     },

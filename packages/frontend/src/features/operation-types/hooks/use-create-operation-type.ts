@@ -12,7 +12,7 @@ export const useCreateOperationType = () => {
       OperationTypeService.createOperationType(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['operation-types'] });
-      toast.success(response.message || 'Тип операции успешно создан');
+      toast.success(response.message || 'Создан');
     },
   });
 };

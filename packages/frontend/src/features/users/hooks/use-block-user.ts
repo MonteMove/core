@@ -11,11 +11,7 @@ export function useBlockUser() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success(
-        data.blocked
-          ? `Пользователь заблокирован`
-          : `Пользователь разблокирован`,
-      );
+      toast.success(data.blocked ? `Заблокирован` : `Разблокирован`);
     },
   });
 }

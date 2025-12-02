@@ -10,7 +10,7 @@ export const useDeleteCurrency = () => {
     mutationFn: (id: string) => currencyApi.deleteCurrency(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success(response.message || 'Валюта успешно удалена');
+      toast.success(response.message || 'Удалена');
     },
   });
 };

@@ -12,7 +12,7 @@ export const useUpdateCurrency = () => {
       currencyApi.updateCurrency(id, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success(response.message || 'Валюта успешно обновлена');
+      toast.success(response.message || 'Обновлена');
     },
   });
 };

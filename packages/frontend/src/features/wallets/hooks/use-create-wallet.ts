@@ -23,7 +23,7 @@ export const useCreateWallet = () => {
       WalletService.createWallet(payload),
     onSuccess: (wallet) => {
       const walletName = wallet.name?.trim() || 'Кошелек';
-      toast.success(`"${walletName}" успешно создан`);
+      toast.success('Создан');
       queryClient.invalidateQueries({ queryKey: WALLETS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: PINNED_WALLETS_QUERY_KEY });
       router.push(ROUTER_MAP.WALLETS);

@@ -17,7 +17,7 @@ export const useCreateHelp = () => {
     mutationKey: ['help', 'create'],
     mutationFn: (data: CreateHelp) => HelpService.create(data),
     onSuccess: () => {
-      toast.success('Обращение успешно отправленно!');
+      toast.success('Отправленно');
       queryClient.invalidateQueries({ queryKey: ['help'] });
       router.push(ROUTER_MAP.HELP);
     },

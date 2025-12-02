@@ -13,7 +13,7 @@ export const useRestorePlatform = () => {
     mutationFn: (id: string) => PlatformService.restorePlatform(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
-      toast.success('Платформа успешно восстановлена');
+      toast.success('Восстановлена');
     },
   });
 };

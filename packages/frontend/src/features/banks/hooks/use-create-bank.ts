@@ -13,7 +13,7 @@ export const useCreateBank = () => {
     mutationFn: (data: CreateBankRequest) => BankService.createBank(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BANKS_QUERY_KEY });
-      toast.success('Банк успешно создан');
+      toast.success('Создан');
     },
   });
 };

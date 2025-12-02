@@ -14,7 +14,7 @@ export const useUpdatePlatform = () => {
       PlatformService.updatePlatform(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
-      toast.success('Платформа успешно обновлена');
+      toast.success('Обновлена');
     },
   });
 };

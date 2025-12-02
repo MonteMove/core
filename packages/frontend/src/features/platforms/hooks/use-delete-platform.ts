@@ -13,7 +13,7 @@ export const useDeletePlatform = () => {
     mutationFn: (id: string) => PlatformService.deletePlatform(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: PLATFORMS_QUERY_KEY });
-      toast.success('Платформа успешно удалена');
+      toast.success('Удалена');
     },
   });
 };

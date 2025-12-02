@@ -124,7 +124,7 @@ export const CryptoWalletCard = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success('Статус баланса обновлен');
+      toast.success('Обновлено');
     },
   });
 
@@ -139,9 +139,7 @@ export const CryptoWalletCard = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success(
-        wallet.active ? 'Кошелек деактивирован' : 'Кошелек активирован',
-      );
+      toast.success(wallet.active ? 'Деактивирован' : 'Активирован');
     },
   });
 
@@ -157,7 +155,7 @@ export const CryptoWalletCard = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success(wallet.visible ? 'Кошелек скрыт' : 'Кошелек показан');
+      toast.success(wallet.visible ? 'Скрыт' : 'Показан');
     },
   });
 
@@ -172,7 +170,7 @@ export const CryptoWalletCard = ({
       navigator.clipboard
         .writeText(copyText)
         .then(() => {
-          toast.success(`Реквизиты кошелька "${wallet.name}" скопированы`);
+          toast.success('Скопировано');
         })
         .catch((err) => {
           toast.error(`Не удалось скопировать: ${err}`);
@@ -187,7 +185,7 @@ export const CryptoWalletCard = ({
     navigator.clipboard
       .writeText(copyText)
       .then(() => {
-        toast.success(`Шаблон для "${wallet.name}" скопирован`);
+        toast.success('Скопировано');
       })
       .catch((err) => {
         toast.error(`Не удалось скопировать: ${err}`);
@@ -509,7 +507,7 @@ export const CryptoWalletCard = ({
             {wallet.visible ? 'Скрыть' : 'Показать'}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleTogglePinned}>
-            {wallet.pinned ? 'Открепить' : 'Закрепить'}
+            {wallet.pinned ? 'Убрать из быстрого доступа' : 'В быстрый доступ'}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleTogglePinOnMain}>
             {wallet.pinOnMain ? 'Открепить с главной' : 'Закрепить на главной'}

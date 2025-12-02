@@ -12,7 +12,7 @@ export const useCreateNetworkType = () => {
       networkTypeApi.createNetworkType(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['network-types'] });
-      toast.success(response.message || 'Тип сети успешно создан');
+      toast.success(response.message || 'Ссоздан');
     },
   });
 };

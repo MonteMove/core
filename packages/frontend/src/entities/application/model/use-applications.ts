@@ -37,7 +37,7 @@ export const useUpdateApplication = () => {
       ApplicationService.update(id, data),
     onSuccess: () => {
       router.push(ROUTER_MAP.APPLICATIONS);
-      toast.success('Заявка обновлена');
+      toast.success('Обновлён');
     },
   });
 };
@@ -49,7 +49,7 @@ export const useUpdateStatusApplication = () => {
     onSuccess: () => {
       // Инвалидируем кэш заявок для обновления списка
       queryClient.invalidateQueries({ queryKey: APPLICATION_QUERY_KEY });
-      toast.success('Статус заявки обновлён');
+      toast.success('Обновлён');
     },
   });
 };
@@ -120,7 +120,7 @@ export const useDeleteApplication = (filters?: GetApplicationsFilters) => {
     mutationFn: (id: number) => ApplicationService.delete(id),
 
     onSuccess: () => {
-      toast.success('Заявка удалена');
+      toast.success('Удалена');
 
       queryClient.invalidateQueries({
         queryKey: APPLICATIONS_WITH_FILTERS_KEY(filters) as readonly unknown[],
@@ -169,7 +169,7 @@ export function useCopyApplication() {
 
       try {
         await navigator.clipboard.writeText(text);
-        toast.success('Скопировано в буфер обмена');
+        toast.success('Скопировано');
         return true;
       } catch (err) {
         console.error('Ошибка при копировании:', err);

@@ -10,7 +10,7 @@ export const useRestoreCurrency = () => {
     mutationFn: (id: string) => currencyApi.restoreCurrency(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success(response.message || 'Валюта успешно восстановлена');
+      toast.success(response.message || 'Восстановлена');
     },
   });
 };

@@ -31,7 +31,7 @@ export const useBulkWalletActions = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success('Кошельки успешно обновлены');
+      toast.success('Обновлено');
     },
     onError: (error: unknown) => {
       const message = isAxiosError(error)
@@ -90,7 +90,7 @@ export const useBulkWalletActions = () => {
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['wallets'] });
         queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-        toast.success('Статус баланса обновлен');
+        toast.success('Обновлено');
       })
       .catch((error: unknown) => {
         const message = isAxiosError(error)

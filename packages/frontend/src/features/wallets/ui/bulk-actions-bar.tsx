@@ -122,7 +122,7 @@ export function BulkActionsBar({
             <DropdownMenuItem
               onSelect={() => handleAction(() => onTogglePinned(false))}
             >
-              Открепить
+              В быстрый доступ
             </DropdownMenuItem>
             <DropdownMenuItem
               onSelect={() => handleAction(() => onTogglePinOnMain(true))}

@@ -222,7 +222,9 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-6"
       >
-        <div className="grid gap-4 md:grid-cols-2">
+        <div
+          className={`grid gap-4 ${!isEditMode ? 'md:grid-cols-2' : 'grid-cols-1'}`}
+        >
           <FormField
             control={form.control}
             name="name"
@@ -239,34 +241,36 @@ export function WalletForm({ initialData, walletId }: WalletFormProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="amount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Сумма <span className="text-destructive">*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    value={
-                      typeof field.value === 'number'
-                        ? formatNumber(field.value)
-                        : String(field.value || '')
-                    }
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      const parsed = parseFormattedNumber(value);
-                      field.onChange(isNaN(parsed) ? 0 : parsed);
-                    }}
-                    placeholder="0"
-                    inputMode="numeric"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!isEditMode && (
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Сумма <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      value={
+                        typeof field.value === 'number'
+                          ? formatNumber(field.value)
+                          : String(field.value || '')
+                      }
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const parsed = parseFormattedNumber(value);
+                        field.onChange(isNaN(parsed) ? 0 : parsed);
+                      }}
+                      placeholder="0"
+                      inputMode="numeric"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
 
         <FormField

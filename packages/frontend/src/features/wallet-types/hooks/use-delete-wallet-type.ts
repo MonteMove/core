@@ -10,7 +10,7 @@ export const useDeleteWalletType = () => {
     mutationFn: (id: string) => walletTypeApi.deleteWalletType(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
-      toast.success(response.message || 'Тип кошелька успешно удалён');
+      toast.success(response.message || 'Удалён');
     },
   });
 };

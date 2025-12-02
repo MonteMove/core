@@ -12,7 +12,7 @@ export const useCreateCurrency = () => {
       currencyApi.createCurrency(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
-      toast.success(response.message || 'Валюта успешно создана');
+      toast.success(response.message || 'Создана');
     },
   });
 };

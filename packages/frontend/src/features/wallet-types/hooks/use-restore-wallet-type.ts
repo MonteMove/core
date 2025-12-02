@@ -13,7 +13,7 @@ export const useRestoreWalletType = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
-      toast.success('Тип кошелька восстановлен');
+      toast.success('Восстановлен');
     },
   });
 };

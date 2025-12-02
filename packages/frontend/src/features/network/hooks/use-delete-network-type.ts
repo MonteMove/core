@@ -10,7 +10,7 @@ export const useDeleteNetworkType = () => {
     mutationFn: (id: string) => networkApi.deleteNetworkType(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['network-types'] });
-      toast.success(response.message || 'Тип сети успешно удалён');
+      toast.success(response.message || 'Удалён');
     },
   });
 };

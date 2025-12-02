@@ -12,7 +12,7 @@ export const useRestoreOperationType = () => {
     mutationFn: (id: string) => OperationTypeService.restoreOperationType(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['operationTypes'] });
-      toast.success('Тип операции успешно восстановлен');
+      toast.success('Восстановлен');
     },
   });
 };

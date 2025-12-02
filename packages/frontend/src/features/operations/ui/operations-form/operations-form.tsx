@@ -4,7 +4,13 @@ import React from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, Trash2 } from 'lucide-react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import {
+  useFieldArray,
+  useForm,
+  useController,
+  Control,
+  FieldPath,
+} from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 
 import {
@@ -49,6 +55,56 @@ import {
   formatNumber,
   parseFormattedNumber,
 } from '@/shared/lib/utils/format-number';
+
+/** Компонент поля суммы, использует useController */
+const AmountInputField = ({
+  control,
+  name,
+}: {
+  control: Control<CreateOperationDto>;
+  name: `entries.${number}.amount`;
+}) => {
+  const { field } = useController({
+    control,
+    name,
+  });
+
+  const [displayValue, setDisplayValue] = React.useState(
+    field.value === 0 ? '0' : String(field.value ?? ''),
+  );
+
+  return (
+    <Input
+      type="text"
+      value={displayValue}
+      onFocus={() => {
+        if (displayValue === '0') setDisplayValue('');
+      }}
+      onChange={(e) => {
+        const v = e.target.value;
+
+        // Только цифры
+        if (!/^\d*$/.test(v)) return;
+
+        setDisplayValue(v);
+
+        if (v === '') {
+          field.onChange(0);
+          return;
+        }
+
+        field.onChange(Number(v));
+      }}
+      onBlur={() => {
+        if (displayValue === '') {
+          setDisplayValue('0');
+          field.onChange(0);
+        }
+      }}
+      placeholder="0"
+    />
+  );
+};
 
 export function OperationForm({
   initialData,
@@ -114,10 +170,39 @@ export function OperationForm({
           applicationId: undefined,
           description: '',
           conversionGroupId: null,
-          entries: [],
-          creatureDate: undefined,
+          entries: [
+            {
+              wallet: { id: '', name: '' },
+              direction: 'credit',
+              amount: 0,
+            },
+            {
+              wallet: { id: '', name: '' },
+              direction: 'debit',
+              amount: 0,
+            },
+          ],
+          creatureDate: new Date().toISOString(),
         },
   });
+
+  React.useEffect(() => {
+    if (!initialData) {
+      const today = new Date();
+      setRawInput(
+        String(today.getDate()).padStart(2, '0') +
+          '.' +
+          String(today.getMonth() + 1).padStart(2, '0') +
+          '.' +
+          today.getFullYear(),
+      );
+    } else {
+      // Если редактирование — покажем существующую дату в readable формате
+      if (initialData.createdAt) {
+        setRawInput(formatDate(new Date(initialData.createdAt)));
+      }
+    }
+  }, [initialData]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -240,7 +325,18 @@ export function OperationForm({
                   onValueChange={(value) => {
                     field.onChange(value);
                     if (!isEditing) {
-                      form.setValue('entries', []);
+                      form.setValue('entries', [
+                        {
+                          wallet: { id: '', name: '' },
+                          direction: 'credit',
+                          amount: 0,
+                        },
+                        {
+                          wallet: { id: '', name: '' },
+                          direction: 'debit',
+                          amount: 0,
+                        },
+                      ]);
                     }
                   }}
                   value={field.value || ''}
@@ -256,11 +352,15 @@ export function OperationForm({
                         Загрузка...
                       </SelectItem>
                     )}
-                    {operationTypes?.map((t) => (
-                      <SelectItem key={t.id} value={t.id}>
-                        {t.name}
-                      </SelectItem>
-                    ))}
+
+                    {operationTypes
+                      ?.slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </FormItem>
@@ -391,7 +491,6 @@ export function OperationForm({
                         }
                         onSelect={(date) => {
                           if (date) {
-                            // Создаем дату в UTC из выбранного дня, чтобы избежать смещения часовых поясов
                             const utcDate = new Date(
                               Date.UTC(
                                 date.getFullYear(),
@@ -475,31 +574,15 @@ export function OperationForm({
                 <FormField
                   control={form.control}
                   name={`entries.${realIndex}.amount`}
-                  render={({ field }) => (
+                  render={() => (
                     <FormItem className="w-[280px]">
                       <FormLabel>
                         Сумма <span className="text-destructive">*</span>
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          value={
-                            typeof field.value === 'number' && field.value !== 0
-                              ? formatNumber(field.value)
-                              : field.value === 0
-                                ? '0'
-                                : ''
-                          }
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || value === null) {
-                              field.onChange('');
-                              return;
-                            }
-                            const parsed = parseFormattedNumber(value);
-                            field.onChange(isNaN(parsed) ? '' : parsed);
-                          }}
-                          placeholder="0"
-                          inputMode="numeric"
+                        <AmountInputField
+                          control={form.control}
+                          name={`entries.${realIndex}.amount`}
                         />
                       </FormControl>
                       <FormMessage />
@@ -592,28 +675,15 @@ export function OperationForm({
                       <FormField
                         control={form.control}
                         name={`entries.${realIndex}.amount`}
-                        render={({ field }) => (
+                        render={() => (
                           <FormItem>
                             <FormLabel>
                               Сумма <span className="text-destructive">*</span>
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                type="number"
-                                {...field}
-                                value={field.value ?? ''}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || value === null) {
-                                    field.onChange('');
-                                    return;
-                                  }
-                                  const numValue = parseFloat(value);
-                                  field.onChange(
-                                    isNaN(numValue) ? '' : numValue,
-                                  );
-                                }}
-                                className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                              <AmountInputField
+                                control={form.control}
+                                name={`entries.${realIndex}.amount`}
                               />
                             </FormControl>
                             <FormMessage />

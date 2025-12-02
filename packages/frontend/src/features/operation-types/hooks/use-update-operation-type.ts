@@ -17,7 +17,7 @@ export const useUpdateOperationType = () => {
     }) => OperationTypeService.updateOperationType(id, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['operation-types'] });
-      toast.success(response.message || 'Тип операции успешно обновлен');
+      toast.success(response.message || 'Обновлен');
     },
   });
 };

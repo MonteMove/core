@@ -12,7 +12,7 @@ export const useUpdateNetwork = () => {
       networkApi.updateNetwork(id, data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
-      toast.success(response.message || 'Сеть успешно обновлена');
+      toast.success(response.message || 'Обновлена');
     },
   });
 };

@@ -13,7 +13,7 @@ export const useDeleteBank = () => {
     mutationFn: (id: string) => BankService.deleteBank(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BANKS_QUERY_KEY });
-      toast.success('Банк успешно удалён');
+      toast.success('Удалён');
     },
   });
 };

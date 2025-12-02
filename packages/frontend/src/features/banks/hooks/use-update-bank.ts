@@ -14,7 +14,7 @@ export const useUpdateBank = () => {
       BankService.updateBank(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BANKS_QUERY_KEY });
-      toast.success('Банк успешно обновлён');
+      toast.success('Обновлён');
     },
   });
 };

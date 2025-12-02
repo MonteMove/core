@@ -10,7 +10,7 @@ export const useRestoreNetworkType = () => {
     mutationFn: (id: string) => networkTypeApi.restoreNetworkType(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['network-types'] });
-      toast.success(response.message || 'Тип сети успешно восстановлен');
+      toast.success(response.message || 'Восстановлен');
     },
   });
 };

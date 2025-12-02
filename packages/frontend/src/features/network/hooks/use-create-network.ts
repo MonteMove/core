@@ -11,7 +11,7 @@ export const useCreateNetwork = () => {
     mutationFn: (data: CreateNetworkRequest) => networkApi.createNetwork(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
-      toast.success(response.message || 'Сеть успешно создана');
+      toast.success(response.message || 'Создана');
     },
   });
 };

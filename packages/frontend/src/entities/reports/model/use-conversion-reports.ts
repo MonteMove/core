@@ -19,7 +19,7 @@ export const useConversionReport = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      toast.success('Отчёт скачивается!');
+      toast.success('Скачивается!');
     },
   });
 };

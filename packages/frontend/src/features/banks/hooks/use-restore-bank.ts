@@ -13,7 +13,7 @@ export const useRestoreBank = () => {
     mutationFn: (id: string) => BankService.restoreBank(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BANKS_QUERY_KEY });
-      toast.success('Банк успешно восстановлен');
+      toast.success('Восстановлен');
     },
   });
 };

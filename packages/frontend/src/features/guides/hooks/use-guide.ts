@@ -40,7 +40,7 @@ export const useCreateGuide = () => {
     mutationFn: (data: CreateGuideRequest) => GuideService.create(data),
     onSuccess: () => {
       router.push(ROUTER_MAP.GUIDES);
-      toast.success('Справочник успешно создан');
+      toast.success('Создан');
     },
   });
 };
@@ -52,7 +52,7 @@ export const useUpdateGuide = () => {
       GuideService.update(id, data),
     onSuccess: () => {
       router.push(ROUTER_MAP.GUIDES);
-      toast.success('Справочник обновлён');
+      toast.success('Обновлён');
     },
   });
 };
@@ -141,7 +141,7 @@ export const useDeleteGuide = (filters?: GetGuidesParamsRequest) => {
     mutationFn: (id: string) => GuideService.delete(id),
 
     onSuccess: () => {
-      toast.success('Справочник удалён');
+      toast.success('Удалён');
 
       queryClient.invalidateQueries({
         queryKey: GUIDES_WITH_FILTERS_KEY(filters) as readonly unknown[],
@@ -177,7 +177,7 @@ export function useCopyGuide() {
 
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('Скопировано в буфер обмена');
+      toast.success('Скопировано');
       return true;
     } catch (err) {
       console.error('Ошибка при копировании:', err);

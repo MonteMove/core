@@ -20,10 +20,10 @@ export const copyHandler = (value: string | number | null) => {
   navigator.clipboard
     .writeText(str)
     .then(() => {
-      toast.success(`Успешно скопировано: ${str}`);
+      toast.success('Скопировано');
     })
     .catch((err) => {
-      toast.error(`Не удалось скопировать: ${err}`);
+      toast.error('Не удалось скопировать');
     });
 };
 

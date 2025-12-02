@@ -28,7 +28,7 @@ export const useLogin = () => {
       setToken(data.accessToken);
       setUser(data.user);
 
-      toast.success('Вход выполнен успешно');
+      toast.success('Успешно');
 
       const nextPath = searchParams.get('next');
       const redirectPath = nextPath || ROUTER_MAP.DASHBOARD;

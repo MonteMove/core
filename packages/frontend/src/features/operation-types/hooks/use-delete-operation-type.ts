@@ -10,7 +10,7 @@ export const useDeleteOperationType = () => {
     mutationFn: (id: string) => OperationTypeService.deleteOperationType(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['operation-types'] });
-      toast.success(response.message || 'Тип операции успешно удален');
+      toast.success(response.message || 'Удален');
     },
   });
 };

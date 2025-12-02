@@ -10,7 +10,7 @@ export const useRestoreNetwork = () => {
     mutationFn: (id: string) => networkApi.restoreNetwork(id),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['networks'] });
-      toast.success(response.message || 'Сеть успешно восстановлена');
+      toast.success(response.message || 'Восстановлена');
     },
   });
 };

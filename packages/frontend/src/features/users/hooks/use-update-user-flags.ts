@@ -20,7 +20,7 @@ export const useUpdateUserFlags = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Настройки пользователя обновлены');
+      toast.success('Обновлено');
     },
   });
 };

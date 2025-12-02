@@ -119,7 +119,7 @@ export const BankWalletCard = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success('Статус баланса обновлен');
+      toast.success('Обновлено');
     },
   });
 
@@ -134,9 +134,7 @@ export const BankWalletCard = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success(
-        wallet.active ? 'Кошелек деактивирован' : 'Кошелек активирован',
-      );
+      toast.success(wallet.active ? 'Деактивирован' : 'Активирован');
     },
   });
 
@@ -152,7 +150,7 @@ export const BankWalletCard = ({
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['wallet', wallet.id] });
       queryClient.invalidateQueries({ queryKey: ['pinnedWallets'] });
-      toast.success(wallet.visible ? 'Кошелек скрыт' : 'Кошелек показан');
+      toast.success(wallet.visible ? 'Скрыт' : 'Показан');
     },
   });
 
@@ -167,7 +165,7 @@ export const BankWalletCard = ({
       navigator.clipboard
         .writeText(copyText)
         .then(() => {
-          toast.success(`Реквизиты кошелька "${wallet.name}" скопированы`);
+          toast.success('Скопировано');
         })
         .catch((err) => {
           toast.error(`Не удалось скопировать: ${err}`);
@@ -429,7 +427,7 @@ export const BankWalletCard = ({
             {wallet.visible ? 'Скрыть' : 'Показать'}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleTogglePinned}>
-            {wallet.pinned ? 'Открепить' : 'Закрепить'}
+            {wallet.pinned ? 'Убрать из быстрого доступа' : 'В быстрый доступ'}
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={handleTogglePinOnMain}>
             {wallet.pinOnMain ? 'Открепить с главной' : 'Закрепить на главной'}

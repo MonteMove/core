@@ -12,7 +12,7 @@ export const useCreateWalletType = () => {
       walletTypeApi.createWalletType(data),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['wallet-types'] });
-      toast.success(response.message || 'Тип кошелька успешно создан');
+      toast.success(response.message || 'Создан');
     },
   });
 };

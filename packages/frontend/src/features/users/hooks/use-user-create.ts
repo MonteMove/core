@@ -13,7 +13,7 @@ export const useCreateUser = () => {
     mutationFn: (userData: RegisterRequest) => UserService.createUser(userData),
 
     onSuccess: (data) => {
-      toast.success(`Пользователь "${data.username}" создан успешно`);
+      toast.success('Создан');
     },
   });
 };
